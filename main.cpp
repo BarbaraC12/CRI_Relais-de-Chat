@@ -6,14 +6,14 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 12:19:46 by bcano             #+#    #+#             */
-/*   Updated: 2022/06/07 12:45:17 by bcano            ###   ########.fr       */
+/*   Updated: 2022/06/09 14:20:47 by bcano            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <iostream>
 #include <cstring>
 #include <cstdlib>
 #include <ctype.h>
+#include "irc.hpp"
 
 int    display_error(int type, const char *err, const char *message)
 {
@@ -28,14 +28,13 @@ int main(int argc, char **argv)
     std::string pwd("");
     
     if (argc != 3)
-        return (display_error(1, "Wrong numbers of Parameters","Usage: ./ircserv <port> <password>"));
-    for (int i ( 0 ); argv[1][i]; i++)
-        if (!(isdigit(argv[1][i])))
-            return (display_error(1, "Port must be a number", "Usage: ./ircserv <port> <password>"));
-    if (atoi(argv[1]) <= 0)
-        return (display_error(1, "Port must be strictly number", "Usage: ./ircserv <port> <password>"));
+        return (display_error(1, "Wrong numbers of Parameters", USAGE));
     port = atoi(argv[1]);
+    if (port < 0)
+        return (display_error(1, "Port must be strictly positive", USAGE));
     pwd = argv[2];
-    std::cout << port << " " << pwd << std::endl;
+    std::cout << "Port called: " << port << " - Password set:" << pwd << std::endl;
+    while (1)
+        ;
     return (0);
 }
