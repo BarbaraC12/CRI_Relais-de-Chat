@@ -6,7 +6,7 @@
 #    By: bcano <bcano@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/07 18:43:20 by bcano             #+#    #+#              #
-#    Updated: 2022/06/10 03:37:52 by anclarma         ###   ########.fr        #
+#    Updated: 2022/06/10 21:11:34 by anclarma         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,49 +25,62 @@ NAME		=	ircserv
 # ################################## #
 #               SOURCES              #
 # ################################## #
-# SRC_DIR		= 	./
-SRC			=	main.cpp 
+C_DIR		= srcs
+C_FILES		= main.cpp	\
+			  Server.cpp
+SRCS		= $(patsubst %, $(C_DIR)/%, $(C_FILES))
 
 # ################################## #
 #               OBJECTS              #
 # ################################## #
-OBJ_DIR		=	./
-OBJ			=	${SRC:.cpp=.o}
-OBJ			:=	${addprefix ${OBJ_DIR}, ${OBJ}}
-DEP			=	${OBJ:.o=.d}
+O_DIR		= objs
+O_FILES		= $(C_FILES:.cpp=.o)
+OBJS		= $(patsubst %, $(O_DIR)/%, $(O_FILES))
 
 # ################################## #
 #                FLAGS               #
 # ################################## #
-CXXFLAGS		=	-Wall -Wextra -Werror 
-CXXFLAGS		+=	-MMD -MP 
-CXXFLAGS		+=	-std=c++98
-# CXXFLAGS		+=	-I ./
+CXXFLAGS	= -Wall -Wextra -Werror -MMD -MP
+CXXFLAGS	+= -std=c++98
+LFLAGS		= 
+CINCLUDES	= -I ./includes
+CLIBS		= 
 
 # ################################## #
 #                RULES               #
 # ################################## #
 
-${OBJ}%.o: ${SRC}%.cpp
-	@${MKDIR} ${@D}
-	${CXX} ${CXXFLAGS}
+$(O_DIR)/%.o: $(C_DIR)/%.cpp
+			$(CXX) $(CXXFLAGS) $(CINCLUDES) -c $< -o $@
 
-${NAME}: ${OBJ}
-	${CXX} ${CXXFLAGS} ${OBJ} -o $@
+all:		$(NAME)
 
-all:	${NAME}
-
+check:	fclean
+check:	CXXFLAGS	+=  -Weffc++ -pedantic
+check:	CXXFLAGS	+=  -fsanitize=address
+check:	CXXFLAGS	+=  -fsanitize=leak
+check:	CXXFLAGS	+=  -fsanitize=undefined
+check:	CXXFLAGS	+=  -g3
+check:	LFLAGS		+=  -fsanitize=address
+check:	LFLAGS		+=  -fsanitize=leak
+check:	LFLAGS		+=  -fsanitize=undefined
+check:	LFLAGS		+=  -g3
 check:	${NAME}
 
+$(NAME):	$(O_DIR) $(OBJS)
+			$(CXX) $(OBJS) $(LFLAGS) $(CLIBS) -o $@
+
+$(O_DIR):
+			$(MKDIR) $(O_DIR)
+
 clean:
-	${RM} ${OBJ} ${DEP}
+			$(RM) $(O_DIR)
 
-fclean: clean
-	${RM} ${NAME}
+fclean:		clean
+			$(RM) $(NAME)
 
-re: fclean all
+re:			fclean all
 
+-include	$(OBJS:.o=.d)
 
--include ${DEP}
-
-.PHONY: all clean fclean re
+.PHONY: all check clean fclean re

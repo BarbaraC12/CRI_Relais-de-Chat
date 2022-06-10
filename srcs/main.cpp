@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 12:19:46 by bcano             #+#    #+#             */
-/*   Updated: 2022/06/07 12:45:17 by bcano            ###   ########.fr       */
+/*   Updated: 2022/06/10 20:47:17 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <ctype.h>
+#include "Server.hpp"
 
 int    display_error(int type, const char *err, const char *message)
 {
