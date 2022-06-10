@@ -6,21 +6,22 @@
 #    By: bcano <bcano@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/07 18:43:20 by bcano             #+#    #+#              #
-#    Updated: 2022/06/10 21:11:34 by anclarma         ###   ########.fr        #
+#    Updated: 2022/06/10 21:24:20 by anclarma         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 # ################################## #
 #               COMMAND              #
 # ################################## #
-CXX			=	c++
-MKDIR		=	mkdir -p
-RM			=	rm -rf
+CXX			= c++
+MKDIR		= mkdir -p
+RM			= rm -rf
+UNAME		= $(shell uname)
 
 # ################################## #
 #              EXEC NAME             #
 # ################################## #
-NAME		=	ircserv
+NAME		= ircserv
 
 # ################################## #
 #               SOURCES              #
@@ -58,11 +59,9 @@ all:		$(NAME)
 check:	fclean
 check:	CXXFLAGS	+=  -Weffc++ -pedantic
 check:	CXXFLAGS	+=  -fsanitize=address
-check:	CXXFLAGS	+=  -fsanitize=leak
 check:	CXXFLAGS	+=  -fsanitize=undefined
 check:	CXXFLAGS	+=  -g3
 check:	LFLAGS		+=  -fsanitize=address
-check:	LFLAGS		+=  -fsanitize=leak
 check:	LFLAGS		+=  -fsanitize=undefined
 check:	LFLAGS		+=  -g3
 check:	${NAME}
