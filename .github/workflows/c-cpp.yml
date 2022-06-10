@@ -8,10 +8,10 @@ on:
 
 jobs:
   build:
-  
+
     runs-on: ${{ matrix.os }}
-    strategy:                                                                   
-      matrix:                                                                   
+    strategy:
+      matrix:
         os: [ubuntu-20.04, ubuntu-latest, macos-11]
 
     steps:
