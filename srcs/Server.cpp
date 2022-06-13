@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/13 18:24:21 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/13 19:18:43 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,8 @@ Server::Server(int const &port, std::string const &passwd) :
 	_port(port),
 	_passwd(passwd),
 	_listen_sd(-1),
-	_fds()
+	_fds(),
+	_ndfs(0)
 {
 	return ;
 }
@@ -32,7 +33,8 @@ Server::Server(void) :
 	_port(),
 	_passwd(),
 	_listen_sd(-1),
-	_fds()
+	_fds(),
+	_ndfs(0)
 {
 	return ;
 }
@@ -41,7 +43,8 @@ Server::Server(Server const &src) :
 	_port(),
 	_passwd(),
 	_listen_sd(-1),
-	_fds()
+	_fds(),
+	_ndfs(0)
 {
 	*this = src;
 	return ;
@@ -49,6 +52,11 @@ Server::Server(Server const &src) :
 
 Server::~Server(void)
 {
+	for (int i = 0; i < this->_ndfs; i++)
+	{
+		if (this->_fds[i].fd >= 0)
+			close(this->_fds[i].fd);
+	}
 	return ;
 }
 
@@ -127,6 +135,48 @@ int	Server::listen(void)
 		std::cerr << "listen() failed" << std::endl;
 		close(this->_listen_sd);
 		return (-1);
+	}
+	return (0);
+}
+
+int	Server::poll_loop(void)
+{
+	int	ret;
+	int	end_server;
+	
+	this->_fds[0].fd = this->_listen_sd;
+	this->_fds[0].events = POLLIN;
+	this->_ndfs++;
+	end_server = 0;
+	while (end_server == 0)
+	{
+		ret = poll(this->_fds.data(), this->_ndfs, -1);
+		if (ret < 0)
+		{
+			std::cerr << "poll() failed" << std::endl;
+			return (-1);
+		}
+		if (ret == 0)
+		{
+			std::cerr << "poll() timed out" << std::endl;
+			return (-1);
+		}
+		for (int i = 0, current_size = this->_ndfs; i < current_size; i++)
+		{
+			if (this->_fds[i].revents == 0)
+				continue;
+			if (this->_fds[i].revents != POLLIN)
+			{
+				std::cerr << "Error! revents = " << this->_fds[i].revents
+					<< std::endl;
+				end_server = 1;
+				break;
+			}
+			if (this->_fds[i].fd == this->_listen_sd)
+			{
+				//line 166
+			}
+		}
 	}
 	return (0);
 }
