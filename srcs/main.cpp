@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 12:19:46 by bcano             #+#    #+#             */
-/*   Updated: 2022/06/10 20:47:17 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/13 21:32:07 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,5 +38,11 @@ int main(int argc, char **argv)
     port = atoi(argv[1]);
     pwd = argv[2];
     std::cout << port << " " << pwd << std::endl;
+	Server	s(port, pwd);
+	s.create_sock();
+	s.set_sock();
+	s.bind_sock();
+	s.listen();
+	s.poll_loop();
     return (0);
 }
