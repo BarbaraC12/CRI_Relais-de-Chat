@@ -6,7 +6,7 @@
 #    By: bcano <bcano@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/07 18:43:20 by bcano             #+#    #+#              #
-#    Updated: 2022/06/10 21:24:20 by anclarma         ###   ########.fr        #
+#    Updated: 2022/06/13 18:22:53 by anclarma         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -51,12 +51,10 @@ CLIBS		=
 #                RULES               #
 # ################################## #
 
-$(O_DIR)/%.o: $(C_DIR)/%.cpp
-			$(CXX) $(CXXFLAGS) $(CINCLUDES) -c $< -o $@
-
 all:		$(NAME)
 
 check:	fclean
+check:	CXX			=  g++
 check:	CXXFLAGS	+=  -Weffc++ -pedantic
 check:	CXXFLAGS	+=  -fsanitize=address
 check:	CXXFLAGS	+=  -fsanitize=undefined
@@ -68,6 +66,9 @@ check:	${NAME}
 
 $(NAME):	$(O_DIR) $(OBJS)
 			$(CXX) $(OBJS) $(LFLAGS) $(CLIBS) -o $@
+
+$(O_DIR)/%.o: $(C_DIR)/%.cpp
+			$(CXX) $(CXXFLAGS) $(CINCLUDES) -c $< -o $@
 
 $(O_DIR):
 			$(MKDIR) $(O_DIR)
