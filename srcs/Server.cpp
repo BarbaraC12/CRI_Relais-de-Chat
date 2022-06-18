@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/19 01:35:42 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/19 01:42:36 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ Server	&Server::operator=(Server const &rhs)
 
 int	Server::create_sock(void)
 {
-	this->_listen_sd = socket(AF_INET, SOCK_STREAM, 0);
+	this->_listen_sd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
 	if (this->_listen_sd < 0)
 	{
 		std::cerr << "socket() failed" << std::endl;
