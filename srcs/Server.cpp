@@ -6,12 +6,13 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/13 21:59:57 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/19 01:35:42 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
 #include <unistd.h>
+#include <fcntl.h>
 #include <sys/ioctl.h>
 #include <sys/poll.h>
 #include <sys/socket.h>
@@ -95,7 +96,7 @@ int	Server::set_sock(void)
 		close(this->_listen_sd);
 		return (-1);
 	}
-#if 1
+#if 0
 	ret = ioctl(this->_listen_sd, FIONBIO, &on);
 	if (ret < 0)
 	{
@@ -103,6 +104,8 @@ int	Server::set_sock(void)
 		close(this->_listen_sd);
 		return (-1);
 	}
+#else
+	fcntl(this->_listen_sd, F_SETFL, O_NONBLOCK);
 #endif
 	return (0);
 }
@@ -246,7 +249,6 @@ int	Server::poll_loop(void)
 				}
 			}
 		}
-		///////////////////////////////////
 		if (compress_array)
 		{
 			compress_array = 0;
