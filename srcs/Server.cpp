@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/19 17:52:16 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/19 19:14:07 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,10 @@
 #include <cstring>
 #include <errno.h>
 #include "Server.hpp"
+
+#ifndef SOCK_NONBLOCK
+# define SOCK_NONBLOCK O_NONBLOCK
+#endif
 
 Server::Server(int const &port, std::string const &passwd) :
 	_port(port),
