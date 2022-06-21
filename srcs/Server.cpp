@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/21 22:18:11 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/21 22:24:47 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -228,7 +228,7 @@ int Server::poll(int timeout)
 	int	ret;
 
 	std::clog << this->logtime() << "Waiting on poll()..." << std::endl;
-	ret = ::poll(this->_fds.data(), this->_ndfs, timeout);
+	ret = ::poll(this->_fds.data(), static_cast<nfds_t>(this->_ndfs), timeout);
 	if (ret < 0)
 	{
 		std::clog << this->logtime() << "poll() failed" << std::endl;
