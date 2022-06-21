@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/21 20:17:36 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/21 20:40:32 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 #include <unistd.h>
 
 #ifndef SOCK_NONBLOCK
-#	define SOCK_NONBLOCK O_NONBLOCK
+# define SOCK_NONBLOCK O_NONBLOCK
 #endif
 
 Server::Server(int const &port, std::string const &passwd)
@@ -77,8 +77,8 @@ int Server::create_sock(void)
 
 int Server::set_sock(void)
 {
-	int on;
-	int ret;
+	int	on;
+	int	ret;
 
 	on = 1;
 	ret =
@@ -101,7 +101,7 @@ int Server::set_sock(void)
 
 int Server::bind_sock(void)
 {
-	sockaddr_in addr;
+	sockaddr_in	addr;
 	int			ret;
 
 	memset(&addr, 0, sizeof(addr));
@@ -120,7 +120,7 @@ int Server::bind_sock(void)
 
 int Server::listen(void)
 {
-	int ret;
+	int	ret;
 
 	ret = ::listen(this->_listen_sd, 32);
 	if (ret < 0)
@@ -134,8 +134,8 @@ int Server::listen(void)
 
 int Server::receiving(int fd)
 {
-	int	 ret;
-	char buffer[80];
+	int		ret;
+	char	buffer[80];
 
 	ret = recv(fd, buffer, sizeof(buffer), 0);
 	if (ret < 0)
@@ -164,7 +164,7 @@ int Server::receiving(int fd)
 
 int Server::receive_loop(int fd_index)
 {
-	int close_conn;
+	int	close_conn;
 
 	close_conn = 0;
 	std::cout << "Descriptor " << this->_fds[fd_index].fd << " is readable\n"
@@ -182,7 +182,7 @@ int Server::receive_loop(int fd_index)
 
 int Server::listening(void)
 {
-	int new_sd;
+	int	new_sd;
 
 	new_sd = 0;
 	std::cout << "Listening socket is readable" << std::endl;
@@ -222,7 +222,7 @@ void Server::compress_array(void)
 
 int Server::poll(int timeout)
 {
-	int ret;
+	int	ret;
 
 	std::cout << "Waiting on poll()..." << std::endl;
 	ret = ::poll(this->_fds.data(), this->_ndfs, timeout);
@@ -241,8 +241,8 @@ int Server::poll(int timeout)
 
 int Server::poll_loop(void)
 {
-	int end_server;
-	int compress_array;
+	int	end_server;
+	int	compress_array;
 
 	this->_fds[0].fd = this->_listen_sd;
 	this->_fds[0].events = POLLIN;

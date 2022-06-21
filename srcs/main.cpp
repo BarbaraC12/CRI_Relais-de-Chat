@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 12:19:46 by bcano             #+#    #+#             */
-/*   Updated: 2022/06/19 19:14:19 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/21 20:40:49 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ int display_error(int type, const char *err, const char *message)
 int main(int argc, char **argv)
 {
 	int			port = 0;
-	std::string pwd("");
+	std::string	pwd("");
 
 	if (argc != 3)
 		return (display_error(1, "Wrong numbers of Parameters",
