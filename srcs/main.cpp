@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 12:19:46 by bcano             #+#    #+#             */
-/*   Updated: 2022/06/21 20:40:49 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/21 21:57:53 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ int display_error(int type, const char *err, const char *message)
 
 int main(int argc, char **argv)
 {
-	int			port = 0;
+	uint16_t	port = 0;
 	std::string	pwd("");
 
 	if (argc != 3)
@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 	if (atoi(argv[1]) <= 0)
 		return (display_error(1, "Port must be strictly number",
 							  "Usage: ./ircserv <port> <password>"));
-	port = atoi(argv[1]);
+	port = static_cast<uint16_t>(atoi(argv[1]));
 	pwd = argv[2];
 	std::cout << port << " " << pwd << std::endl;
 	Server s(port, pwd);

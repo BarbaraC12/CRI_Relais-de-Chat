@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/21 21:34:18 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/21 22:18:11 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@
 # define SOCK_NONBLOCK O_NONBLOCK
 #endif
 
-Server::Server(int const &port, std::string const &passwd)
+Server::Server(uint16_t &port, std::string const &passwd)
 	: _port(port), _passwd(passwd), _listen_sd(-1), _fds(200), _ndfs(0)
 {
 	return;
@@ -47,7 +47,7 @@ Server::Server(Server const &src)
 
 Server::~Server(void)
 {
-	for (int i = 0; i < this->_ndfs; i++)
+	for (std::vector<pollfd>::size_type i = 0; i < this->_ndfs; i++)
 	{
 		if (this->_fds[i].fd >= 0)
 			close(this->_fds[i].fd);
@@ -135,7 +135,7 @@ int Server::listen(void)
 
 int Server::receiving(int fd)
 {
-	int		ret;
+	ssize_t	ret;
 	char	buffer[80];
 
 	memset(buffer,'\0',80);
@@ -155,7 +155,7 @@ int Server::receiving(int fd)
 		return (-1);
 	}
 	std::clog << this->logtime() << "receiving: " << buffer << std::endl;
-	ret = send(fd, buffer, ret, 0);
+	ret = send(fd, buffer, static_cast<size_t>(ret), 0);
 	if (ret < 0)
 	{
 		std::clog << this->logtime() << "send() failed" << std::endl;
@@ -164,7 +164,7 @@ int Server::receiving(int fd)
 	return (0);
 }
 
-int Server::receive_loop(int fd_index)
+int Server::receive_loop(std::vector<pollfd>::size_type fd_index)
 {
 	int	close_conn;
 
@@ -211,11 +211,11 @@ int Server::listening(void)
 
 void Server::compress_array(void)
 {
-	for (int i = 0; i < this->_ndfs; i++)
+	for (std::vector<pollfd>::size_type i = 0; i < this->_ndfs; i++)
 	{
 		if (this->_fds[i].fd == -1)
 		{
-			for (int j = i; j < this->_ndfs - 1; j++)
+			for (std::vector<pollfd>::size_type j = i; j < this->_ndfs - 1; j++)
 				this->_fds[j].fd = this->_fds[j + 1].fd;
 			i--;
 			this->_ndfs--;
@@ -256,7 +256,7 @@ int Server::poll_loop(void)
 		compress_array = 0;
 		if (this->poll(-1))
 			return (-1);
-		for (int i = 0, current_size = this->_ndfs; i < current_size; i++)
+		for (std::vector<pollfd>::size_type i = 0, current_size = this->_ndfs; i < current_size; i++)
 		{
 			if (this->_fds[i].revents == 0)
 				continue;

@@ -6,7 +6,7 @@
 #    By: bcano <bcano@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/07 18:43:20 by bcano             #+#    #+#              #
-#    Updated: 2022/06/13 18:22:53 by anclarma         ###   ########.fr        #
+#    Updated: 2022/06/21 22:21:30 by anclarma         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -53,16 +53,16 @@ CLIBS		=
 
 all:		$(NAME)
 
-check:	fclean
 check:	CXX			=  g++
 check:	CXXFLAGS	+=  -Weffc++ -pedantic
+check:	CXXFLAGS	+=  -Wconversion
 check:	CXXFLAGS	+=  -fsanitize=address
 check:	CXXFLAGS	+=  -fsanitize=undefined
 check:	CXXFLAGS	+=  -g3
 check:	LFLAGS		+=  -fsanitize=address
 check:	LFLAGS		+=  -fsanitize=undefined
 check:	LFLAGS		+=  -g3
-check:	${NAME}
+check:	fclean $(NAME)
 
 $(NAME):	$(O_DIR) $(OBJS)
 			$(CXX) $(OBJS) $(LFLAGS) $(CLIBS) -o $@
