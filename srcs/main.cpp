@@ -6,10 +6,11 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 12:19:46 by bcano             #+#    #+#             */
-/*   Updated: 2022/06/21 18:59:55 by bcano            ###   ########.fr       */
+/*   Updated: 2022/06/19 19:14:19 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <iostream>
 #include <cstring>
 #include <cstdlib>
 #include <ctype.h>
@@ -28,10 +29,13 @@ int main(int argc, char **argv)
     std::string pwd("");
     
     if (argc != 3)
-        return (display_error(1, "Wrong numbers of Parameters", USAGE));
+        return (display_error(1, "Wrong numbers of Parameters","Usage: ./ircserv <port> <password>"));
+    for (int i ( 0 ); argv[1][i]; i++)
+        if (!(isdigit(argv[1][i])))
+            return (display_error(1, "Port must be a number", "Usage: ./ircserv <port> <password>"));
+    if (atoi(argv[1]) <= 0)
+        return (display_error(1, "Port must be strictly number", "Usage: ./ircserv <port> <password>"));
     port = atoi(argv[1]);
-    if (port < 0)
-        return (display_error(1, "Port must be strictly positive", USAGE));
     pwd = argv[2];
     std::cout << port << " " << pwd << std::endl;
 	Server	s(port, pwd);
