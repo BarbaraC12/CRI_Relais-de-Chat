@@ -6,55 +6,42 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/21 18:08:27 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/21 20:17:36 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <iostream>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <sys/poll.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
+#include "Server.hpp"
 #include <cstring>
 #include <errno.h>
-#include "Server.hpp"
+#include <fcntl.h>
+#include <iostream>
+#include <netinet/in.h>
+#include <sys/ioctl.h>
+#include <sys/poll.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #ifndef SOCK_NONBLOCK
-# define SOCK_NONBLOCK O_NONBLOCK
+#	define SOCK_NONBLOCK O_NONBLOCK
 #endif
 
-Server::Server(int const &port, std::string const &passwd) :
-	_port(port),
-	_passwd(passwd),
-	_listen_sd(-1),
-	_fds(200),
-	_ndfs(0)
+Server::Server(int const &port, std::string const &passwd)
+	: _port(port), _passwd(passwd), _listen_sd(-1), _fds(200), _ndfs(0)
 {
-	return ;
+	return;
 }
 
-Server::Server(void) :
-	_port(),
-	_passwd(),
-	_listen_sd(-1),
-	_fds(200),
-	_ndfs(0)
+Server::Server(void) : _port(), _passwd(), _listen_sd(-1), _fds(200), _ndfs(0)
 {
-	return ;
+	return;
 }
 
-Server::Server(Server const &src) :
-	_port(),
-	_passwd(),
-	_listen_sd(-1),
-	_fds(200),
-	_ndfs(0)
+Server::Server(Server const &src)
+	: _port(), _passwd(), _listen_sd(-1), _fds(200), _ndfs(0)
 {
 	*this = src;
-	return ;
+	return;
 }
 
 Server::~Server(void)
@@ -64,10 +51,10 @@ Server::~Server(void)
 		if (this->_fds[i].fd >= 0)
 			close(this->_fds[i].fd);
 	}
-	return ;
+	return;
 }
 
-Server	&Server::operator=(Server const &rhs)
+Server &Server::operator=(Server const &rhs)
 {
 	if (this != &rhs)
 	{
@@ -77,7 +64,7 @@ Server	&Server::operator=(Server const &rhs)
 	return (*this);
 }
 
-int	Server::create_sock(void)
+int Server::create_sock(void)
 {
 	this->_listen_sd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
 	if (this->_listen_sd < 0)
@@ -88,13 +75,14 @@ int	Server::create_sock(void)
 	return (0);
 }
 
-int	Server::set_sock(void)
+int Server::set_sock(void)
 {
-	int	on;
-	int	ret;
+	int on;
+	int ret;
 
 	on = 1;
-	ret = setsockopt(this->_listen_sd, SOL_SOCKET,  SO_REUSEADDR, &on, sizeof(on));
+	ret =
+		setsockopt(this->_listen_sd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
 	if (ret < 0)
 	{
 		std::cerr << "setsockopt() failed" << std::endl;
@@ -111,10 +99,10 @@ int	Server::set_sock(void)
 	return (0);
 }
 
-int	Server::bind_sock(void)
+int Server::bind_sock(void)
 {
 	sockaddr_in addr;
-	int	ret;
+	int			ret;
 
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
@@ -130,9 +118,9 @@ int	Server::bind_sock(void)
 	return (0);
 }
 
-int	Server::listen(void)
+int Server::listen(void)
 {
-	int	ret;
+	int ret;
 
 	ret = ::listen(this->_listen_sd, 32);
 	if (ret < 0)
@@ -144,10 +132,10 @@ int	Server::listen(void)
 	return (0);
 }
 
-int	Server::receiving(int fd)
+int Server::receiving(int fd)
 {
-	int		ret;
-	char	buffer[80];
+	int	 ret;
+	char buffer[80];
 
 	ret = recv(fd, buffer, sizeof(buffer), 0);
 	if (ret < 0)
@@ -174,13 +162,13 @@ int	Server::receiving(int fd)
 	return (0);
 }
 
-int	Server::receive_loop(int fd_index)
+int Server::receive_loop(int fd_index)
 {
-	int	close_conn;
+	int close_conn;
 
 	close_conn = 0;
 	std::cout << "Descriptor " << this->_fds[fd_index].fd << " is readable\n"
-		<< std::endl;
+			  << std::endl;
 	if (this->receiving(this->_fds[fd_index].fd) == -1)
 		close_conn = 1;
 	if (close_conn)
@@ -192,9 +180,9 @@ int	Server::receive_loop(int fd_index)
 	return (0);
 }
 
-int	Server::listening(void)
+int Server::listening(void)
 {
-	int	new_sd;
+	int new_sd;
 
 	new_sd = 0;
 	std::cout << "Listening socket is readable" << std::endl;
@@ -218,13 +206,13 @@ int	Server::listening(void)
 	return (0);
 }
 
-void	Server::compress_array(void)
+void Server::compress_array(void)
 {
 	for (int i = 0; i < this->_ndfs; i++)
 	{
 		if (this->_fds[i].fd == -1)
 		{
-			for(int j = i; j < this->_ndfs - 1; j++)
+			for (int j = i; j < this->_ndfs - 1; j++)
 				this->_fds[j].fd = this->_fds[j + 1].fd;
 			i--;
 			this->_ndfs--;
@@ -232,9 +220,9 @@ void	Server::compress_array(void)
 	}
 }
 
-int	Server::poll(int timeout)
+int Server::poll(int timeout)
 {
-	int	ret;
+	int ret;
 
 	std::cout << "Waiting on poll()..." << std::endl;
 	ret = ::poll(this->_fds.data(), this->_ndfs, timeout);
@@ -251,10 +239,10 @@ int	Server::poll(int timeout)
 	return (0);
 }
 
-int	Server::poll_loop(void)
+int Server::poll_loop(void)
 {
-	int	end_server;
-	int	compress_array;
+	int end_server;
+	int compress_array;
 
 	this->_fds[0].fd = this->_listen_sd;
 	this->_fds[0].events = POLLIN;
@@ -272,7 +260,7 @@ int	Server::poll_loop(void)
 			if (this->_fds[i].revents != POLLIN)
 			{
 				std::cerr << "Error! revents = " << this->_fds[i].revents
-					<< std::endl;
+						  << std::endl;
 				end_server = 1;
 				break;
 			}
