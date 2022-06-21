@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/19 19:14:07 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/21 18:08:27 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,17 +101,13 @@ int	Server::set_sock(void)
 		close(this->_listen_sd);
 		return (-1);
 	}
-#if 0
-	ret = ioctl(this->_listen_sd, FIONBIO, &on);
+	ret = fcntl(this->_listen_sd, F_SETFL, O_NONBLOCK);
 	if (ret < 0)
 	{
-		std::cerr << "ioctl() failed" << std::endl;
+		std::cerr << "fcntl() failed" << std::endl;
 		close(this->_listen_sd);
 		return (-1);
 	}
-#else
-	fcntl(this->_listen_sd, F_SETFL, O_NONBLOCK);
-#endif
 	return (0);
 }
 
@@ -148,36 +144,129 @@ int	Server::listen(void)
 	return (0);
 }
 
-int	Server::poll_loop(void)
+int	Server::receiving(int fd)
+{
+	int		ret;
+	char	buffer[80];
+
+	ret = recv(fd, buffer, sizeof(buffer), 0);
+	if (ret < 0)
+	{
+		if (errno != EWOULDBLOCK)
+		{
+			std::cerr << "recv() failed" << std::endl;
+			return (-1);
+		}
+		return (1);
+	}
+	if (ret == 0)
+	{
+		std::cout << "Connection closed" << std::endl;
+		return (-1);
+	}
+	std::cout << ret << " bytes received" << std::endl;
+	ret = send(fd, buffer, ret, 0);
+	if (ret < 0)
+	{
+		std::cerr << "send() failed" << std::endl;
+		return (-1);
+	}
+	return (0);
+}
+
+int	Server::receive_loop(int fd_index)
+{
+	int	close_conn;
+
+	close_conn = 0;
+	std::cout << "Descriptor " << this->_fds[fd_index].fd << " is readable\n"
+		<< std::endl;
+	if (this->receiving(this->_fds[fd_index].fd) == -1)
+		close_conn = 1;
+	if (close_conn)
+	{
+		close(this->_fds[fd_index].fd);
+		this->_fds[fd_index].fd = -1;
+		return (1);
+	}
+	return (0);
+}
+
+int	Server::listening(void)
+{
+	int	new_sd;
+
+	new_sd = 0;
+	std::cout << "Listening socket is readable" << std::endl;
+	while (new_sd != -1)
+	{
+		new_sd = accept(this->_listen_sd, NULL, NULL);
+		if (new_sd < 0)
+		{
+			if (errno != EWOULDBLOCK)
+			{
+				std::cerr << "accept() failed" << std::endl;
+				return (1);
+			}
+			return (0);
+		}
+		std::cout << "New incoming connection - " << new_sd << std::endl;
+		this->_fds[this->_ndfs].fd = new_sd;
+		this->_fds[this->_ndfs].events = POLLIN;
+		this->_ndfs++;
+	}
+	return (0);
+}
+
+void	Server::compress_array(void)
+{
+	for (int i = 0; i < this->_ndfs; i++)
+	{
+		if (this->_fds[i].fd == -1)
+		{
+			for(int j = i; j < this->_ndfs - 1; j++)
+				this->_fds[j].fd = this->_fds[j + 1].fd;
+			i--;
+			this->_ndfs--;
+		}
+	}
+}
+
+int	Server::poll(int timeout)
 {
 	int	ret;
+
+	std::cout << "Waiting on poll()..." << std::endl;
+	ret = ::poll(this->_fds.data(), this->_ndfs, timeout);
+	if (ret < 0)
+	{
+		std::cerr << "poll() failed" << std::endl;
+		return (-1);
+	}
+	if (ret == 0)
+	{
+		std::cerr << "poll() timed out" << std::endl;
+		return (-1);
+	}
+	return (0);
+}
+
+int	Server::poll_loop(void)
+{
 	int	end_server;
 	int	compress_array;
 
-	compress_array = 0;
 	this->_fds[0].fd = this->_listen_sd;
 	this->_fds[0].events = POLLIN;
 	this->_ndfs++;
 	end_server = 0;
 	while (end_server == 0)
 	{
-		std::cout << "Waiting on poll()..." << std::endl;
-		ret = poll(this->_fds.data(), this->_ndfs, -1);
-		if (ret < 0)
-		{
-			std::cerr << "poll() failed" << std::endl;
+		compress_array = 0;
+		if (this->poll(-1))
 			return (-1);
-		}
-		if (ret == 0)
-		{
-			std::cerr << "poll() timed out" << std::endl;
-			return (-1);
-		}
 		for (int i = 0, current_size = this->_ndfs; i < current_size; i++)
 		{
-			int		close_conn;
-			
-			close_conn = 0;
 			if (this->_fds[i].revents == 0)
 				continue;
 			if (this->_fds[i].revents != POLLIN)
@@ -189,85 +278,14 @@ int	Server::poll_loop(void)
 			}
 			if (this->_fds[i].fd == this->_listen_sd)
 			{
-				std::cout << "Listening socket is readable" << std::endl;
-				int	new_sd;
-
-				new_sd = 0;
-				while (new_sd != -1)
-				{
-					new_sd = accept(this->_listen_sd, NULL, NULL);
-					if (new_sd < 0)
-					{
-						if (errno != EWOULDBLOCK)
-						{
-							std::cerr << "accept() failed" << std::endl;
-							end_server = 1;
-						}
-						break;
-					}
-					std::cout << "New incoming connection - " << new_sd
-						<< std::endl;
-					this->_fds[this->_ndfs].fd = new_sd;
-					this->_fds[this->_ndfs].events = POLLIN;
-					this->_ndfs++;
-				}
+				if (this->listening())
+					end_server = 1;
 			}
-			else
-			{
-				char	buffer[80];
-
-				std::cout << "Descriptor " << this->_fds[i].fd
-					<< " is readable\n" << std::endl;
-				close_conn = 0;
-				while (1)
-				{
-					ret = recv(this->_fds[i].fd, buffer, sizeof(buffer), 0);
-					if (ret < 0)
-					{
-						if (errno != EWOULDBLOCK)
-						{
-							std::cerr << "recv() failed" << std::endl;
-							close_conn = 1;
-						}
-						break;
-					}
-					if (ret == 0)
-					{
-						std::cout << "Connection closed" << std::endl;
-						close_conn = 1;
-						break;
-					}
-					std::cout << ret << " bytes received" << std::endl;
-					ret = send(this->_fds[i].fd, buffer, ret, 0);
-					if (ret < 0)
-					{
-						std::cerr << "send() failed" << std::endl;
-						close_conn = 1;
-						break;
-					}
-				}
-				if (close_conn)
-				{
-					close(this->_fds[i].fd);
-					this->_fds[i].fd = -1;
-					compress_array = 1;
-				}
-			}
+			else if (this->receive_loop(i))
+				compress_array = 1;
 		}
 		if (compress_array)
-		{
-			compress_array = 0;
-			for (int i = 0; i < this->_ndfs; i++)
-			{
-				if (this->_fds[i].fd == -1)
-				{
-					for(int j = i; j < this->_ndfs - 1; j++)
-						this->_fds[j].fd = this->_fds[j + 1].fd;
-					i--;
-					this->_ndfs--;
-				}
-			}
-		}
+			this->compress_array();
 	}
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 19:39:02 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/13 18:48:31 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/21 15:16:24 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,11 @@ class	Server
 		int	bind_sock(void);
 		int	listen(void);
 		int	poll_loop(void);
+		int	receiving(int fd);
+		int	receive_loop(int fd_index);
+		int	listening(void);
+		int	poll(int timeout);
+		void	compress_array(void);
 };
 
 #endif
