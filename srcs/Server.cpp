@@ -6,11 +6,12 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/21 20:40:32 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/21 21:34:18 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
+#include <ctime>
 #include <cstring>
 #include <errno.h>
 #include <fcntl.h>
@@ -69,7 +70,7 @@ int Server::create_sock(void)
 	this->_listen_sd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
 	if (this->_listen_sd < 0)
 	{
-		std::cerr << "socket() failed" << std::endl;
+		std::clog << this->logtime() << "socket() failed" << std::endl;
 		return (-1);
 	}
 	return (0);
@@ -85,14 +86,14 @@ int Server::set_sock(void)
 		setsockopt(this->_listen_sd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
 	if (ret < 0)
 	{
-		std::cerr << "setsockopt() failed" << std::endl;
+		std::clog << this->logtime() << "setsockopt() failed" << std::endl;
 		close(this->_listen_sd);
 		return (-1);
 	}
 	ret = fcntl(this->_listen_sd, F_SETFL, O_NONBLOCK);
 	if (ret < 0)
 	{
-		std::cerr << "fcntl() failed" << std::endl;
+		std::clog << this->logtime() << "fcntl() failed" << std::endl;
 		close(this->_listen_sd);
 		return (-1);
 	}
@@ -111,7 +112,7 @@ int Server::bind_sock(void)
 	ret = bind(this->_listen_sd, (sockaddr *)&addr, sizeof(addr));
 	if (ret < 0)
 	{
-		std::cerr << "bind() failed" << std::endl;
+		std::clog << this->logtime() << "bind() failed" << std::endl;
 		close(this->_listen_sd);
 		return (-1);
 	}
@@ -125,7 +126,7 @@ int Server::listen(void)
 	ret = ::listen(this->_listen_sd, 32);
 	if (ret < 0)
 	{
-		std::cerr << "listen() failed" << std::endl;
+		std::clog << this->logtime() << "listen() failed" << std::endl;
 		close(this->_listen_sd);
 		return (-1);
 	}
@@ -137,26 +138,27 @@ int Server::receiving(int fd)
 	int		ret;
 	char	buffer[80];
 
+	memset(buffer,'\0',80);
 	ret = recv(fd, buffer, sizeof(buffer), 0);
 	if (ret < 0)
 	{
 		if (errno != EWOULDBLOCK)
 		{
-			std::cerr << "recv() failed" << std::endl;
+			std::clog << this->logtime() << "recv() failed" << std::endl;
 			return (-1);
 		}
 		return (1);
 	}
 	if (ret == 0)
 	{
-		std::cout << "Connection closed" << std::endl;
+		std::clog << this->logtime() << "Connection closed" << std::endl;
 		return (-1);
 	}
-	std::cout << ret << " bytes received" << std::endl;
+	std::clog << this->logtime() << "receiving: " << buffer << std::endl;
 	ret = send(fd, buffer, ret, 0);
 	if (ret < 0)
 	{
-		std::cerr << "send() failed" << std::endl;
+		std::clog << this->logtime() << "send() failed" << std::endl;
 		return (-1);
 	}
 	return (0);
@@ -167,8 +169,8 @@ int Server::receive_loop(int fd_index)
 	int	close_conn;
 
 	close_conn = 0;
-	std::cout << "Descriptor " << this->_fds[fd_index].fd << " is readable\n"
-			  << std::endl;
+	std::clog << this->logtime() << "Descriptor " << this->_fds[fd_index].fd
+		<< " is readable" << std::endl;
 	if (this->receiving(this->_fds[fd_index].fd) == -1)
 		close_conn = 1;
 	if (close_conn)
@@ -185,7 +187,7 @@ int Server::listening(void)
 	int	new_sd;
 
 	new_sd = 0;
-	std::cout << "Listening socket is readable" << std::endl;
+	std::clog << this->logtime() << "Listening socket is readable" << std::endl;
 	while (new_sd != -1)
 	{
 		new_sd = accept(this->_listen_sd, NULL, NULL);
@@ -193,12 +195,13 @@ int Server::listening(void)
 		{
 			if (errno != EWOULDBLOCK)
 			{
-				std::cerr << "accept() failed" << std::endl;
+				std::clog << this->logtime() << "accept() failed" << std::endl;
 				return (1);
 			}
 			return (0);
 		}
-		std::cout << "New incoming connection - " << new_sd << std::endl;
+		std::clog << this->logtime() << "New incoming connection - " << new_sd
+			<< std::endl;
 		this->_fds[this->_ndfs].fd = new_sd;
 		this->_fds[this->_ndfs].events = POLLIN;
 		this->_ndfs++;
@@ -224,16 +227,16 @@ int Server::poll(int timeout)
 {
 	int	ret;
 
-	std::cout << "Waiting on poll()..." << std::endl;
+	std::clog << this->logtime() << "Waiting on poll()..." << std::endl;
 	ret = ::poll(this->_fds.data(), this->_ndfs, timeout);
 	if (ret < 0)
 	{
-		std::cerr << "poll() failed" << std::endl;
+		std::clog << this->logtime() << "poll() failed" << std::endl;
 		return (-1);
 	}
 	if (ret == 0)
 	{
-		std::cerr << "poll() timed out" << std::endl;
+		std::clog << this->logtime() << "poll() timed out" << std::endl;
 		return (-1);
 	}
 	return (0);
@@ -259,8 +262,8 @@ int Server::poll_loop(void)
 				continue;
 			if (this->_fds[i].revents != POLLIN)
 			{
-				std::cerr << "Error! revents = " << this->_fds[i].revents
-						  << std::endl;
+				std::clog << this->logtime() << "Error! revents = "
+					<< this->_fds[i].revents << std::endl;
 				end_server = 1;
 				break;
 			}
@@ -276,4 +279,16 @@ int Server::poll_loop(void)
 			this->compress_array();
 	}
 	return (0);
+}
+
+std::string	Server::logtime(void)
+{
+	std::string	buffer(50, '\0');
+	time_t		rawtime;
+	struct tm	*timeinfo;
+
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+	strftime(const_cast<char *>(buffer.data()), 25, "[%x %X] ", timeinfo);
+	return (buffer);
 }
