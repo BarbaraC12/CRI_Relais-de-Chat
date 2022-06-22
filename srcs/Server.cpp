@@ -6,68 +6,59 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/21 18:08:27 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/22 16:28:17 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <iostream>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <sys/poll.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
+#include "Server.hpp"
+#include <ctime>
 #include <cstring>
 #include <errno.h>
-#include "Server.hpp"
+#include <fcntl.h>
+#include <iostream>
+#include <netinet/in.h>
+#include <sys/ioctl.h>
+#include <sys/poll.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #ifndef SOCK_NONBLOCK
 # define SOCK_NONBLOCK O_NONBLOCK
 #endif
+#define BUFFER_SIZE_IRC	512
 
-Server::Server(int const &port, std::string const &passwd) :
-	_port(port),
-	_passwd(passwd),
-	_listen_sd(-1),
-	_fds(200),
+Server::Server(uint16_t &port, std::string const &passwd)
+	: _port(port), _passwd(passwd), _listen_sd(-1), _fds(200), _fds_buffer(200),
 	_ndfs(0)
 {
-	return ;
+	return;
 }
 
-Server::Server(void) :
-	_port(),
-	_passwd(),
-	_listen_sd(-1),
-	_fds(200),
-	_ndfs(0)
+Server::Server(void) : _port(), _passwd(), _listen_sd(-1), _fds(200),
+	_fds_buffer(200), _ndfs(0)
 {
-	return ;
+	return;
 }
 
-Server::Server(Server const &src) :
-	_port(),
-	_passwd(),
-	_listen_sd(-1),
-	_fds(200),
-	_ndfs(0)
+Server::Server(Server const &src)
+	: _port(), _passwd(), _listen_sd(-1), _fds(200), _fds_buffer(200), _ndfs(0)
 {
 	*this = src;
-	return ;
+	return;
 }
 
 Server::~Server(void)
 {
-	for (int i = 0; i < this->_ndfs; i++)
+	for (std::vector<pollfd>::size_type i = 0; i < this->_ndfs; i++)
 	{
 		if (this->_fds[i].fd >= 0)
 			close(this->_fds[i].fd);
 	}
-	return ;
+	return;
 }
 
-Server	&Server::operator=(Server const &rhs)
+Server &Server::operator=(Server const &rhs)
 {
 	if (this != &rhs)
 	{
@@ -77,44 +68,45 @@ Server	&Server::operator=(Server const &rhs)
 	return (*this);
 }
 
-int	Server::create_sock(void)
+int Server::create_sock(void)
 {
 	this->_listen_sd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
 	if (this->_listen_sd < 0)
 	{
-		std::cerr << "socket() failed" << std::endl;
+		std::clog << this->logtime() << "socket() failed" << std::endl;
 		return (-1);
 	}
 	return (0);
 }
 
-int	Server::set_sock(void)
+int Server::set_sock(void)
 {
 	int	on;
 	int	ret;
 
 	on = 1;
-	ret = setsockopt(this->_listen_sd, SOL_SOCKET,  SO_REUSEADDR, &on, sizeof(on));
+	ret =
+		setsockopt(this->_listen_sd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
 	if (ret < 0)
 	{
-		std::cerr << "setsockopt() failed" << std::endl;
+		std::clog << this->logtime() << "setsockopt() failed" << std::endl;
 		close(this->_listen_sd);
 		return (-1);
 	}
 	ret = fcntl(this->_listen_sd, F_SETFL, O_NONBLOCK);
 	if (ret < 0)
 	{
-		std::cerr << "fcntl() failed" << std::endl;
+		std::clog << this->logtime() << "fcntl() failed" << std::endl;
 		close(this->_listen_sd);
 		return (-1);
 	}
 	return (0);
 }
 
-int	Server::bind_sock(void)
+int Server::bind_sock(void)
 {
-	sockaddr_in addr;
-	int	ret;
+	sockaddr_in	addr;
+	int			ret;
 
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
@@ -123,81 +115,106 @@ int	Server::bind_sock(void)
 	ret = bind(this->_listen_sd, (sockaddr *)&addr, sizeof(addr));
 	if (ret < 0)
 	{
-		std::cerr << "bind() failed" << std::endl;
+		std::clog << this->logtime() << "bind() failed" << std::endl;
 		close(this->_listen_sd);
 		return (-1);
 	}
 	return (0);
 }
 
-int	Server::listen(void)
+int Server::listen(void)
 {
 	int	ret;
 
 	ret = ::listen(this->_listen_sd, 32);
 	if (ret < 0)
 	{
-		std::cerr << "listen() failed" << std::endl;
+		std::clog << this->logtime() << "listen() failed" << std::endl;
 		close(this->_listen_sd);
 		return (-1);
 	}
 	return (0);
 }
 
-int	Server::receiving(int fd)
+int Server::parse_buffer(fd_index_t fd)
 {
-	int		ret;
-	char	buffer[80];
+	std::size_t	found;
 
-	ret = recv(fd, buffer, sizeof(buffer), 0);
+	do
+	{
+		found = this->_fds_buffer[fd].find("\r\n");
+		if (found != std::string::npos)
+		{
+			char	sub_str[512];
+
+			this->_fds_buffer[fd].copy(sub_str, found, 0);
+			this->_fds_buffer[fd].erase(0, found + 2);
+			sub_str[found] = '\0';
+			std::clog << this->logtime() << "receiving: " << sub_str << std::endl;
+			strcat(sub_str, "\r\n");
+			if (send(static_cast<int>(fd), sub_str, strlen(sub_str), 0) < 0)
+			{
+				std::clog << this->logtime() << "send() failed" << std::endl;
+				return (-1);
+			}
+		}
+	}
+	while (found != std::string::npos);
+	return (0);
+}
+
+int Server::receiving(fd_index_t fd)
+{
+	ssize_t	ret;
+	char	buffer[BUFFER_SIZE_IRC + 1];
+
+	ret = recv(static_cast<int>(fd), buffer, BUFFER_SIZE_IRC, 0);
+	buffer[ret] = '\0';
 	if (ret < 0)
 	{
 		if (errno != EWOULDBLOCK)
 		{
-			std::cerr << "recv() failed" << std::endl;
+			std::clog << this->logtime() << "recv() failed" << std::endl;
 			return (-1);
 		}
 		return (1);
 	}
 	if (ret == 0)
 	{
-		std::cout << "Connection closed" << std::endl;
+		std::clog << this->logtime() << "Connection closed" << std::endl;
+		this->_fds_buffer[fd].clear();
 		return (-1);
 	}
-	std::cout << ret << " bytes received" << std::endl;
-	ret = send(fd, buffer, ret, 0);
-	if (ret < 0)
-	{
-		std::cerr << "send() failed" << std::endl;
+	this->_fds_buffer[fd].append(buffer);
+	if (this->parse_buffer(fd) < 0)
 		return (-1);
-	}
 	return (0);
 }
 
-int	Server::receive_loop(int fd_index)
+int Server::receive_loop(fd_index_t fd)
 {
 	int	close_conn;
 
 	close_conn = 0;
-	std::cout << "Descriptor " << this->_fds[fd_index].fd << " is readable\n"
-		<< std::endl;
-	if (this->receiving(this->_fds[fd_index].fd) == -1)
+	std::clog << this->logtime() << "Descriptor " << this->_fds[fd].fd
+		<< " is readable" << std::endl;
+	if (this->receiving(static_cast<fd_index_t>(this->_fds[fd].fd)) == -1)
 		close_conn = 1;
 	if (close_conn)
 	{
-		close(this->_fds[fd_index].fd);
-		this->_fds[fd_index].fd = -1;
+		close(this->_fds[fd].fd);
+		this->_fds[fd].fd = -1;
 		return (1);
 	}
 	return (0);
 }
 
-int	Server::listening(void)
+int Server::listening(void)
 {
 	int	new_sd;
 
 	new_sd = 0;
-	std::cout << "Listening socket is readable" << std::endl;
+	std::clog << this->logtime() << "Listening socket is readable" << std::endl;
 	while (new_sd != -1)
 	{
 		new_sd = accept(this->_listen_sd, NULL, NULL);
@@ -205,12 +222,13 @@ int	Server::listening(void)
 		{
 			if (errno != EWOULDBLOCK)
 			{
-				std::cerr << "accept() failed" << std::endl;
+				std::clog << this->logtime() << "accept() failed" << std::endl;
 				return (1);
 			}
 			return (0);
 		}
-		std::cout << "New incoming connection - " << new_sd << std::endl;
+		std::clog << this->logtime() << "New incoming connection - " << new_sd
+			<< std::endl;
 		this->_fds[this->_ndfs].fd = new_sd;
 		this->_fds[this->_ndfs].events = POLLIN;
 		this->_ndfs++;
@@ -218,13 +236,13 @@ int	Server::listening(void)
 	return (0);
 }
 
-void	Server::compress_array(void)
+void Server::compress_array(void)
 {
-	for (int i = 0; i < this->_ndfs; i++)
+	for (std::vector<pollfd>::size_type i = 0; i < this->_ndfs; i++)
 	{
 		if (this->_fds[i].fd == -1)
 		{
-			for(int j = i; j < this->_ndfs - 1; j++)
+			for (std::vector<pollfd>::size_type j = i; j < this->_ndfs - 1; j++)
 				this->_fds[j].fd = this->_fds[j + 1].fd;
 			i--;
 			this->_ndfs--;
@@ -232,26 +250,26 @@ void	Server::compress_array(void)
 	}
 }
 
-int	Server::poll(int timeout)
+int Server::poll(int timeout)
 {
 	int	ret;
 
-	std::cout << "Waiting on poll()..." << std::endl;
-	ret = ::poll(this->_fds.data(), this->_ndfs, timeout);
+	std::clog << this->logtime() << "Waiting on poll()..." << std::endl;
+	ret = ::poll(this->_fds.data(), static_cast<nfds_t>(this->_ndfs), timeout);
 	if (ret < 0)
 	{
-		std::cerr << "poll() failed" << std::endl;
+		std::clog << this->logtime() << "poll() failed" << std::endl;
 		return (-1);
 	}
 	if (ret == 0)
 	{
-		std::cerr << "poll() timed out" << std::endl;
+		std::clog << this->logtime() << "poll() timed out" << std::endl;
 		return (-1);
 	}
 	return (0);
 }
 
-int	Server::poll_loop(void)
+int Server::poll_loop(void)
 {
 	int	end_server;
 	int	compress_array;
@@ -265,14 +283,14 @@ int	Server::poll_loop(void)
 		compress_array = 0;
 		if (this->poll(-1))
 			return (-1);
-		for (int i = 0, current_size = this->_ndfs; i < current_size; i++)
+		for (fd_index_t i = 0, current_size = this->_ndfs; i < current_size; i++)
 		{
 			if (this->_fds[i].revents == 0)
 				continue;
 			if (this->_fds[i].revents != POLLIN)
 			{
-				std::cerr << "Error! revents = " << this->_fds[i].revents
-					<< std::endl;
+				std::clog << this->logtime() << "Error! revents = "
+					<< this->_fds[i].revents << std::endl;
 				end_server = 1;
 				break;
 			}
@@ -288,4 +306,16 @@ int	Server::poll_loop(void)
 			this->compress_array();
 	}
 	return (0);
+}
+
+std::string	Server::logtime(void)
+{
+	std::string	buffer(50, '\0');
+	time_t		rawtime;
+	struct tm	*timeinfo;
+
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+	strftime(const_cast<char *>(buffer.data()), 25, "[%x %X] ", timeinfo);
+	return (buffer);
 }
