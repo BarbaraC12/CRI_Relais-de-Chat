@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/22 15:46:39 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/22 16:28:17 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,7 +136,7 @@ int Server::listen(void)
 	return (0);
 }
 
-int Server::parse_buffer(int fd)
+int Server::parse_buffer(fd_index_t fd)
 {
 	std::size_t	found;
 
@@ -151,18 +151,24 @@ int Server::parse_buffer(int fd)
 			this->_fds_buffer[fd].erase(0, found + 2);
 			sub_str[found] = '\0';
 			std::clog << this->logtime() << "receiving: " << sub_str << std::endl;
+			strcat(sub_str, "\r\n");
+			if (send(static_cast<int>(fd), sub_str, strlen(sub_str), 0) < 0)
+			{
+				std::clog << this->logtime() << "send() failed" << std::endl;
+				return (-1);
+			}
 		}
 	}
 	while (found != std::string::npos);
 	return (0);
 }
 
-int Server::receiving(int fd)
+int Server::receiving(fd_index_t fd)
 {
 	ssize_t	ret;
 	char	buffer[BUFFER_SIZE_IRC + 1];
 
-	ret = recv(fd, buffer, BUFFER_SIZE_IRC, 0);
+	ret = recv(static_cast<int>(fd), buffer, BUFFER_SIZE_IRC, 0);
 	buffer[ret] = '\0';
 	if (ret < 0)
 	{
@@ -176,32 +182,28 @@ int Server::receiving(int fd)
 	if (ret == 0)
 	{
 		std::clog << this->logtime() << "Connection closed" << std::endl;
+		this->_fds_buffer[fd].clear();
 		return (-1);
 	}
 	this->_fds_buffer[fd].append(buffer);
-	this->parse_buffer(fd);
-	ret = send(fd, buffer, static_cast<size_t>(ret), 0);
-	if (ret < 0)
-	{
-		std::clog << this->logtime() << "send() failed" << std::endl;
+	if (this->parse_buffer(fd) < 0)
 		return (-1);
-	}
 	return (0);
 }
 
-int Server::receive_loop(std::vector<pollfd>::size_type fd_index)
+int Server::receive_loop(fd_index_t fd)
 {
 	int	close_conn;
 
 	close_conn = 0;
-	std::clog << this->logtime() << "Descriptor " << this->_fds[fd_index].fd
+	std::clog << this->logtime() << "Descriptor " << this->_fds[fd].fd
 		<< " is readable" << std::endl;
-	if (this->receiving(this->_fds[fd_index].fd) == -1)
+	if (this->receiving(static_cast<fd_index_t>(this->_fds[fd].fd)) == -1)
 		close_conn = 1;
 	if (close_conn)
 	{
-		close(this->_fds[fd_index].fd);
-		this->_fds[fd_index].fd = -1;
+		close(this->_fds[fd].fd);
+		this->_fds[fd].fd = -1;
 		return (1);
 	}
 	return (0);
@@ -281,7 +283,7 @@ int Server::poll_loop(void)
 		compress_array = 0;
 		if (this->poll(-1))
 			return (-1);
-		for (std::vector<pollfd>::size_type i = 0, current_size = this->_ndfs; i < current_size; i++)
+		for (fd_index_t i = 0, current_size = this->_ndfs; i < current_size; i++)
 		{
 			if (this->_fds[i].revents == 0)
 				continue;
