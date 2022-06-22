@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 19:39:02 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/21 22:16:19 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/22 14:46:13 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ class Server
 		std::string						_passwd;
 		int								_listen_sd; // sd for Socket Descriptor
 		std::vector<pollfd> 			_fds;
+		std::vector<std::string> 		_fds_buffer;
 		std::vector<pollfd>::size_type	_ndfs;
 
 	public:
@@ -42,6 +43,7 @@ class Server
 		int		listen(void);
 		int		poll_loop(void);
 		int		receiving(int fd);
+		int		parse_buffer(int fd);
 		int		receive_loop(std::vector<pollfd>::size_type fd_index);
 		int		listening(void);
 		int		poll(int timeout);

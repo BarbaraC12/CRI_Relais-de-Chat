@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/21 22:24:47 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/22 15:46:39 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,20 +26,23 @@
 #ifndef SOCK_NONBLOCK
 # define SOCK_NONBLOCK O_NONBLOCK
 #endif
+#define BUFFER_SIZE_IRC	512
 
 Server::Server(uint16_t &port, std::string const &passwd)
-	: _port(port), _passwd(passwd), _listen_sd(-1), _fds(200), _ndfs(0)
+	: _port(port), _passwd(passwd), _listen_sd(-1), _fds(200), _fds_buffer(200),
+	_ndfs(0)
 {
 	return;
 }
 
-Server::Server(void) : _port(), _passwd(), _listen_sd(-1), _fds(200), _ndfs(0)
+Server::Server(void) : _port(), _passwd(), _listen_sd(-1), _fds(200),
+	_fds_buffer(200), _ndfs(0)
 {
 	return;
 }
 
 Server::Server(Server const &src)
-	: _port(), _passwd(), _listen_sd(-1), _fds(200), _ndfs(0)
+	: _port(), _passwd(), _listen_sd(-1), _fds(200), _fds_buffer(200), _ndfs(0)
 {
 	*this = src;
 	return;
@@ -133,13 +136,34 @@ int Server::listen(void)
 	return (0);
 }
 
+int Server::parse_buffer(int fd)
+{
+	std::size_t	found;
+
+	do
+	{
+		found = this->_fds_buffer[fd].find("\r\n");
+		if (found != std::string::npos)
+		{
+			char	sub_str[512];
+
+			this->_fds_buffer[fd].copy(sub_str, found, 0);
+			this->_fds_buffer[fd].erase(0, found + 2);
+			sub_str[found] = '\0';
+			std::clog << this->logtime() << "receiving: " << sub_str << std::endl;
+		}
+	}
+	while (found != std::string::npos);
+	return (0);
+}
+
 int Server::receiving(int fd)
 {
 	ssize_t	ret;
-	char	buffer[80];
+	char	buffer[BUFFER_SIZE_IRC + 1];
 
-	memset(buffer,'\0',80);
-	ret = recv(fd, buffer, sizeof(buffer), 0);
+	ret = recv(fd, buffer, BUFFER_SIZE_IRC, 0);
+	buffer[ret] = '\0';
 	if (ret < 0)
 	{
 		if (errno != EWOULDBLOCK)
@@ -154,7 +178,8 @@ int Server::receiving(int fd)
 		std::clog << this->logtime() << "Connection closed" << std::endl;
 		return (-1);
 	}
-	std::clog << this->logtime() << "receiving: " << buffer << std::endl;
+	this->_fds_buffer[fd].append(buffer);
+	this->parse_buffer(fd);
 	ret = send(fd, buffer, static_cast<size_t>(ret), 0);
 	if (ret < 0)
 	{
