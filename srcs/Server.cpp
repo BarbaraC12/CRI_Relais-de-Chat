@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/22 16:28:17 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/23 09:46:08 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,14 +145,14 @@ int Server::parse_buffer(fd_index_t fd)
 		found = this->_fds_buffer[fd].find("\r\n");
 		if (found != std::string::npos)
 		{
-			char	sub_str[512];
+			std::string	sub_str;
 
-			this->_fds_buffer[fd].copy(sub_str, found, 0);
+			sub_str = this->_fds_buffer[fd].substr(0, found);
 			this->_fds_buffer[fd].erase(0, found + 2);
 			sub_str[found] = '\0';
 			std::clog << this->logtime() << "receiving: " << sub_str << std::endl;
-			strcat(sub_str, "\r\n");
-			if (send(static_cast<int>(fd), sub_str, strlen(sub_str), 0) < 0)
+			sub_str += "\r\n";
+			if (send(static_cast<int>(fd), sub_str.data(), sub_str.length(), 0) < 0)
 			{
 				std::clog << this->logtime() << "send() failed" << std::endl;
 				return (-1);
