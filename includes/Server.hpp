@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 19:39:02 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/24 16:50:09 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/24 18:59:52 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ class Server
 		fd_index_t					_ndfs;
 		std::map<std::string, int (Server::* const)(std::string, int)>	_map_funct;
 		std::map<int, User>			_map_users;
+		int							_end_server;
 
 	public:
 		Server(uint16_t &port, std::string const &passwd);
@@ -54,6 +55,7 @@ class Server
 		int		listening(void);
 		int		poll(int timeout);
 		void	compress_array(void);
+		void	sigint_handler(int param);
 
 	private:
 		std::string	logtime(void);

@@ -6,12 +6,13 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/24 17:05:55 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/24 19:44:21 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 #include <ctime>
+#include <csignal>
 #include <cstring>
 #include <errno.h>
 #include <fcntl.h>
@@ -30,7 +31,7 @@
 
 Server::Server(uint16_t &port, std::string const &passwd)
 	: _port(port), _passwd(passwd), _listen_sd(-1), _fds(200), _fds_buffer(200),
-	_ndfs(0), _map_funct(), _map_users()
+	_ndfs(0), _map_funct(), _map_users(), _end_server(1)
 {
 	this->init_map_funct();
 	return;
@@ -38,7 +39,7 @@ Server::Server(uint16_t &port, std::string const &passwd)
 
 Server::Server(void)
 	: _port(), _passwd(), _listen_sd(-1), _fds(200), _fds_buffer(200),
-	_ndfs(0), _map_funct(), _map_users()
+	_ndfs(0), _map_funct(), _map_users(), _end_server(1)
 {
 	this->init_map_funct();
 	return;
@@ -46,7 +47,7 @@ Server::Server(void)
 
 Server::Server(Server const &src)
 	: _port(), _passwd(), _listen_sd(-1), _fds(200), _fds_buffer(200), _ndfs(0),
-	_map_funct(), _map_users()
+	_map_funct(), _map_users(), _end_server(1)
 {
 	*this = src;
 	return;
@@ -275,14 +276,13 @@ int Server::poll(int timeout)
 
 int Server::poll_loop(void)
 {
-	int	end_server;
 	int	compress_array;
 
 	this->_fds[0].fd = this->_listen_sd;
 	this->_fds[0].events = POLLIN;
 	this->_ndfs++;
-	end_server = 0;
-	while (end_server == 0)
+	this->_end_server = 0;
+	while (this->_end_server == 0)
 	{
 		compress_array = 0;
 		if (this->poll(-1))
@@ -295,13 +295,13 @@ int Server::poll_loop(void)
 			{
 				std::clog << this->logtime() << "Error! revents = "
 					<< this->_fds[i].revents << std::endl;
-				end_server = 1;
+				this->_end_server = 1;
 				break;
 			}
 			if (this->_fds[i].fd == this->_listen_sd)
 			{
 				if (this->listening())
-					end_server = 1;
+					this->_end_server = 1;
 			}
 			else if (this->receive_loop(i))
 				compress_array = 1;
