@@ -6,20 +6,47 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 12:58:28 by bcano             #+#    #+#             */
-/*   Updated: 2022/06/24 15:05:16 by bcano            ###   ########.fr       */
+/*   Updated: 2022/06/24 20:51:50 by bcano            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/User.hpp"
 
-User::User( const int sd )
+User::User( int sd )
 	:_sd(sd), _nickName("Empty"), _userName("Empty"), _hostName("Empty"), _servName("Empty"),
-	_realName("Empty"), _userMode("Empty"), _chan(NULL), _online(false)	
+	_realName("Empty"), _userMode("Empty"), _chan(NULL), _online(false), nickname()
 {
 	std::cout << "New user create" << std::endl;
 }
 
-User::~User( ) {}
+User::User(void)
+	:_sd(0), _nickName("Empty"), _userName("Empty"), _hostName("Empty"), _servName("Empty"),
+	_realName("Empty"), _userMode("Empty"), _chan(NULL), _online(false), nickname()
+{
+	return;
+}
+
+User::User(User const &src)
+	:_sd(0), _nickName("Empty"), _userName("Empty"), _hostName("Empty"), _servName("Empty"),
+	_realName("Empty"), _userMode("Empty"), _chan(NULL), _online(false), nickname()
+{
+	*this = src;
+	return;
+}
+
+User::~User(void)
+{
+	return;
+}
+
+User &User::operator=(User const &rhs)
+{
+	if (this != &rhs)
+	{
+		this->nickname = rhs.nickname;
+	}
+	return (*this);
+}
 
 void		User::setNickname( std::string nickN) {
 
@@ -67,7 +94,7 @@ void		User::setStatus( bool status ) {
 
 }
 
-const int		User::getSd( void ) {
+int				User::getSd( void ) {
 
 	return this->_sd;
 }
@@ -103,12 +130,11 @@ std::string		User::getUsermode( void ) {
 }
 
 std::string		User::getChanels( void ) {
-	
+	std::string st("this chan");
+	return st;
 }
 
 bool			User::getStatus( void ) {
 
 	return this->_online;
 }
-
-

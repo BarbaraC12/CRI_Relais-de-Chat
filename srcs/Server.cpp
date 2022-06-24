@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/22 16:28:17 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/24 20:53:28 by bcano            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 #include <ctime>
+#include <csignal>
 #include <cstring>
 #include <errno.h>
 #include <fcntl.h>
@@ -30,19 +31,23 @@
 
 Server::Server(uint16_t &port, std::string const &passwd)
 	: _port(port), _passwd(passwd), _listen_sd(-1), _fds(200), _fds_buffer(200),
-	_ndfs(0)
+	_ndfs(0), _map_funct(), _map_users(), _end_server(1)
 {
+	this->init_map_funct();
 	return;
 }
 
-Server::Server(void) : _port(), _passwd(), _listen_sd(-1), _fds(200),
-	_fds_buffer(200), _ndfs(0)
+Server::Server(void)
+	: _port(), _passwd(), _listen_sd(-1), _fds(200), _fds_buffer(200),
+	_ndfs(0), _map_funct(), _map_users(), _end_server(1)
 {
+	this->init_map_funct();
 	return;
 }
 
 Server::Server(Server const &src)
-	: _port(), _passwd(), _listen_sd(-1), _fds(200), _fds_buffer(200), _ndfs(0)
+	: _port(), _passwd(), _listen_sd(-1), _fds(200), _fds_buffer(200), _ndfs(0),
+	_map_funct(), _map_users(), _end_server(1)
 {
 	*this = src;
 	return;
@@ -145,14 +150,14 @@ int Server::parse_buffer(fd_index_t fd)
 		found = this->_fds_buffer[fd].find("\r\n");
 		if (found != std::string::npos)
 		{
-			char	sub_str[512];
+			std::string	sub_str;
 
-			this->_fds_buffer[fd].copy(sub_str, found, 0);
+			sub_str = this->_fds_buffer[fd].substr(0, found);
 			this->_fds_buffer[fd].erase(0, found + 2);
 			sub_str[found] = '\0';
 			std::clog << this->logtime() << "receiving: " << sub_str << std::endl;
-			strcat(sub_str, "\r\n");
-			if (send(static_cast<int>(fd), sub_str, strlen(sub_str), 0) < 0)
+			sub_str += "\r\n";
+			if (send(static_cast<int>(fd), sub_str.data(), sub_str.length(), 0) < 0)
 			{
 				std::clog << this->logtime() << "send() failed" << std::endl;
 				return (-1);
@@ -271,14 +276,13 @@ int Server::poll(int timeout)
 
 int Server::poll_loop(void)
 {
-	int	end_server;
 	int	compress_array;
 
 	this->_fds[0].fd = this->_listen_sd;
 	this->_fds[0].events = POLLIN;
 	this->_ndfs++;
-	end_server = 0;
-	while (end_server == 0)
+	this->_end_server = 0;
+	while (this->_end_server == 0)
 	{
 		compress_array = 0;
 		if (this->poll(-1))
@@ -291,13 +295,13 @@ int Server::poll_loop(void)
 			{
 				std::clog << this->logtime() << "Error! revents = "
 					<< this->_fds[i].revents << std::endl;
-				end_server = 1;
+				this->_end_server = 1;
 				break;
 			}
 			if (this->_fds[i].fd == this->_listen_sd)
 			{
 				if (this->listening())
-					end_server = 1;
+					this->_end_server = 1;
 			}
 			else if (this->receive_loop(i))
 				compress_array = 1;
@@ -318,4 +322,63 @@ std::string	Server::logtime(void)
 	timeinfo = localtime(&rawtime);
 	strftime(const_cast<char *>(buffer.data()), 25, "[%x %X] ", timeinfo);
 	return (buffer);
+}
+
+void	Server::init_map_funct(void)
+{
+	this->_map_funct.insert(make_pair("KILL", &Server::kill_msg));
+	this->_map_funct.insert(make_pair("PING", &Server::ping_msg));
+	this->_map_funct.insert(make_pair("PONG", &Server::pong_msg));
+	this->_map_funct.insert(make_pair("ERROR", &Server::error_msg));
+}
+
+// BARBARA
+
+int	pass_msg(std::string params, int fd);
+int	nick_msg(std::string params, int fd);
+int	user_msg(std::string params, int fd);
+int	server_msg(std::string params, int fd);
+int	oper_msg(std::string params, int fd);
+int	quit_msg(std::string params, int fd);
+int	squit_msg(std::string params, int fd);
+
+// ANTOINE
+
+int	Server::kill_msg(std::string params, int fd)
+{
+	std::string	kill_nickname;
+	std::string	kill_comment;
+
+	(void)params;
+	(void)fd;
+	for (std::map<int, User>::iterator it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
+	{
+		if (it->second.nickname == kill_nickname)
+		{
+			this->_map_users.erase(it);
+			it = this->_map_users.begin();
+		}
+	}
+	return (0);
+}
+
+int	Server::ping_msg(std::string params, int fd)
+{
+	(void)params;
+	(void)fd;
+	return (0);
+}
+
+int	Server::pong_msg(std::string params, int fd)
+{
+	(void)params;
+	(void)fd;
+	return (0);
+}
+
+int	Server::error_msg(std::string params, int fd)
+{
+	(void)params;
+	(void)fd;
+	return (0);
 }

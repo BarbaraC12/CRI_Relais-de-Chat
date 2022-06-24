@@ -6,19 +6,19 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 12:16:22 by bcano             #+#    #+#             */
-/*   Updated: 2022/06/24 15:30:13 by bcano            ###   ########.fr       */
+/*   Updated: 2022/06/24 20:49:12 by bcano            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef USER_HPP
 # define USER_HPP
 
-# include <cstring>
+# include <string>
 # include <iostream>
 
 class User {
 
-		const int	_sd;
+		int	_sd;
 		std::string	_nickName;//
 		std::string	_userName;
 		std::string _hostName;
@@ -29,8 +29,11 @@ class User {
 		bool		_online;
 		
 	public:
+		User( void );
 		User( int );
-		~User( );
+		User(User const &src);
+		virtual ~User(void);
+		std::string	nickname;
 		
 		void	setNickname( std::string );
 		void	setUsername( std::string );
@@ -41,7 +44,7 @@ class User {
 		void	addChanel( std::string );
 		void	setStatus( bool );
 		
-		const int	getSd( void );
+		int			getSd( void );
 		std::string	getNickname( void );
 		std::string	getUsername( void );
 		std::string	getHostname( void );
@@ -51,9 +54,9 @@ class User {
 		std::string	getChanels( void );
 		bool		getStatus( void );
 
+		User &operator=(User const &rhs);
 	private:
-	
-	
+		
 };
 
 #endif
