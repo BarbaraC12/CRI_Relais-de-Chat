@@ -6,11 +6,12 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/24 20:53:28 by bcano            ###   ########.fr       */
+/*   Updated: 2022/06/24 21:22:46 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
+#include <algorithm>
 #include <ctime>
 #include <csignal>
 #include <cstring>
@@ -314,13 +315,14 @@ int Server::poll_loop(void)
 
 std::string	Server::logtime(void)
 {
-	std::string	buffer(50, '\0');
+	std::string	buffer;
 	time_t		rawtime;
-	struct tm	*timeinfo;
 
 	time(&rawtime);
-	timeinfo = localtime(&rawtime);
-	strftime(const_cast<char *>(buffer.data()), 25, "[%x %X] ", timeinfo);
+	buffer.append("[");
+	buffer.append(ctime(&rawtime));
+	buffer.erase(std::remove(buffer.begin(), buffer.end(), '\n'), buffer.end());
+	buffer.append("]");
 	return (buffer);
 }
 
