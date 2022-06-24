@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/24 15:30:38 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/24 17:05:55 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@
 
 Server::Server(uint16_t &port, std::string const &passwd)
 	: _port(port), _passwd(passwd), _listen_sd(-1), _fds(200), _fds_buffer(200),
-	_ndfs(0), _map_funct()
+	_ndfs(0), _map_funct(), _map_users()
 {
 	this->init_map_funct();
 	return;
@@ -38,7 +38,7 @@ Server::Server(uint16_t &port, std::string const &passwd)
 
 Server::Server(void)
 	: _port(), _passwd(), _listen_sd(-1), _fds(200), _fds_buffer(200),
-	_ndfs(0), _map_funct()
+	_ndfs(0), _map_funct(), _map_users()
 {
 	this->init_map_funct();
 	return;
@@ -46,7 +46,7 @@ Server::Server(void)
 
 Server::Server(Server const &src)
 	: _port(), _passwd(), _listen_sd(-1), _fds(200), _fds_buffer(200), _ndfs(0),
-	_map_funct()
+	_map_funct(), _map_users()
 {
 	*this = src;
 	return;
@@ -334,8 +334,19 @@ void	Server::init_map_funct(void)
 
 int	Server::kill_msg(std::string params, int fd)
 {
+	std::string	kill_nickname;
+	std::string	kill_comment;
+
 	(void)params;
 	(void)fd;
+	for (std::map<int, User>::iterator it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
+	{
+		if (it->second.nickname == kill_nickname)
+		{
+			this->_map_users.erase(it);
+			it = this->_map_users.begin();
+		}
+	}
 	return (0);
 }
 

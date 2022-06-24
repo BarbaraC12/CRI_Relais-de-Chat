@@ -6,7 +6,7 @@
 #    By: bcano <bcano@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/07 18:43:20 by bcano             #+#    #+#              #
-#    Updated: 2022/06/24 15:30:54 by anclarma         ###   ########.fr        #
+#    Updated: 2022/06/24 17:07:49 by anclarma         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,7 +28,8 @@ NAME		= ircserv
 # ################################## #
 C_DIR		= srcs
 C_FILES		= main.cpp	\
-			  Server.cpp
+			  Server.cpp	\
+			  User.cpp
 SRCS		= $(patsubst %, $(C_DIR)/%, $(C_FILES))
 
 # ################################## #
