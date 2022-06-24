@@ -33,3 +33,5 @@
 ircserv
 
 .vscode
+# Vim files
+*.swp
