@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 12:58:28 by bcano             #+#    #+#             */
-/*   Updated: 2022/06/24 20:51:50 by bcano            ###   ########.fr       */
+/*   Updated: 2022/06/24 20:57:05 by bcano            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,7 +130,9 @@ std::string		User::getUsermode( void ) {
 }
 
 std::string		User::getChanels( void ) {
+	
 	std::string st("this chan");
+	(void)this->_chan;
 	return st;
 }
 
