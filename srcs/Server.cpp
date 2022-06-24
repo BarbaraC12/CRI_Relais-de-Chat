@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/23 09:46:08 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/24 15:30:38 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,19 +30,23 @@
 
 Server::Server(uint16_t &port, std::string const &passwd)
 	: _port(port), _passwd(passwd), _listen_sd(-1), _fds(200), _fds_buffer(200),
-	_ndfs(0)
+	_ndfs(0), _map_funct()
 {
+	this->init_map_funct();
 	return;
 }
 
-Server::Server(void) : _port(), _passwd(), _listen_sd(-1), _fds(200),
-	_fds_buffer(200), _ndfs(0)
+Server::Server(void)
+	: _port(), _passwd(), _listen_sd(-1), _fds(200), _fds_buffer(200),
+	_ndfs(0), _map_funct()
 {
+	this->init_map_funct();
 	return;
 }
 
 Server::Server(Server const &src)
-	: _port(), _passwd(), _listen_sd(-1), _fds(200), _fds_buffer(200), _ndfs(0)
+	: _port(), _passwd(), _listen_sd(-1), _fds(200), _fds_buffer(200), _ndfs(0),
+	_map_funct()
 {
 	*this = src;
 	return;
@@ -318,4 +322,40 @@ std::string	Server::logtime(void)
 	timeinfo = localtime(&rawtime);
 	strftime(const_cast<char *>(buffer.data()), 25, "[%x %X] ", timeinfo);
 	return (buffer);
+}
+
+void	Server::init_map_funct(void)
+{
+	this->_map_funct.insert(make_pair("KILL", &Server::kill_msg));
+	this->_map_funct.insert(make_pair("PING", &Server::ping_msg));
+	this->_map_funct.insert(make_pair("PONG", &Server::pong_msg));
+	this->_map_funct.insert(make_pair("ERROR", &Server::error_msg));
+}
+
+int	Server::kill_msg(std::string params, int fd)
+{
+	(void)params;
+	(void)fd;
+	return (0);
+}
+
+int	Server::ping_msg(std::string params, int fd)
+{
+	(void)params;
+	(void)fd;
+	return (0);
+}
+
+int	Server::pong_msg(std::string params, int fd)
+{
+	(void)params;
+	(void)fd;
+	return (0);
+}
+
+int	Server::error_msg(std::string params, int fd)
+{
+	(void)params;
+	(void)fd;
+	return (0);
 }
