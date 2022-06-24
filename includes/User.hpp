@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 12:16:22 by bcano             #+#    #+#             */
-/*   Updated: 2022/06/24 21:04:44 by bcano            ###   ########.fr       */
+/*   Updated: 2022/06/24 21:11:46 by bcano            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 # include <iostream>
 
 class User {
-
+	private:
 		int	_sd;
 		std::string	_nickName;//
 		std::string	_userName;
@@ -55,8 +55,6 @@ class User {
 		bool		getStatus( void );
 
 		User &operator=(User const &rhs);
-	private:
-		
 };
 
 #endif
