@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/25 17:05:39 by bcano            ###   ########.fr       */
+/*   Updated: 2022/06/25 22:58:44 by bcano            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -335,15 +335,14 @@ void	Server::init_map_funct(void)
 // BARBARA
 
 int	Server::pass_msg(std::string params, int fd) {
+	(void)fd;
 	if (params != "\0") {
 		if (params != this->_passwd)
 			return (2); //ERR_ALREADYREGISTRED
 		else
 			return (0); //RIGHT_PASSWD
 	}
-	else
-		return (1); //ERR_NEEDMOREPARAMS
-	
+	return (1); //ERR_NEEDMOREPARAMS
 }
 
 int	Server::nick_msg(std::string params, int fd) {
@@ -367,16 +366,15 @@ int	Server::nick_msg(std::string params, int fd) {
 			}
 		}
 	}
-	else
-		return (1); //ERR_NONICKNAMEGIVEN
+	return (1); //ERR_NONICKNAMEGIVEN
 }
 
 int	Server::user_msg(std::string params, int fd) {
+	(void)fd;
 	if (params != "\0") {
 		;
 	}
-	else
-		return (1); //ERR_NEEDMOREPARAMS
+	return (1); //ERR_NEEDMOREPARAMS
 
 }
 
