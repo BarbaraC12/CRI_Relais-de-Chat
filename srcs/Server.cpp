@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/24 20:53:28 by bcano            ###   ########.fr       */
+/*   Updated: 2022/06/25 17:05:39 by bcano            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -334,9 +334,52 @@ void	Server::init_map_funct(void)
 
 // BARBARA
 
-int	pass_msg(std::string params, int fd);
-int	nick_msg(std::string params, int fd);
-int	user_msg(std::string params, int fd);
+int	Server::pass_msg(std::string params, int fd) {
+	if (params != "\0") {
+		if (params != this->_passwd)
+			return (2); //ERR_ALREADYREGISTRED
+		else
+			return (0); //RIGHT_PASSWD
+	}
+	else
+		return (1); //ERR_NEEDMOREPARAMS
+	
+}
+
+int	Server::nick_msg(std::string params, int fd) {
+	if (params != "\0") {
+		//if (noConform(params))
+		//	return (2); //ERR_ERRONEUSNICKNAME
+		std::map<int, User>::iterator it;
+		for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
+		{
+			if (it->second.getNickname() == params && it->second.getSd() != fd)
+				return (3); //ERR_NICKNAMEINUSE
+			else if (it->second.getNickname() == params && it->second.getSd() == fd)
+				return (4); //ERR_NICKCOLLISION
+		}
+		for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
+		{
+			if (it->second.getSd() == fd)
+			{
+				it->second.setNickname(params);
+				return (0);	//NICKNAME_SET
+			}
+		}
+	}
+	else
+		return (1); //ERR_NONICKNAMEGIVEN
+}
+
+int	Server::user_msg(std::string params, int fd) {
+	if (params != "\0") {
+		;
+	}
+	else
+		return (1); //ERR_NEEDMOREPARAMS
+
+}
+
 int	server_msg(std::string params, int fd);
 int	oper_msg(std::string params, int fd);
 int	quit_msg(std::string params, int fd);
