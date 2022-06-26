@@ -6,13 +6,12 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/26 17:49:01 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/26 17:52:46 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 #include <algorithm>
-#include <bits/stdc++.h>
 #include <ctime>
 #include <csignal>
 #include <cstring>
@@ -20,6 +19,7 @@
 #include <fcntl.h>
 #include <iostream>
 #include <netinet/in.h>
+#include <sstream>
 #include <sys/ioctl.h>
 #include <sys/poll.h>
 #include <sys/socket.h>
