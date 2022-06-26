@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/26 12:27:44 by bcano            ###   ########.fr       */
+/*   Updated: 2022/06/26 12:30:30 by bcano            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -410,7 +410,6 @@ int	Server::user_msg(std::string params, int fd) {
 		// this->_map_users.push_back(newUser);
 	}
 	return (1); //ERR_NEEDMOREPARAMS
-
 }
 
 int	server_msg(std::string params, int fd);
