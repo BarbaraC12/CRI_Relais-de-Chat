@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/26 14:23:13 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/26 16:24:04 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,7 @@
 
 Server::Server(uint16_t &port, std::string const &passwd)
 	: _port(port), _passwd(passwd), _listen_sd(-1), _fds(200), _fds_buffer(200),
-	_ndfs(0), _map_funct(), _map_users(), _end_server(1),
-	_name("irc.anclarma.42.fr")
+	_ndfs(0), _map_funct(), _map_users(), _name("irc.anclarma.42.fr")
 {
 	this->init_map_funct();
 	return;
@@ -41,8 +40,7 @@ Server::Server(uint16_t &port, std::string const &passwd)
 
 Server::Server(void)
 	: _port(), _passwd(), _listen_sd(-1), _fds(200), _fds_buffer(200),
-	_ndfs(0), _map_funct(), _map_users(), _end_server(1),
-	_name("irc.anclarma.42.fr")
+	_ndfs(0), _map_funct(), _map_users(), _name("irc.anclarma.42.fr")
 {
 	this->init_map_funct();
 	return;
@@ -50,7 +48,7 @@ Server::Server(void)
 
 Server::Server(Server const &src)
 	: _port(), _passwd(), _listen_sd(-1), _fds(200), _fds_buffer(200), _ndfs(0),
-	_map_funct(), _map_users(), _end_server(1), _name("irc.anclarma.42.fr")
+	_map_funct(), _map_users(), _name("irc.anclarma.42.fr")
 {
 	*this = src;
 	return;
@@ -141,6 +139,9 @@ int Server::listen(void)
 		close(this->_listen_sd);
 		return (-1);
 	}
+	this->_fds[0].fd = this->_listen_sd;
+	this->_fds[0].events = POLLIN;
+	this->_ndfs++;
 	return (0);
 }
 
@@ -294,39 +295,34 @@ int Server::poll(int timeout)
 int Server::poll_loop(void)
 {
 	int	compress_array;
+	int	end;
 
-	this->_fds[0].fd = this->_listen_sd;
-	this->_fds[0].events = POLLIN;
-	this->_ndfs++;
-	this->_end_server = 0;
-	while (this->_end_server == 0)
+	compress_array = 0;
+	end = 0;
+	if (this->poll(-1))
+		return (-1);
+	for (fd_index_t i = 0, current_size = this->_ndfs; i < current_size; i++)
 	{
-		compress_array = 0;
-		if (this->poll(-1))
-			return (-1);
-		for (fd_index_t i = 0, current_size = this->_ndfs; i < current_size; i++)
+		if (this->_fds[i].revents == 0)
+			continue;
+		if (this->_fds[i].revents != POLLIN)
 		{
-			if (this->_fds[i].revents == 0)
-				continue;
-			if (this->_fds[i].revents != POLLIN)
-			{
-				std::clog << this->logtime() << "Error! revents = "
-					<< this->_fds[i].revents << std::endl;
-				this->_end_server = 1;
-				break;
-			}
-			if (this->_fds[i].fd == this->_listen_sd)
-			{
-				if (this->listening())
-					this->_end_server = 1;
-			}
-			else if (this->receive_loop(i))
-				compress_array = 1;
+			std::clog << this->logtime() << "Error! revents = "
+				<< this->_fds[i].revents << std::endl;
+			end = 1;
+			break;
 		}
-		if (compress_array)
-			this->compress_array();
+		if (this->_fds[i].fd == this->_listen_sd)
+		{
+			if (this->listening())
+				end = 1;
+		}
+		else if (this->receive_loop(i))
+			compress_array = 1;
 	}
-	return (0);
+	if (compress_array)
+		this->compress_array();
+	return (end);
 }
 
 std::string	Server::logtime(void)

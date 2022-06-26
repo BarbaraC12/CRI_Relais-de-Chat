@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 19:39:02 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/25 16:17:52 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/26 16:19:37 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ class Server
 		fd_index_t					_ndfs;
 		std::map<std::string, int (Server::* const)(std::string, int)>	_map_funct;
 		std::map<int, User>			_map_users;
-		int							_end_server;
 		std::string					_name;
 
 	public:
