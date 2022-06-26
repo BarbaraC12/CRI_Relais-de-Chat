@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/26 17:38:50 by bcano            ###   ########.fr       */
+/*   Updated: 2022/06/26 17:46:00 by bcano            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -396,26 +396,34 @@ int	Server::pass_msg(std::string params, int fd) {
 
 int	Server::nick_msg(std::string params, int fd) {
 	if (params != "\0") {
-		//if (noConform(params))
-		//	return (2); //ERR_ERRONEUSNICKNAME
 		std::map<int, User>::iterator it;
 		for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
 		{
-			if (it->second.getNickname() == params && it->second.getSd() != fd)
-				return (3); //ERR_NICKNAMEINUSE
-			else if (it->second.getNickname() == params && it->second.getSd() == fd)
-				return (4); //ERR_NICKCOLLISION
+			if (it->second.getNickname() == params && it->second.getSd() != fd) {
+				std::cout << "Nickname already taken" << std::endl;	
+				return (3);
+			}
+			else if (it->second.getNickname() == params && it->second.getSd() == fd) {
+				std::cout << "Nickname is already your" << std::endl;
+				return (4);
+			}
 		}
+		//if (noConform(params)) {
+		//		std::cout << "Nickname not conform" << std::endl;
+		//		return (2); //ERR_ERRONEUSNICKNAME
+		// }
 		for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
 		{
 			if (it->second.getSd() == fd)
 			{
 				it->second.setNickname(params);
-				return (0);	//NICKNAME_SET
+				std::cout << "Nickname changed to " << params << std::endl;
+				return (0);
 			}
 		}
 	}
-	return (1); //ERR_NONICKNAMEGIVEN
+	std::cout << "No nickname given" << std::endl;
+	return (1);
 }
 
 int	Server::user_msg(std::string params, int fd) {
