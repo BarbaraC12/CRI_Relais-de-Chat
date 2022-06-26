@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/26 12:25:54 by bcano            ###   ########.fr       */
+/*   Updated: 2022/06/26 12:27:44 by bcano            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -371,7 +371,6 @@ int	Server::nick_msg(std::string params, int fd) {
 
 int	Server::user_msg(std::string params, int fd) {
 	(void)fd;
-	
 	if (params != "\0") {
 		std::map<int, User>::iterator it;
 		for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
@@ -381,7 +380,7 @@ int	Server::user_msg(std::string params, int fd) {
 				// std::stringstream ss(params);
 				for (int i(0); i < 5; i++ ) {
 					// ss << params;
-					if (i == 0){
+					if (i == 0) {
 						it->second.setNickname(params);
 					// else if (i == 1)
 					// 	it->second.setUsername(ss);
@@ -409,7 +408,6 @@ int	Server::user_msg(std::string params, int fd) {
 		// 	return (0);
 		// }
 		// this->_map_users.push_back(newUser);
-
 	}
 	return (1); //ERR_NEEDMOREPARAMS
 
