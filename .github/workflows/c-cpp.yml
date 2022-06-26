@@ -2,9 +2,9 @@ name: C/C++ CI
 
 on:
   push:
-    branches: [ "main", "bcano", "anclarma" ]
+    branches: [ "main", "bcano", "anclarma", "jdidier" ]
   pull_request:
-    branches: [ "main", "bcano", "anclarma" ]
+    branches: [ "main", "bcano", "anclarma", "jdidier" ]
 
 jobs:
   build:
