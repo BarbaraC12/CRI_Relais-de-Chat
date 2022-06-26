@@ -6,13 +6,12 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/26 17:46:00 by bcano            ###   ########.fr       */
+/*   Updated: 2022/06/26 21:02:09 by bcano            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 #include <algorithm>
-#include <bits/stdc++.h>
 #include <ctime>
 #include <csignal>
 #include <cstring>
@@ -20,6 +19,7 @@
 #include <fcntl.h>
 #include <iostream>
 #include <netinet/in.h>
+#include <sstream>
 #include <sys/ioctl.h>
 #include <sys/poll.h>
 #include <sys/socket.h>
@@ -374,6 +374,7 @@ void	Server::init_map_funct(void)
 	this->_map_funct.insert(make_pair("PING", &Server::ping_msg));
 	this->_map_funct.insert(make_pair("PONG", &Server::pong_msg));
 	this->_map_funct.insert(make_pair("ERROR", &Server::error_msg));
+	this->_map_funct.insert(make_pair("CAP", &Server::cap_msg));
 }
 
 // BARBARA
@@ -542,6 +543,13 @@ int	Server::pong_msg(std::string params, int fd)
 }
 
 int	Server::error_msg(std::string params, int fd)
+{
+	(void)params;
+	(void)fd;
+	return (0);
+}
+
+int	Server::cap_msg(std::string params, int fd)
 {
 	(void)params;
 	(void)fd;
