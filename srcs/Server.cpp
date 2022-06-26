@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/26 12:30:30 by bcano            ###   ########.fr       */
+/*   Updated: 2022/06/26 12:38:01 by bcano            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -412,10 +412,29 @@ int	Server::user_msg(std::string params, int fd) {
 	return (1); //ERR_NEEDMOREPARAMS
 }
 
-int	server_msg(std::string params, int fd);
-int	oper_msg(std::string params, int fd);
-int	quit_msg(std::string params, int fd);
-int	squit_msg(std::string params, int fd);
+int	Server::server_msg(std::string params, int fd) {
+	(void)params;
+	(void)fd;
+	return (1);
+}
+
+int	Server::oper_msg(std::string params, int fd) {
+	(void)params;
+	(void)fd;
+	return (1);
+}
+
+int	Server::quit_msg(std::string params, int fd) {
+	(void)params;
+	(void)fd;
+	return (1);
+}
+
+int	Server::squit_msg(std::string params, int fd) {
+	(void)params;
+	(void)fd;
+	return (1);
+}
 
 // ANTOINE
 
