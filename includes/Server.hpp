@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 19:39:02 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/25 16:19:56 by bcano            ###   ########.fr       */
+/*   Updated: 2022/06/26 17:39:06 by bcano            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ class Server
 		fd_index_t					_ndfs;
 		std::map<std::string, int (Server::* const)(std::string, int)>	_map_funct;
 		std::map<int, User>			_map_users;
-		int							_end_server;
+		std::string					_name;
 
 	public:
 		Server(uint16_t &port, std::string const &passwd);
@@ -50,6 +50,7 @@ class Server
 		int		listen(void);
 		int		poll_loop(void);
 		int		receiving(fd_index_t fd);
+		int		receive_msg(std::string line, fd_index_t fd);
 		int		parse_buffer(fd_index_t fd);
 		int		receive_loop(fd_index_t fd);
 		int		listening(void);

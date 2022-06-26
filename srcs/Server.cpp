@@ -6,11 +6,12 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/26 17:36:10 by bcano            ###   ########.fr       */
+/*   Updated: 2022/06/26 17:38:50 by bcano            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
+#include <algorithm>
 #include <bits/stdc++.h>
 #include <ctime>
 #include <csignal>
@@ -33,7 +34,7 @@
 
 Server::Server(uint16_t &port, std::string const &passwd)
 	: _port(port), _passwd(passwd), _listen_sd(-1), _fds(200), _fds_buffer(200),
-	_ndfs(0), _map_funct(), _map_users(), _end_server(1)
+	_ndfs(0), _map_funct(), _map_users(), _name("irc.anclarma.42.fr")
 {
 	this->init_map_funct();
 	return;
@@ -41,7 +42,7 @@ Server::Server(uint16_t &port, std::string const &passwd)
 
 Server::Server(void)
 	: _port(), _passwd(), _listen_sd(-1), _fds(200), _fds_buffer(200),
-	_ndfs(0), _map_funct(), _map_users(), _end_server(1)
+	_ndfs(0), _map_funct(), _map_users(), _name("irc.anclarma.42.fr")
 {
 	this->init_map_funct();
 	return;
@@ -49,7 +50,7 @@ Server::Server(void)
 
 Server::Server(Server const &src)
 	: _port(), _passwd(), _listen_sd(-1), _fds(200), _fds_buffer(200), _ndfs(0),
-	_map_funct(), _map_users(), _end_server(1)
+	_map_funct(), _map_users(), _name("irc.anclarma.42.fr")
 {
 	*this = src;
 	return;
@@ -140,6 +141,28 @@ int Server::listen(void)
 		close(this->_listen_sd);
 		return (-1);
 	}
+	this->_fds[0].fd = this->_listen_sd;
+	this->_fds[0].events = POLLIN;
+	this->_ndfs++;
+	return (0);
+}
+
+int	Server::receive_msg(std::string line, fd_index_t fd)
+{
+	std::map<std::string, int (Server::* const)(std::string, int)>::iterator	it;
+	std::string	fisrt_word;
+
+	fisrt_word = line.substr(0, line.find(" "));
+	it = this->_map_funct.find(fisrt_word);
+	if (it != this->_map_funct.end())
+	{
+		std::string	new_line;
+
+		new_line = line.substr(line.find(" ") + 1);
+		(this->*(it->second))(new_line, static_cast<int>(fd));
+	}
+	(void)fd;
+	(void)it;
 	return (0);
 }
 
@@ -156,14 +179,9 @@ int Server::parse_buffer(fd_index_t fd)
 
 			sub_str = this->_fds_buffer[fd].substr(0, found);
 			this->_fds_buffer[fd].erase(0, found + 2);
-			sub_str[found] = '\0';
 			std::clog << this->logtime() << "receiving: " << sub_str << std::endl;
-			sub_str += "\r\n";
-			if (send(static_cast<int>(fd), sub_str.data(), sub_str.length(), 0) < 0)
-			{
-				std::clog << this->logtime() << "send() failed" << std::endl;
-				return (-1);
-			}
+			receive_msg(sub_str, fd);
+			sub_str[found] = '\0';
 		}
 	}
 	while (found != std::string::npos);
@@ -279,50 +297,46 @@ int Server::poll(int timeout)
 int Server::poll_loop(void)
 {
 	int	compress_array;
+	int	end;
 
-	this->_fds[0].fd = this->_listen_sd;
-	this->_fds[0].events = POLLIN;
-	this->_ndfs++;
-	this->_end_server = 0;
-	while (this->_end_server == 0)
+	compress_array = 0;
+	end = 0;
+	if (this->poll(-1))
+		return (-1);
+	for (fd_index_t i = 0, current_size = this->_ndfs; i < current_size; i++)
 	{
-		compress_array = 0;
-		if (this->poll(-1))
-			return (-1);
-		for (fd_index_t i = 0, current_size = this->_ndfs; i < current_size; i++)
+		if (this->_fds[i].revents == 0)
+			continue;
+		if (this->_fds[i].revents != POLLIN)
 		{
-			if (this->_fds[i].revents == 0)
-				continue;
-			if (this->_fds[i].revents != POLLIN)
-			{
-				std::clog << this->logtime() << "Error! revents = "
-					<< this->_fds[i].revents << std::endl;
-				this->_end_server = 1;
-				break;
-			}
-			if (this->_fds[i].fd == this->_listen_sd)
-			{
-				if (this->listening())
-					this->_end_server = 1;
-			}
-			else if (this->receive_loop(i))
-				compress_array = 1;
+			std::clog << this->logtime() << "Error! revents = "
+				<< this->_fds[i].revents << std::endl;
+			end = 1;
+			break;
 		}
-		if (compress_array)
-			this->compress_array();
+		if (this->_fds[i].fd == this->_listen_sd)
+		{
+			if (this->listening())
+				end = 1;
+		}
+		else if (this->receive_loop(i))
+			compress_array = 1;
 	}
-	return (0);
+	if (compress_array)
+		this->compress_array();
+	return (end);
 }
 
 std::string	Server::logtime(void)
 {
-	std::string	buffer(50, '\0');
+	std::string	buffer;
 	time_t		rawtime;
-	struct tm	*timeinfo;
 
 	time(&rawtime);
-	timeinfo = localtime(&rawtime);
-	strftime(const_cast<char *>(buffer.data()), 25, "[%x %X] ", timeinfo);
+	buffer.append("[");
+	buffer.append(ctime(&rawtime));
+	buffer.erase(std::remove(buffer.begin(), buffer.end(), '\n'), buffer.end());
+	buffer.append("]");
 	return (buffer);
 }
 
@@ -498,8 +512,17 @@ int	Server::kill_msg(std::string params, int fd)
 
 int	Server::ping_msg(std::string params, int fd)
 {
+	std::string	reply;
+
 	(void)params;
-	(void)fd;
+	reply += "PONG ";
+	reply += this->_name;
+	reply += "\r\n";
+	if (send(fd, reply.data(), reply.length(), 0) < 0)
+	{
+		std::clog << this->logtime() << "send() failed" << std::endl;
+		return (-1);
+	}
 	return (0);
 }
 

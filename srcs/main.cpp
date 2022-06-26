@@ -6,15 +6,24 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 12:19:46 by bcano             #+#    #+#             */
-/*   Updated: 2022/06/24 19:39:33 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/26 16:20:56 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 #include <cstdlib>
 #include <cstring>
-#include <ctype.h>
+#include <csignal>
+#include <cctype>
 #include <iostream>
+
+static sig_atomic_t	end_irc = 0;
+
+void	sigint_handler(int param)
+{
+	(void)param;
+	end_irc = 0;
+}
 
 int display_error(int type, const char *err, const char *message)
 {
@@ -28,6 +37,7 @@ int main(int argc, char **argv)
 	uint16_t	port = 0;
 	std::string	pwd("");
 
+	signal(SIGINT, sigint_handler);
 	if (argc != 3)
 		return (display_error(1, "Wrong numbers of Parameters",
 							  "Usage: ./ircserv <port> <password>"));
@@ -46,6 +56,7 @@ int main(int argc, char **argv)
 	s.set_sock();
 	s.bind_sock();
 	s.listen();
-	s.poll_loop();
+	while (end_irc == 0)
+		end_irc = s.poll_loop();
 	return (0);
 }
