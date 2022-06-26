@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 19:39:02 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/26 16:19:37 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/26 16:48:46 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,8 @@ class Server
 		int	ping_msg(std::string params, int fd);
 		int	pong_msg(std::string params, int fd);
 		int	error_msg(std::string params, int fd);
+		// capacity
+		int	cap_msg(std::string params, int fd);
 };
 
 #endif

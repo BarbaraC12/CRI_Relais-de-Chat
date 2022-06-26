@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/26 16:24:04 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/26 16:49:53 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -344,6 +344,7 @@ void	Server::init_map_funct(void)
 	this->_map_funct.insert(make_pair("PING", &Server::ping_msg));
 	this->_map_funct.insert(make_pair("PONG", &Server::pong_msg));
 	this->_map_funct.insert(make_pair("ERROR", &Server::error_msg));
+	this->_map_funct.insert(make_pair("CAP", &Server::cap_msg));
 }
 
 // BARBARA
@@ -400,6 +401,13 @@ int	Server::pong_msg(std::string params, int fd)
 }
 
 int	Server::error_msg(std::string params, int fd)
+{
+	(void)params;
+	(void)fd;
+	return (0);
+}
+
+int	Server::cap_msg(std::string params, int fd)
 {
 	(void)params;
 	(void)fd;
