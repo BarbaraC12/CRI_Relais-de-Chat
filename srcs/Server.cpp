@@ -6,11 +6,12 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/26 12:38:01 by bcano            ###   ########.fr       */
+/*   Updated: 2022/06/26 17:36:10 by bcano            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
+#include <bits/stdc++.h>
 #include <ctime>
 #include <csignal>
 #include <cstring>
@@ -23,6 +24,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <utility>
 
 #ifndef SOCK_NONBLOCK
 # define SOCK_NONBLOCK O_NONBLOCK
@@ -326,6 +328,34 @@ std::string	Server::logtime(void)
 
 void	Server::init_map_funct(void)
 {
+	this->_map_funct.insert(make_pair("PASS", &Server::pass_msg));
+	// this->_map_funct.insert(make_pair("NICK", &Server::nick_msg));
+	// this->_map_funct.insert(make_pair("USER", &Server::user_msg));
+	// this->_map_funct.insert(make_pair("SERVER", &Server::server_msg));
+	// this->_map_funct.insert(make_pair("OPER", &Server::oper_msg));
+	// this->_map_funct.insert(make_pair("QUIT", &Server::quit_msg));
+	// this->_map_funct.insert(make_pair("SQUIT", &Server::squit_msg));
+	// this->_map_funct.insert(make_pair("JOIN", &Server::join_msg));
+	// this->_map_funct.insert(make_pair("PART", &Server::part_msg));
+	// this->_map_funct.insert(make_pair("MODE", &Server::mode_msg));
+	// this->_map_funct.insert(make_pair("TOPIC", &Server::topic_msg));
+	// this->_map_funct.insert(make_pair("NAMES", &Server::names_msg));
+	// this->_map_funct.insert(make_pair("LIST", &Server::list_msg));
+	// this->_map_funct.insert(make_pair("INVITE", &Server::invite_msg));
+	// this->_map_funct.insert(make_pair("KICK", &Server::kick_msg));
+	// this->_map_funct.insert(make_pair("VERSION", &Server::version_msg));
+	// this->_map_funct.insert(make_pair("STATS", &Server::stats_msg));
+	// this->_map_funct.insert(make_pair("LINKS", &Server::links_msg));
+	// this->_map_funct.insert(make_pair("TIME", &Server::time_msg));
+	// this->_map_funct.insert(make_pair("CONNECT", &Server::connect_msg));
+	// this->_map_funct.insert(make_pair("TRACE", &Server::trace_msg));
+	// this->_map_funct.insert(make_pair("ADMIN", &Server::admin_msg));
+	// this->_map_funct.insert(make_pair("INFO", &Server::info_msg));
+	// this->_map_funct.insert(make_pair("PRIVMSG", &Server::privmsg_msg));
+	// this->_map_funct.insert(make_pair("NOTICE", &Server::notice_msg));
+	// this->_map_funct.insert(make_pair("WHO", &Server::who_msg));
+	// this->_map_funct.insert(make_pair("WHOIS", &Server::whois_msg));
+	// this->_map_funct.insert(make_pair("WHOWAS", &Server::whowas_msg));
 	this->_map_funct.insert(make_pair("KILL", &Server::kill_msg));
 	this->_map_funct.insert(make_pair("PING", &Server::ping_msg));
 	this->_map_funct.insert(make_pair("PONG", &Server::pong_msg));
@@ -337,12 +367,17 @@ void	Server::init_map_funct(void)
 int	Server::pass_msg(std::string params, int fd) {
 	(void)fd;
 	if (params != "\0") {
-		if (params != this->_passwd)
-			return (2); //ERR_ALREADYREGISTRED
-		else
-			return (0); //RIGHT_PASSWD
+		if (params != this->_passwd) {
+			std::cout << "Incorrect password" << std::endl;
+			return (2);
+		}
+		else {
+			std::cout << "Login successful" << std::endl;
+			return (0);
+		}
 	}
-	return (1); //ERR_NEEDMOREPARAMS
+	std::cout << "No password given" << std::endl;
+	return (1);
 }
 
 int	Server::nick_msg(std::string params, int fd) {
@@ -377,37 +412,42 @@ int	Server::user_msg(std::string params, int fd) {
 		{
 			if (it->second.getSd() == fd)
 			{
-				// std::stringstream ss(params);
-				for (int i(0); i < 5; i++ ) {
-					// ss << params;
-					if (i == 0) {
-						it->second.setNickname(params);
-					// else if (i == 1)
-					// 	it->second.setUsername(ss);
-					// else if (i == 2)
-					// 	it->second.setHostname(ss);
-					// else {
-					// 	it->second.setRealname(ss);
+				std::stringstream ss(params);
+				std::string str;
+				for (int i(0); i < 4; i++ ) {
+					ss >> str;
+					if (i == 0)
+						it->second.setUsername(str);
+					else if (i == 1)
+						it->second.setHostname(str);
+					else if (i == 2)
+						it->second.setServname(str);
+					else {
+						it->second.setRealname(str);
 						return (0); // USER_SET
 					}
 				}
 			}
 		}
-	// ########### CREER UN NEW USER ##############
-		// std::stringstream ss();
-		// User newUser(fd);
-		// for (int i(0); ss << params && i < 5; i++ ) {
-		// 	if (i == 0)
-		// 		newUser.setNickname(ss);
-		// 	else if (i == 1)
-		// 		newUser.setUsername(ss);
-		// 	else if (i == 2)
-		// 		newUser.setHostname(ss);
-		// 	else 
-		// 		newUser.setRealname(ss);
-		// 	return (0);
-		// }
-		// this->_map_users.push_back(newUser);
+		std::stringstream ss(params);
+		std::string str;
+		User newUser(fd);
+		for (int i(0); i < 4; i++ ) {
+			ss >> str;
+			if (i == 0)
+				newUser.setUsername(str);
+			else if (i == 1)
+				newUser.setHostname(str);
+			else if (i == 2)
+				newUser.setServname(str);
+			else {
+				newUser.setRealname(str);
+				return (0);
+			}
+		}
+// ########### CREER UN NEW USER ##############
+		this->_map_users.insert(std::make_pair(fd, newUser));
+		return (0); // USER_SET
 	}
 	return (1); //ERR_NEEDMOREPARAMS
 }
