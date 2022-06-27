@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
+/*   By: jdidier <jdidier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/26 17:52:46 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/27 22:18:40 by jdidier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -545,5 +545,42 @@ int	Server::cap_msg(std::string params, int fd)
 {
 	(void)params;
 	(void)fd;
+	return (0);
+}
+
+/* ########### Server & Queries Commands ########### */
+//RFC 2812 3.4.1. Motd Message
+int	Server::motd_msg(std::string params, int fd)
+{
+	(void)params;
+	(void)fd;
+	std::string		reply;
+	// Open ./motd.txt file
+	std::ifstream	ifs;
+	try
+	{
+		ifs.open("motd.txt", std::ifstream::in);
+		if (!ifs)
+		{
+			throw std::exception();
+		}
+		else
+		{
+			//send 375 RPL_MOTDSTART ":- <server> Message of the day - "
+			//TODO: read file with getline to <text>
+			for (std::string line; std::getline(ifs, line); )
+			{
+				reply += line + "\n";
+			}
+			//send 372 RPL_MOTD ":- <text>"
+			//send 376 RPL_ENDOFMOTD ":End of MOTD command"
+			std::cout << reply << std::endl;
+		}
+	}
+	catch (std::exception &e)
+	{
+		std::cerr << e.what() << std::endl;
+		//send 422 ERR_NOMOTD ":MOTD File is missing"
+	}
 	return (0);
 }
