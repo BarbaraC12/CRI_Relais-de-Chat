@@ -19,6 +19,7 @@
 class User {
 	private:
 		int	_sd;
+		bool		_auth;
 		std::string	_nickName;//
 		std::string	_userName;
 		std::string _hostName;
@@ -35,6 +36,7 @@ class User {
 		virtual ~User(void);
 		std::string	nickname;
 		
+		void	setAuth( bool );
 		void	setNickname( std::string );
 		void	setUsername( std::string );
 		void	setHostname( std::string );
@@ -45,6 +47,7 @@ class User {
 		void	setStatus( bool );
 		
 		int			getSd( void );
+		bool		getAuth( void );
 		std::string	getNickname( void );
 		std::string	getUsername( void );
 		std::string	getHostname( void );
