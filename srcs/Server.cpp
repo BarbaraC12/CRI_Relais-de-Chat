@@ -577,7 +577,10 @@ int	Server::motd_msg(std::string params, int fd)
 
 int	version_msg(std::string params, int fd)
 {
-	if (params != "") 
+	(void)params;
+	(void)fd;
+	std::string		server = "";
+	if (server != "") 
 	{
 		//send 402 ERR_NOSUCHSERVER "<server name>:No such server"
 	}
@@ -585,12 +588,15 @@ int	version_msg(std::string params, int fd)
 	{
 		//send 351 RPL_VERSION "<version>.<debuglevel> <server> :<comments>"
 	}
+	return (0);
 }
 
 int	stats_msg(std::string params, int fd)
 {
-	char			request;
-	std::string		server;
+	(void)params;
+	(void)fd;
+	char			request = 'a';
+	std::string		server = "";
 
 	if (server != "")
 	{
@@ -646,11 +652,14 @@ int	stats_msg(std::string params, int fd)
 		}
 	}
 	// send 219 RPL_ENDOFSTATS "<stats letter> :End of /STATS report"
+	return (0);
 }
 
 int	time_msg(std::string params, int fd)
 {
-	std::string		server;
+	(void)params;
+	(void)fd;
+	std::string		server = "";
 
 	if (server != "")
 	{
@@ -660,12 +669,15 @@ int	time_msg(std::string params, int fd)
 	{
 		// send 392 RPL_TIME "<server> :<string showing server's local time>"
 	}
+	return (0);
 }
 
 int	connect_msg(std::string params, int fd)
 {
-	std::string		server;
-	std::string		port;
+	(void)params;
+	(void)fd;
+	std::string		server = "";
+	std::string		port = "";
 	//Alternative solution : always send ERR_NOPRIVILEGES
 
 	// IF User is not an operator
@@ -679,17 +691,21 @@ int	connect_msg(std::string params, int fd)
 	{
 		// send 402 ERR_NOSUCHSERVER "<server name>:No such server"
 	}
+	return (0);
 }
 
 int	trace_msg(std::string params, int fd)
 {
 	(void)params;
 	(void)fd;
+	return (0);
 }
 
 int	admin_msg(std::string params, int fd)
 {
-	std::string		server;
+	(void)params;
+	(void)fd;
+	std::string		server = "";
 
 	if (server != "")
 	{
@@ -702,11 +718,14 @@ int	admin_msg(std::string params, int fd)
 		// send 258 RPL_ADMINLOC2 ":<admin info>"
 		// send 259 RPL_ADMINEMAIL ":<admin info>"
 	}
+	return (0);
 }
 
 int	info_msg(std::string params, int fd)
 {
-	std::string		server;
+	(void)params;
+	(void)fd;
+	std::string		server = "";
 
 	if (server != "")
 	{
@@ -719,4 +738,5 @@ int	info_msg(std::string params, int fd)
 
 		// send 374 RPL_ENDOFINFO ":End of /INFO list"
 	}
+	return (0);
 }
