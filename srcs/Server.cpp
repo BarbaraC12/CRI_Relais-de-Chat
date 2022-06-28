@@ -543,6 +543,7 @@ int	Server::motd_msg(std::string params, int fd)
 	(void)params;
 	(void)fd;
 	std::string		reply;
+	std::string		text;
 	// Open ./motd.txt file
 	std::ifstream	ifs;
 	try
@@ -558,9 +559,10 @@ int	Server::motd_msg(std::string params, int fd)
 			//TODO: read file with getline to <text>
 			for (std::string line; std::getline(ifs, line); )
 			{
-				reply += line + "\n";
+				text += line;
+				//send 372 RPL_MOTD ":- <text>"
+				reply += text; //to do some test
 			}
-			//send 372 RPL_MOTD ":- <text>"
 			//send 376 RPL_ENDOFMOTD ":End of MOTD command"
 			std::cout << reply << std::endl;
 		}
@@ -571,4 +573,150 @@ int	Server::motd_msg(std::string params, int fd)
 		//send 422 ERR_NOMOTD ":MOTD File is missing"
 	}
 	return (0);
+}
+
+int	version_msg(std::string params, int fd)
+{
+	if (params != "") 
+	{
+		//send 402 ERR_NOSUCHSERVER "<server name>:No such server"
+	}
+	else //no server in params
+	{
+		//send 351 RPL_VERSION "<version>.<debuglevel> <server> :<comments>"
+	}
+}
+
+int	stats_msg(std::string params, int fd)
+{
+	char			request;
+	std::string		server;
+
+	if (server != "")
+	{
+		// send 402 ERR_NOSUCHSERVER "<server name>:No such server"
+	}
+	else
+	{
+		switch (request)
+		{
+		case 'c':
+			/* send 213 RPL_STATSCLINE "C <host> * <name> <port> <class>" */ 
+			// NO NEED BECAUSE SERVER TO SERVER COMMUNICATION IS FORBIDDEN
+			// As final implementation : just ignore message ?
+			// send 402 ERR_NOSUCHSERVER "<server name>:No such server"
+			break;
+		
+		case 'h':
+			/* send 244 RPL_STATSHLINE "H <hostmask> * <servername>" */
+			// NO NEED BECAUSE SERVER TO SERVER COMMUNICATION IS FORBIDDEN
+			// As final implementation : just ignore message ?
+			// send 402 ERR_NOSUCHSERVER "<server name>:No such server"
+			break;
+		
+		case 'i':
+			/* send 215 RPL_STATSILINE "I <host> * <host> <port> <class>" */
+			break;
+		
+		case 'k':
+			/* send 216 RPL_STATSKLINE "K <host> * <username> <port> <class>" */
+			break;
+		
+		case 'l':
+			/* send 241 RPL_STATSLLINE "L <hostmask> * <servername> <maxdepth>" */
+			break;
+
+		case 'm':
+			// for each command :
+			/* RFC 1459 send 212 RPL_STATSCOMMANDS "<command> <count>" */
+			/* RFC 2812 send 212 RPL_STATSCOMMANDS "<command> <count> <byte count> <remote count>" */
+			break;
+
+		case 'o':
+			/* send 243 RPL_STATSOLINE "O <hostmask> * <name>" */
+			break;
+
+		case 'y':
+			/* sen 218 218 RPL_STATSYLINE "Y <class> <ping frequency> <connect frequency> <max sendq>" */
+			break;
+
+		default: //u
+			//send 242 RPL_STATSUPTIME ":Server Up %d days %d:20d:%02d"
+			break;
+		}
+	}
+	// send 219 RPL_ENDOFSTATS "<stats letter> :End of /STATS report"
+}
+
+int	time_msg(std::string params, int fd)
+{
+	std::string		server;
+
+	if (server != "")
+	{
+		// send 402 ERR_NOSUCHSERVER "<server name>:No such server"
+	}
+	else
+	{
+		// send 392 RPL_TIME "<server> :<string showing server's local time>"
+	}
+}
+
+int	connect_msg(std::string params, int fd)
+{
+	std::string		server;
+	std::string		port;
+	//Alternative solution : always send ERR_NOPRIVILEGES
+
+	// IF User is not an operator
+	// send 481 ERR_NOPRIVILEGES ":Permission Denied- You're not an IRC operator"
+
+	if (port == "" || server == "")
+	{
+		// send 461 ERR_NEEDMOREPARAMS "<command> :Not enough parameters"
+	}
+	else if (server != "")
+	{
+		// send 402 ERR_NOSUCHSERVER "<server name>:No such server"
+	}
+}
+
+int	trace_msg(std::string params, int fd)
+{
+	(void)params;
+	(void)fd;
+}
+
+int	admin_msg(std::string params, int fd)
+{
+	std::string		server;
+
+	if (server != "")
+	{
+		// send 402 ERR_NOSUCHSERVER "<server name>:No such server"
+	}
+	else
+	{
+		// send 256 RPL_ADMINME "<server> :Administrative info"
+		// send 257 RPL_ADMINLOC1 ":<admin info>"
+		// send 258 RPL_ADMINLOC2 ":<admin info>"
+		// send 259 RPL_ADMINEMAIL ":<admin info>"
+	}
+}
+
+int	info_msg(std::string params, int fd)
+{
+	std::string		server;
+
+	if (server != "")
+	{
+		// send 402 ERR_NOSUCHSERVER "<server name>:No such server"
+	}
+	else
+	{
+		// for each line of INFO
+		// send 371 RPL_INFO ":<string>"
+
+		// send 374 RPL_ENDOFINFO ":End of /INFO list"
+	}
 }

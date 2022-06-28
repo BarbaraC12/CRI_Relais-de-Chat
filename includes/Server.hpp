@@ -26,6 +26,8 @@ class Server
 		std::map<std::string, int (Server::* const)(std::string, int)>	_map_funct;
 		std::map<int, User>			_map_users;
 		std::string					_name;
+		std::string					_version;
+		std::string					_debuglevel;
 
 	public:
 		Server(uint16_t &port, std::string const &passwd);
