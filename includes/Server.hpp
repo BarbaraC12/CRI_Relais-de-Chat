@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/10 19:39:02 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/26 17:47:23 by anclarma         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
@@ -20,6 +8,9 @@
 #include <sys/socket.h>
 #include <vector>
 #include <map>
+#include <iostream>
+#include <fstream>
+#include <stdexcept>
 
 class Server
 {
@@ -80,6 +71,7 @@ class Server
 		int	invite_msg(std::string params, int fd);
 		int	kick_msg(std::string params, int fd);
 		// Server queries and commands
+		int	motd_msg(std::string params, int fd);
 		int	version_msg(std::string params, int fd);
 		int	stats_msg(std::string params, int fd);
 		int	links_msg(std::string params, int fd);
