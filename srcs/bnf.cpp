@@ -6,12 +6,28 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/27 10:16:39 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/27 12:23:51 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/28 14:30:30 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "bnf.hpp"
 #include <map>
+
+class	Param
+{
+	public:
+		std::string	nick;
+		std::string	user;
+		std::string	host;
+		std::string	server_name;
+		std::string	server_ver;
+		std::string	date;
+		std::string	server_name;
+}
+
+std::string	gen_bnf_msg(const int &id, const Param &p)
+{
+}
 
 void	init_bnf_msg(std::map<int, char *> &map_bnf_msg)
 {
@@ -114,46 +130,68 @@ void	init_bnf_msg(std::map<int, char *> &map_bnf_msg)
 	map_bnf_msg[RPL_MOTDSTART] = ":- <server> Message of the day - ";
 	map_bnf_msg[RPL_ENDOFMOTD] = ":End of MOTD command";
 	map_bnf_msg[RPL_YOUREOPER] = ":You are now an IRC operator";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
-	map_bnf_msg[] = "";
+	map_bnf_msg[RPL_REHASHING] = "<config file> :Rehashing";
+	map_bnf_msg[RPL_YOURESERVICE] = "You are service <servicename>";
+	map_bnf_msg[RPL_MYPORTIS] = "";
+	map_bnf_msg[RPL_TIME] = "<server> :<time string>";
+	map_bnf_msg[RPL_USERSSTART] = ":UserID Terminal Host";
+	map_bnf_msg[RPL_USERS] = ":<username> <ttyline> <hostname>";
+	map_bnf_msg[RPL_ENDOFUSERS] = ":<info>";
+	map_bnf_msg[RPL_NOUSERS] = ":<info>";
+	map_bnf_msg[RPL_HOSTHIDDEN] = "";
+	map_bnf_msg[ERR_UNKNOWNERROR] = "<command> [<?>] :<info>";
+	map_bnf_msg[ERR_NOSUCHNICK] = "<nick> :<reason>";
+	map_bnf_msg[ERR_NOSUCHSERVER] = "<server> :No such server";
+	map_bnf_msg[ERR_NOSUCHCHANNEL] = "<channel> :<reason>";
+	map_bnf_msg[ERR_CANNOTSENDTOCHAN] = "<channel> :<reason>";
+	map_bnf_msg[ERR_TOOMANYCHANNELS] = "<channel> :<reason>";
+	map_bnf_msg[ERR_WASNOSUCHNICK] = "<nick> :<reason>";
+	map_bnf_msg[ERR_TOOMANYTARGETS] = "<target> :<reason>";
+	map_bnf_msg[ERR_NOSUCHSERVICE] = "<service_name> :<reason>";
+	map_bnf_msg[ERR_NOORIGIN] = ":No origin specified";
+	map_bnf_msg[ERR_NORECIPIENT] = ":<reason>";
+	map_bnf_msg[ERR_NOTEXTTOSEND] = ":<reason>";
+	map_bnf_msg[ERR_NOTOPLEVEL] = "<mask> :<reason>";
+	map_bnf_msg[ERR_WILDTOPLEVEL] = "<mask> :<reason>";
+	map_bnf_msg[ERR_BADMASK] = "<mask> :<reason>";
+	map_bnf_msg[ERR_UNKNOWNCOMMAND] = "<command> :<reason>";
+	map_bnf_msg[ERR_NOMOTD] = ":<reason>";
+	map_bnf_msg[ERR_NOADMININFO] = "<server> :<reason>";
+	map_bnf_msg[ERR_FILEERROR] = ":<reason>";
+	map_bnf_msg[ERR_NONICKNAMEGIVEN] = ":<reason>";
+	map_bnf_msg[ERR_ERRONEUSNICKNAME] = "<nick> :<reason>";
+	map_bnf_msg[ERR_NICKNAMEINUSE] = "<nick> :<reason>";
+	map_bnf_msg[ERR_NICKCOLLISION] = "<nick> :<reason>";
+	map_bnf_msg[ERR_UNAVAILRESOURCE] = "<nick/channel/service> :<reason>";
+	map_bnf_msg[ERR_USERNOTINCHANNEL] = "<nick> <channel> :<reason>";
+	map_bnf_msg[ERR_NOTONCHANNEL] = "<channel> :<reason>";
+	map_bnf_msg[ERR_USERONCHANNEL] = "<nick> <channel> [:<reason>]";
+	map_bnf_msg[ERR_NOLOGIN] = "<user> :<reason>";
+	map_bnf_msg[ERR_SUMMONDISABLED] = ":<reason>";
+	map_bnf_msg[ERR_USERSDISABLED] = ":<reason>";
+	map_bnf_msg[ERR_NOTREGISTERED] = ":You have not registered";
+	map_bnf_msg[ERR_NEEDMOREPARAMS] = "<command> :Not enough parameters";
+	map_bnf_msg[ERR_ALREADYREGISTERED] = ":<reason>";
+	map_bnf_msg[ERR_NOPERMFORHOST] = ":<reason>";
+	map_bnf_msg[ERR_PASSWDMISMATCH] = ":<reason>";
+	map_bnf_msg[ERR_YOUREBANNEDCREEP] = ":<reason>";
+	map_bnf_msg[ERR_YOUWILLBEBANNED] = "";
+	map_bnf_msg[ERR_KEYSET] = "<channel> :Channel key already set";
+	map_bnf_msg[ERR_CHANNELISFULL] = "<channel> :Cannot join channel (+l)";
+	map_bnf_msg[ERR_UNKNOWNMODE] = "<char> :is unknown mode char to me for <channel>";
+	map_bnf_msg[ERR_INVITEONLYCHAN] = "<channel> :Cannot join channel (+i)";
+	map_bnf_msg[ERR_BANNEDFROMCHAN] = "<channel> :Cannot join channel (+b)";
+	map_bnf_msg[ERR_BADCHANNELKEY] = "<channel> :Cannot join channel (+k)";
+	map_bnf_msg[ERR_BADCHANMASK] = "<channel> :Bad Channel Mask";
+	map_bnf_msg[ERR_NOCHANMODES] = "<channel> :Channel doesn't support modes";
+	map_bnf_msg[ERR_BANLISTFULL] = "<channel> <char> :Channel list is full";
+	map_bnf_msg[ERR_NOPRIVILEGES] = ":Permission Denied- You're not an IRC operator";
+	map_bnf_msg[ERR_CHANOPRIVSNEEDED] = "<channel> :You're not channel operator";
+	map_bnf_msg[ERR_CANTKILLSERVER] = ":You can't kill a server!";
+	map_bnf_msg[ERR_RESTRICTED] = ":Your connection is restricted!";
+	map_bnf_msg[ERR_UNIQOPRIVSNEEDED] = ":You're not the original channel operator";
+	map_bnf_msg[ERR_NOOPERHOST] = ":No O-lines for your host";
+	map_bnf_msg[ERR_NOSERVICEHOST] = ":Unknown MODE flag";
+	map_bnf_msg[ERR_UMODEUNKNOWNFLAG] = ":Unknown MODE flag";
+	map_bnf_msg[ERR_USERSDONTMATCH] = ":Cannot change mode for other users";
 }

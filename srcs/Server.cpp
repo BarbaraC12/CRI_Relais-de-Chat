@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/26 17:52:46 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/06/28 12:08:11 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -513,6 +513,7 @@ int	Server::kill_msg(std::string params, int fd)
 
 int	Server::ping_msg(std::string params, int fd)
 {
+	//ERR_NOORIGIN or ERR_NOSUCHSERVER
 	std::string	reply;
 
 	(void)params;
@@ -529,6 +530,7 @@ int	Server::ping_msg(std::string params, int fd)
 
 int	Server::pong_msg(std::string params, int fd)
 {
+	//ERR_NOORIGIN or ERR_NOSUCHSERVER
 	(void)params;
 	(void)fd;
 	return (0);

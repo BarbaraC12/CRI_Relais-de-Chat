@@ -1,0 +1,86 @@
+─   ~/CRI_Relais-de-Chat   anclarma !2 ································································································  18s  12:26:42
+╰─❯ nc -C smenkhnef.mooo.com 6667
+:smenkhnef.mooo.com NOTICE * :*** Looking up your hostname...
+:smenkhnef.mooo.com NOTICE * :*** Could not resolve your hostname: Nameserver failure; using your IP address (62.210.33.171) instead.
+NICK anto
+USER anclarma anclarma localhost :Antoine CLARMAN
+:smenkhnef.mooo.com 001 anto :Welcome to the SmenkhNef IRC Network anto!anclarma@62.210.33.171
+:smenkhnef.mooo.com 002 anto :Your host is smenkhnef.mooo.com, running version InspIRCd-3
+:smenkhnef.mooo.com 003 anto :This server was created 12:53:27 Jun 02 2022
+:smenkhnef.mooo.com 004 anto smenkhnef.mooo.com InspIRCd-3 BWhikoswx CFNOXbciklmnopstv :FXbklov
+:smenkhnef.mooo.com 005 anto AWAYLEN=400 CASEMAPPING=ascii CHANLIMIT=#:20 CHANMODES=Xb,k,Fl,CNOcimnpst CHANNELLEN=40 CHANTYPES=# ELIST=CMNTU EXTBAN=,CNOcm HOSTLEN=64 KEYLEN=32 KICKLEN=255 LINELEN=512 :are supported by this server
+:smenkhnef.mooo.com 005 anto MAXLIST=Xb:100 MAXTARGETS=6 MODES=6 NETWORK=SmenkhNef NICKLEN=32 OVERRIDE PREFIX=(ov)@+ SAFELIST STATUSMSG=@+ TOPICLEN=307 USERIP USERLEN=11 VBANLIST :are supported by this server
+:smenkhnef.mooo.com 005 anto VLIST=b WHOX :are supported by this server
+:smenkhnef.mooo.com 251 anto :There are 3 users and 3 invisible on 3 servers
+:smenkhnef.mooo.com 252 anto 5 :operator(s) online
+:smenkhnef.mooo.com 253 anto 1 :unknown connections
+:smenkhnef.mooo.com 254 anto 14 :channels formed
+:smenkhnef.mooo.com 255 anto :I have 4 clients and 2 servers
+:smenkhnef.mooo.com 265 anto :Current local users: 4  Max: 6
+:smenkhnef.mooo.com 266 anto :Current global users: 6  Max: 8
+:smenkhnef.mooo.com 375 anto :smenkhnef.mooo.com message of the day
+:smenkhnef.mooo.com 372 anto :- Bienvenue sur le serveur de test Smenkhnef
+:smenkhnef.mooo.com 372 anto :- 
+:smenkhnef.mooo.com 372 anto :- Ce nom est le mélange de Smenkhara et Neferou/Neferty/Nephthys, mes
+:smenkhnef.mooo.com 372 anto :- quatre bots. J'ai pas cherché plus loin pour trouver un nom à ce
+:smenkhnef.mooo.com 372 anto :- serveur. Il a été créé à l'origine pour me permettre de tester mes bots
+:smenkhnef.mooo.com 372 anto :- sur un serveur ou personne ne viendra m'ennuyer, et sans craindre de
+:smenkhnef.mooo.com 372 anto :- ban voire pire. Tu peux connecter tes bots ici sans risque, et les
+:smenkhnef.mooo.com 372 anto :- tester à ta guise. Tu peux aussi y tester ton script
+:smenkhnef.mooo.com 372 anto :- .
+:smenkhnef.mooo.com 372 anto :- Naturellement et pour des raisons de sécurité, il n'est pas prévu que
+:smenkhnef.mooo.com 372 anto :- je délivre de pass ircop pour les bots qui en auraient besoin.
+:smenkhnef.mooo.com 372 anto :- Un système est mis en place te permettant de mettre ton bot ou toi-même
+:smenkhnef.mooo.com 372 anto :- opérateur sur un ou plusieurs salons ou tu t'inscriras, dans le cas ou
+:smenkhnef.mooo.com 372 anto :- celui-ci se retrouverai sans op. /msg Nephthys HELP
+:smenkhnef.mooo.com 372 anto :- .
+:smenkhnef.mooo.com 372 anto :- Je ne recrute pas d'ircops (ce serveur n'est pas conçu pour la discussion)
+:smenkhnef.mooo.com 372 anto :- .
+:smenkhnef.mooo.com 372 anto :- Les bots permanents de ce serveur (Smenkhara Neferou Neferty Nephtys)
+:smenkhnef.mooo.com 372 anto :- ont été concus par moi-même et leurs tcl ne sont pas disponibles
+:smenkhnef.mooo.com 372 anto :- au téléchargement ; pas de "prêt temporaire" (connection sur un autre
+:smenkhnef.mooo.com 372 anto :- serveur) en remplacement d'un autre par exemple...
+:smenkhnef.mooo.com 372 anto :- .
+:smenkhnef.mooo.com 372 anto :- Concernant le comportement de tes bots ou scripts sur le serveur,
+:smenkhnef.mooo.com 372 anto :- je ferme +/- les yeux sur :
+:smenkhnef.mooo.com 372 anto :- * le flood : j'ai prévu large dans la config du serveur pour éviter
+:smenkhnef.mooo.com 372 anto :- les excess flood.
+:smenkhnef.mooo.com 372 anto :- * Messages d'erreur/info divers du serveur
+:smenkhnef.mooo.com 372 anto :- * je ne filtre pas les ip. les proxys sont autorisés.
+:smenkhnef.mooo.com 372 anto :- * les pseudos. Il n'y a pas de filtre, pas de réservation. Je ne possède pas
+:smenkhnef.mooo.com 372 anto :- de Chanserv et compagnie.
+:smenkhnef.mooo.com 372 anto :- Les seuls services connectés sont Nephthys (serveur) et Neferty (salons privés).
+:smenkhnef.mooo.com 372 anto :- * les salons : 30 salons par user max / pas de filtre sur le nom des salons
+:smenkhnef.mooo.com 372 anto :- * tu as accès aux wallops et notices serveur
+:smenkhnef.mooo.com 372 anto :- * pas de link service, pour des raisons évidentes de sécurité.
+:smenkhnef.mooo.com 372 anto :- .
+:smenkhnef.mooo.com 372 anto :- * Sont tolérées 30 connections maximum par host et par seconde
+:smenkhnef.mooo.com 372 anto :- * 100 clônes autorisés.
+:smenkhnef.mooo.com 372 anto :- * Nephthys bloque les entrées au-delà de 80 connections/seconde
+:smenkhnef.mooo.com 372 anto :- .
+:smenkhnef.mooo.com 372 anto :- Ces chiffres peuvent être temporairement modifiés en cas de besoin.
+:smenkhnef.mooo.com 372 anto :- .
+:smenkhnef.mooo.com 372 anto :- << IMPORTANT >> rien de ce qui pourrait se passer ici comme sur
+:smenkhnef.mooo.com 372 anto :- d'autres serveurs à la suite de tests de remotes ne pourra m'être
+:smenkhnef.mooo.com 372 anto :- reproché ! Les scripteurs utilisant ce serveur sont plus ou moins
+:smenkhnef.mooo.com 372 anto :- libres et leurs essais ne sont pas forcément surveillés.
+:smenkhnef.mooo.com 372 anto :- Ce paragraphe les placent devant leurs responsabilités.
+:smenkhnef.mooo.com 372 anto :- Tout se sait et se paie un jour. Faire un méchant bot pour se perfectionner
+:smenkhnef.mooo.com 372 anto :- est utile et bienvenu ; l'utiliser, non.
+:smenkhnef.mooo.com 372 anto :- .
+:smenkhnef.mooo.com 372 anto :- Le salon d'accueil officiel du serveur est #!accueil!
+:smenkhnef.mooo.com 372 anto :- C'est vers ce salon que vous pourrez me trouver pour toute demande
+:smenkhnef.mooo.com 372 anto :- (si je ne suis pas absent)
+:smenkhnef.mooo.com 372 anto :- .
+:smenkhnef.mooo.com 372 anto :- Merci d'avoir tout lu !
+:smenkhnef.mooo.com 372 anto :- Khonsou
+:smenkhnef.mooo.com 376 anto :End of message of the day.
+PING anclarma@62.210.33.171
+:smenkhnef.mooo.com PONG smenkhnef.mooo.com :anclarma@62.210.33.171
+PING :smenkhnef.mooo.com
+ERROR :Closing link: (anclarma@62.210.33.171) [Ping timeout: 180 seconds]
+
+PING
+
+
+^C
