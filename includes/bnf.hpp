@@ -6,12 +6,15 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/26 22:07:21 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/27 10:25:51 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/07/04 10:54:08 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef BNF_HPP
 # define BNF_HPP
+
+# include <map>
+# include <string>
 
 # define RPL_WELCOME	1
 # define RPL_YOURHOST	2
@@ -24,12 +27,12 @@
 # define RPL_MAPEND	7
 # define RPL_SNOMASK	8
 # define RPL_STATMEMTOT	9
-# define RPL_BOUNCE	10
+//# define RPL_BOUNCE	10
 # define RPL_STATMEM	10
 # define RPL_YOURCOOKIE	14
-# define RPL_MAP	15
+//# define RPL_MAP	15
 # define RPL_MAPMORE	16
-# define RPL_MAPEND	17
+//# define RPL_MAPEND	17
 # define RPL_YOURID	42
 # define RPL_SAVENICK	43
 # define RPL_ATTEMPTINGJUNC	50
@@ -56,24 +59,24 @@
 # define RPL_STATSPLINE	217
 # define RPL_STATSYLINE	218
 # define RPL_ENDOFSTATS	219
-# define RPL_STATSPLINE	220
-# define RPL_STATSBLINE	220
+//# define RPL_STATSPLINE	220
+//# define RPL_STATSBLINE	220
 # define RPL_UMODEIS	221
 # define RPL_MODLIST	222
 # define RPL_SQLINE_NICK	222
-# define RPL_STATSBLINE	222
+//# define RPL_STATSBLINE	222
 # define RPL_STATSELINE	223
 # define RPL_STATSGLINE	223
 # define RPL_STATSFLINE	224
 # define RPL_STATSTLINE	224
-# define RPL_STATSDLINE	225
+//# define RPL_STATSDLINE	225
 # define RPL_STATSZLINE	225
-# define RPL_STATSELINE	225
+//# define RPL_STATSELINE	225
 # define RPL_STATSCOUNT	226
-# define RPL_STATSNLINE	226
-# define RPL_STATSGLINE	227
-# define RPL_STATSVLINE	227
-# define RPL_STATSQLINE	228
+//# define RPL_STATSNLINE	226
+//# define RPL_STATSGLINE	227
+//# define RPL_STATSVLINE	227
+//# define RPL_STATSQLINE	228
 # define RPL_SERVICEINFO	231
 # define RPL_ENDOFSERVICES	232
 # define RPL_RULES	232
@@ -82,24 +85,24 @@
 # define RPL_SERVLISTEND	235
 # define RPL_STATSVERBOSE	236
 # define RPL_STATSENGINE	237
-# define RPL_STATSFLINE	238
+//# define RPL_STATSFLINE	238
 # define RPL_STATSIAUTH	239
 # define RPL_STATSVLINE	240
-# define RPL_STATSXLINE	240
+//# define RPL_STATSXLINE	240
 # define RPL_STATSLLINE	241
 # define RPL_STATSUPTIME	242
 # define RPL_STATSOLINE	243
 # define RPL_STATSHLINE	244
 # define RPL_STATSSLINE	245
 # define RPL_STATSPING	246
-# define RPL_STATSTLINE	246
+//# define RPL_STATSTLINE	246
 # define RPL_STATSULINE	246
 # define RPL_STATSBLINE	247
 # define RPL_STATSXLINE	247
-# define RPL_STATSGLINE	247
-# define RPL_STATSULINE	248
+//# define RPL_STATSGLINE	247
+//# define RPL_STATSULINE	248
 # define RPL_STATSDEFINE	248
-# define RPL_STATSULINE	249
+//# define RPL_STATSULINE	249
 # define RPL_STATSDEBUG	249
 # define RPL_STATSDLINE	250
 # define RPL_STATSCONN	250
@@ -127,7 +130,7 @@
 # define RPL_NOTIFY	273
 # define RPL_ENDNOTIFY	274
 # define RPL_STATSDELTA	274
-# define RPL_STATSDLINE	275
+//# define RPL_STATSDLINE	275
 # define RPL_VCHANEXIST	276
 # define RPL_VCHANLIST	277
 # define RPL_VCHANHELP	278
@@ -222,7 +225,7 @@
 # define RPL_CHANPASSOK	338
 # define RPL_WHOISACTUALLY	338
 # define RPL_BADCHANPASS	339
-# define RPL_USERIP	340
+//# define RPL_USERIP	340
 # define RPL_INVITING	341
 # define RPL_SUMMONING	342
 # define RPL_INVITED	345
@@ -235,9 +238,9 @@
 # define RPL_NAMREPLY	353
 # define RPL_WHOSPCRPL	354
 # define RPL_NAMREPLY_	355
-# define RPL_MAP	357
-# define RPL_MAPMORE	358
-# define RPL_MAPEND	359
+//# define RPL_MAP	357
+//# define RPL_MAPMORE	358
+//# define RPL_MAPEND	359
 # define RPL_KILLDONE	361
 # define RPL_CLOSING	362
 # define RPL_CLOSEEND	363
@@ -257,7 +260,7 @@
 # define RPL_SPAM	377
 # define RPL_BANEXPIRED	378
 # define RPL_WHOISHOST	378
-# define RPL_MOTD	378
+//# define RPL_MOTD	378
 # define RPL_KICKLINKED	379
 # define RPL_WHOISMODES	379
 # define RPL_BANLINKED	380
@@ -271,8 +274,8 @@
 # define RPL_IRCOPS	386
 # define RPL_ENDOFQLIST	387
 # define RPL_ENDOFIRCOPS	387
-# define RPL_ALIST	388
-# define RPL_ENDOFALIST	389
+//# define RPL_ALIST	388
+//# define RPL_ENDOFALIST	389
 # define RPL_TIME	391
 # define RPL_TIME	391
 # define RPL_TIME	391
@@ -432,24 +435,24 @@
 # define RPL_WATCHLIST	606
 # define RPL_ENDOFWATCHLIST	607
 # define RPL_WATCHCLEAR	608
-# define RPL_MAPMORE	610
+//# define RPL_MAPMORE	610
 # define RPL_ISOPER	610
 # define RPL_ISLOCOP	611
 # define RPL_ISNOTOPER	612
 # define RPL_ENDOFISOPER	613
-# define RPL_MAPMORE	615
-# define RPL_WHOISMODES	615
-# define RPL_WHOISHOST	616
+//# define RPL_MAPMORE	615
+//# define RPL_WHOISMODES	615
+//# define RPL_WHOISHOST	616
 # define RPL_DCCSTATUS	617
-# define RPL_WHOISBOT	617
+//# define RPL_WHOISBOT	617
 # define RPL_DCCLIST	618
 # define RPL_ENDOFDCCLIST	619
 # define RPL_WHOWASHOST	619
 # define RPL_DCCINFO	620
-# define RPL_RULESSTART	620
-# define RPL_RULES	621
-# define RPL_ENDOFRULES	622
-# define RPL_MAPMORE	623
+//# define RPL_RULESSTART	620
+//# define RPL_RULES	621
+//# define RPL_ENDOFRULES	622
+//# define RPL_MAPMORE	623
 # define RPL_OMOTDSTART	624
 # define RPL_OMOTD	625
 # define RPL_ENDOFO	626
@@ -476,7 +479,7 @@
 # define RPL_LANGUAGE	688
 # define RPL_WHOISSTAFF	689
 # define RPL_WHOISLANGUAGE	690
-# define RPL_MODLIST	702
+//# define RPL_MODLIST	702
 # define RPL_ENDOFMODLIST	703
 # define RPL_HELPSTART	704
 # define RPL_HELPTXT	705
@@ -492,8 +495,8 @@
 # define RPL_TARGUMODEG	716
 # define RPL_TARGNOTIFY	717
 # define RPL_UMODEGMSG	718
-# define RPL_OMOTDSTART	720
-# define RPL_OMOTD	721
+//# define RPL_OMOTDSTART	720
+//# define RPL_OMOTD	721
 # define RPL_ENDOFOMOTD	722
 # define ERR_NOPRIVS	723
 # define RPL_TESTMARK	724
@@ -514,5 +517,25 @@
 # define ERR_NOLANGUAGE	982
 # define ERR_TEXTTOOSHORT	983
 # define ERR_NUMERIC_ERR	999
+
+class	Param
+{
+	public:
+		std::string					_client;
+		std::string					_server;
+		std::string					_version;
+		std::string					_comments;
+		std::string					_debug_level;
+		std::string					_host;
+		std::string					_port;
+		std::string					_host_mask;
+		std::string					_class;
+		std::string					_user;
+		std::string					_nick;
+		std::map<int, std::string>	map_bnf_msg;
+};
+
+std::string	gen_bnf_msg(const int &id, /*const*/ Param &p);
+void		init_bnf_msg(std::map<int, std::string> &map_bnf_msg);
 
 #endif

@@ -6,30 +6,29 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/27 10:16:39 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/28 14:30:30 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/07/04 10:55:14 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "bnf.hpp"
 #include <map>
+#include <string>
+#include <iostream>
+#include <sstream>
 
-class	Param
+#define SSTR( x ) static_cast< std::ostringstream & >( \
+        ( std::ostringstream() << std::dec << x ) ).str()
+
+std::string	gen_bnf_msg(const int &id, /*const*/ Param &p)
 {
-	public:
-		std::string	nick;
-		std::string	user;
-		std::string	host;
-		std::string	server_name;
-		std::string	server_ver;
-		std::string	date;
-		std::string	server_name;
+	std::string	msg;
+
+	msg += ":" + p._server + " " + SSTR(id).c_str() + " " + p._nick + " "
+		+ p.map_bnf_msg[id] + "\r\n";
+	return (msg);
 }
 
-std::string	gen_bnf_msg(const int &id, const Param &p)
-{
-}
-
-void	init_bnf_msg(std::map<int, char *> &map_bnf_msg)
+void	init_bnf_msg(std::map<int, std::string> &map_bnf_msg)
 {
 	map_bnf_msg[RPL_WELCOME] = "Welcome to the Internet Relay Network <nick>!<user>@<host>";
 	map_bnf_msg[RPL_YOURHOST] = "Your host is <servername>, running version <ver>";

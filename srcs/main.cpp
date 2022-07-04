@@ -6,10 +6,11 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 12:19:46 by bcano             #+#    #+#             */
-/*   Updated: 2022/06/26 16:20:56 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/07/04 10:48:17 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "bnf.hpp"
 #include "Server.hpp"
 #include <cstdlib>
 #include <cstring>
@@ -51,6 +52,14 @@ int main(int argc, char **argv)
 	port = static_cast<uint16_t>(atoi(argv[1]));
 	pwd = argv[2];
 	std::cout << port << " " << pwd << std::endl;
+	//test
+	{
+		int		id = 1;
+		Param	p = {};
+
+		init_bnf_msg(p.map_bnf_msg);
+		std::cout << gen_bnf_msg(id, p);
+	}
 	Server s(port, pwd);
 	s.create_sock();
 	s.set_sock();
