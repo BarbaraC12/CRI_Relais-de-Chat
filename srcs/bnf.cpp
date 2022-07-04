@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/27 10:16:39 by anclarma          #+#    #+#             */
-/*   Updated: 2022/07/04 10:55:14 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/07/04 19:20:54 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,28 @@
 #define SSTR( x ) static_cast< std::ostringstream & >( \
         ( std::ostringstream() << std::dec << x ) ).str()
 
+static void	test(std::string &msg, Param &p)
+{
+	std::string::size_type pos = 0u;
+
+	(void)p;
+	while((pos = msg.find("<", pos)) != std::string::npos)
+	{
+		std::string::size_type pos_end = 0u;
+		pos_end = msg.find(">", pos);
+		if (pos_end != std::string::npos)
+			msg.replace(pos, pos_end - pos + 1, "test");
+		pos += 4;
+	}
+}
+
 std::string	gen_bnf_msg(const int &id, /*const*/ Param &p)
 {
 	std::string	msg;
 
 	msg += ":" + p._server + " " + SSTR(id).c_str() + " " + p._nick + " "
 		+ p.map_bnf_msg[id] + "\r\n";
+	test(msg, p);
 	return (msg);
 }
 

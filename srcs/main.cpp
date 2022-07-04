@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 12:19:46 by bcano             #+#    #+#             */
-/*   Updated: 2022/07/04 10:48:17 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/07/04 19:09:57 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ int main(int argc, char **argv)
 
 		init_bnf_msg(p.map_bnf_msg);
 		std::cout << gen_bnf_msg(id, p);
+		std::cout << std::endl;
 	}
 	Server s(port, pwd);
 	s.create_sock();
