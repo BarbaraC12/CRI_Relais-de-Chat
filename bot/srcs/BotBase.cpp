@@ -21,7 +21,7 @@ BotBase		&BotBase::operator=(BotBase const& rhs) {
 }
 
 int			BotBase::create_sock(void) {
-	this->_sock_fd = socket(AF_INET, SOCK_STREAM, 0);
+	this->_sock_fd = ::socket(AF_INET, SOCK_STREAM, 0);
 	if (this->_sock_fd < 0) {
 		std::cout << "Errno" << errno << std::endl;
 		return -1;
@@ -47,28 +47,32 @@ int			BotBase::set_sock(void) {
 	return 0;
 }
 
-int			BotBase::remote_connect(void) {
-	if (connect(this->_sock_fd, (sockaddr*)&this->_addr, sizeof(this->_addr)) < 0) {
+int			BotBase::connect(void) {
+	if (::connect(this->_sock_fd, (sockaddr*)&this->_addr, sizeof(this->_addr)) < 0) {
 		return -1;
 	}
 	return 0;
 }
 
-int			BotBase::send_datas(std::string const& datas) {
-	if (send(this->_sock_fd, datas.c_str(), datas.size() + 1, 0) < 0) {
+int			BotBase::send(std::string const& datas) {
+	if (::send(this->_sock_fd, datas.c_str(), datas.size() + 1, 0) < 0) {
 		return -1;
 	}
 	return 0;
 }
 
-int			BotBase::recv_datas() {
+int			BotBase::recv() {
 	char	buf[4096];
 	int		bytes = 0;
 
 	memset(buf, 0, 4096);
-	bytes = recv(this->_sock_fd, buf, 4096, 0);
+	bytes = ::recv(this->_sock_fd, buf, 4096, 0);
+	std::cout << "recv()::bytes: " << bytes << std::endl;
+	std::cout << "[SERVER]: " << std::string(buf, bytes) << "\r\n";
 	while (bytes > 0) {
-		bytes = recv(this->_sock_fd, buf, 4096, 0);
+		bytes = ::recv(this->_sock_fd, buf, 4096, 0);
+		std::cout << "recv()::bytes: " << bytes << std::endl;
+		std::cout << "[SERVER]: " << std::string(buf, bytes) << "\r\n";
 		if (bytes < 0)
 			return -1;
 	}
