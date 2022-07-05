@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 19:39:02 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/26 21:58:52 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/07/04 20:08:41 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ class Server
 
 		Server &operator=(Server const &rhs);
 
+		int		start(void);
 		int		create_sock(void);
 		int		set_sock(void);
 		int		bind_sock(void);

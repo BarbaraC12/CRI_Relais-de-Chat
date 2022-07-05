@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/27 10:16:39 by anclarma          #+#    #+#             */
-/*   Updated: 2022/07/04 19:20:54 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/07/05 17:30:23 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,12 +34,27 @@ static void	test(std::string &msg, Param &p)
 	}
 }
 
+void	init_bnf_msg(std::map<std::string, std::string (Param::* const)(void)> &map_bnf_funct)
+{
+	map_bnf_funct["<client>"] = &Param::get_client;
+	map_bnf_funct["<server>"] = &Param::get_client;
+	map_bnf_funct["<version>"] = &Param::get_client;
+	map_bnf_funct["<comments>"] = &Param::get_client;
+	map_bnf_funct["<debug_level>"] = &Param::get_client;
+	map_bnf_funct["<host>"] = &Param::get_client;
+	map_bnf_funct["<port>"] = &Param::get_client;
+	map_bnf_funct["<host_mask>"] = &Param::get_client;
+	map_bnf_funct["<class>"] = &Param::get_client;
+	map_bnf_funct["<user>"] = &Param::get_client;
+	map_bnf_funct["<nick>"] = &get_client;
+}
+
 std::string	gen_bnf_msg(const int &id, /*const*/ Param &p)
 {
 	std::string	msg;
 
-	msg += ":" + p._server + " " + SSTR(id).c_str() + " " + p._nick + " "
-		+ p.map_bnf_msg[id] + "\r\n";
+	msg = msg + ":<server> " + SSTR(id).c_str() + " <nick> " + p.map_bnf_msg[id]
+		+ "\r\n";
 	test(msg, p);
 	return (msg);
 }

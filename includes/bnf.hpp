@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/26 22:07:21 by anclarma          #+#    #+#             */
-/*   Updated: 2022/07/04 10:54:08 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/07/05 17:31:34 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -533,6 +533,8 @@ class	Param
 		std::string					_user;
 		std::string					_nick;
 		std::map<int, std::string>	map_bnf_msg;
+
+		std::string	get_client(void) const;
 };
 
 std::string	gen_bnf_msg(const int &id, /*const*/ Param &p);

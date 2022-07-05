@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 12:19:46 by bcano             #+#    #+#             */
-/*   Updated: 2022/07/04 19:09:57 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/07/04 20:11:31 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,12 +61,13 @@ int main(int argc, char **argv)
 		std::cout << gen_bnf_msg(id, p);
 		std::cout << std::endl;
 	}
-	Server s(port, pwd);
-	s.create_sock();
-	s.set_sock();
-	s.bind_sock();
-	s.listen();
-	while (end_irc == 0)
-		end_irc = s.poll_loop();
+	//fin test
+	{
+		Server s(port, pwd);
+
+		s.start();
+		while (end_irc == 0)
+			end_irc = s.poll_loop();
+	}
 	return (0);
 }

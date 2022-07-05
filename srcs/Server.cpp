@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/28 12:08:11 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/07/04 20:11:41 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,14 @@ Server &Server::operator=(Server const &rhs)
 		this->_passwd = rhs._passwd;
 	}
 	return (*this);
+}
+
+int Server::start(void)
+{
+	return (this->create_sock()
+			|| this->set_sock()
+			|| this->bind_sock()
+			|| this->listen());
 }
 
 int Server::create_sock(void)
