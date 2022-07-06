@@ -27,19 +27,20 @@ int		main(void) {
 		return 1;
 	}
 	std::cout << UL + GR + "Connected !" + NOR << std::endl;
-	bot.recv();
-	sleep(5);
-	//bot.send(PASS);
-	std::cout << BLUE2 + "send \'NICK\'..." + NOR << std::endl;
-	bot.send(NICK);
-	std::cout << UL + GR + "Sended !" + NOR << std::endl;
-	std::cout << BLUE2 + "send \'USER\'..." + NOR << std::endl;
-	bot.send(USER);
-	std::cout << UL + GR + "Sended !" + NOR << std::endl;
-	std::cout << BLUE2 + "send \'PING\'..." + NOR << std::endl;
-	bot.send("PING");
-	std::cout << UL + GR + "Sended !" + NOR << std::endl;
 	std::cout << BLUE2 + "Receiving..." + NOR << std::endl;
+	bot.recv();
+	// std::cout << BLUE2 + "send \'PASS\'..." + NOR << std::endl;
+	// //bot.send(PASS);
+	// std::cout << BLUE2 + "send \'NICK\'..." + NOR << std::endl;
+	// bot.send(NICK);
+	// std::cout << UL + GR + "Sended !" + NOR << std::endl;
+	// std::cout << BLUE2 + "send \'USER\'..." + NOR << std::endl;
+	// bot.send(USER);
+	// std::cout << UL + GR + "Sended !" + NOR << std::endl;
+	// std::cout << BLUE2 + "send \'PING\'..." + NOR << std::endl;
+	// bot.send("PING");
+	// std::cout << UL + GR + "Sended !" + NOR << std::endl;
+	
 	
 	return (0);
 }
