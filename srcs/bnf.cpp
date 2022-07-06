@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/27 10:16:39 by anclarma          #+#    #+#             */
-/*   Updated: 2022/07/06 16:35:09 by antoine          ###   ########.fr       */
+/*   Updated: 2022/07/06 18:58:11 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,43 @@
 
 #define SSTR( x ) static_cast< std::ostringstream & >( \
         ( std::ostringstream() << std::dec << x ) ).str()
+
+Param::Param(void)
+	: _client(), _server(), _version(), _comments(), _debug_level(), _host(),
+	_port(), _host_mask(), _class(), _user(), _nick(), map_bnf_msg()
+{
+	return ;
+}
+Param::Param(Param const &src)
+	: _client(), _server(), _version(), _comments(), _debug_level(), _host(),
+	_port(), _host_mask(), _class(), _user(), _nick(), map_bnf_msg()
+{
+	*this = src;
+	return ;
+}
+Param::~Param(void)
+{
+	return ;
+}
+Param	&Param::operator=(Param const &rhs)
+{
+	if (this != &rhs)
+	{
+		this->_client = rhs._client;
+		this->_server = rhs._server;
+		this->_version = rhs._version;
+		this->_comments = rhs._comments;
+		this->_debug_level = rhs._debug_level;
+		this->_host = rhs._host;
+		this->_port = rhs._port;
+		this->_host_mask = rhs._host_mask;
+		this->_class = rhs._class;
+		this->_user = rhs._user;
+		this->_nick = rhs._nick;
+		this->map_bnf_msg = rhs.map_bnf_msg;
+	}
+	return (*this);
+}
 
 std::string     Param::get_client(void) const
 {

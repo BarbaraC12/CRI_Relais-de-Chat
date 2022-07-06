@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/26 22:07:21 by anclarma          #+#    #+#             */
-/*   Updated: 2022/07/06 16:48:30 by antoine          ###   ########.fr       */
+/*   Updated: 2022/07/06 18:42:25 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -534,6 +534,12 @@ class	Param
 		std::string					_nick;
 	public:
 		std::map<int, std::string>	map_bnf_msg;
+
+        Param(void);
+        Param(Param const &src);
+        virtual	~Param(void);
+		Param	&operator=(Param const &rhs);
+
 		void	set_client(std::string client);
 		void	set_server(std::string server);
 		void	set_version(std::string version);
