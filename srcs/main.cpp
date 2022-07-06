@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 12:19:46 by bcano             #+#    #+#             */
-/*   Updated: 2022/07/06 16:47:43 by antoine          ###   ########.fr       */
+/*   Updated: 2022/07/06 17:45:42 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,13 @@
 
 static sig_atomic_t	end_irc = 0;
 
-void	sigint_handler(int param)
+static void	sigint_handler(int param)
 {
 	(void)param;
 	end_irc = 0;
 }
 
-int display_error(int type, const char *err, const char *message)
+static int display_error(int type, const char *err, const char *message)
 {
 	std::cout << "./ircserv: error: " << err << std::endl;
 	std::cout << message << std::endl;

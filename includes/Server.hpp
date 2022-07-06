@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 19:39:02 by anclarma          #+#    #+#             */
-/*   Updated: 2022/07/04 20:08:41 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/07/06 18:20:42 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,16 +26,16 @@ class Server
 	private:
 		typedef std::vector<pollfd>::size_type	fd_index_t;
 		
-		uint16_t					_port;
-		std::string					_passwd;
-		int							_listen_sd; // sd for Socket Descriptor
 		std::vector<pollfd> 		_fds;
 		std::vector<std::string> 	_fds_buffer;
 		fd_index_t					_ndfs;
 		std::map<std::string, int (Server::* const)(std::string, int)>	_map_funct;
 		std::map<int, User>			_map_users;
 		std::string					_name;
-
+		std::string					_passwd;
+		int							_listen_sd; // sd for Socket Descriptor
+		uint16_t					_port;
+		uint16_t					_padded; // for flag -Wpadded
 	public:
 		Server(uint16_t &port, std::string const &passwd);
 		Server(void);

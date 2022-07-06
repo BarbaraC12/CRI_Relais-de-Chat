@@ -6,7 +6,7 @@
 #    By: bcano <bcano@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/07 18:43:20 by bcano             #+#    #+#              #
-#    Updated: 2022/07/03 17:31:50 by anclarma         ###   ########.fr        #
+#    Updated: 2022/07/06 18:30:08 by anclarma         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -45,6 +45,7 @@ OBJS		= $(patsubst %, $(O_DIR)/%, $(O_FILES))
 # ################################## #
 CXXFLAGS	= -Wall -Wextra -Werror -MMD -MP
 CXXFLAGS	+= -std=c++98
+# CXXFLAGS	+= -Weverything
 LFLAGS		= 
 CINCLUDES	= -I ./includes
 CLIBS		= 

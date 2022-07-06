@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/07/04 20:11:41 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/07/06 18:28:11 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,24 +33,25 @@
 #define BUFFER_SIZE_IRC	512
 
 Server::Server(uint16_t &port, std::string const &passwd)
-	: _port(port), _passwd(passwd), _listen_sd(-1), _fds(200), _fds_buffer(200),
-	_ndfs(0), _map_funct(), _map_users(), _name("irc.anclarma.42.fr")
+	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(),
+	_name("irc.anclarma.42.fr"), _passwd(passwd), _listen_sd(-1), _port(port),
+	_padded()
 {
 	this->init_map_funct();
 	return;
 }
 
 Server::Server(void)
-	: _port(), _passwd(), _listen_sd(-1), _fds(200), _fds_buffer(200),
-	_ndfs(0), _map_funct(), _map_users(), _name("irc.anclarma.42.fr")
+	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(),
+	_name("irc.anclarma.42.fr"), _passwd(), _listen_sd(-1), _port(), _padded()
 {
 	this->init_map_funct();
 	return;
 }
 
 Server::Server(Server const &src)
-	: _port(), _passwd(), _listen_sd(-1), _fds(200), _fds_buffer(200), _ndfs(0),
-	_map_funct(), _map_users(), _name("irc.anclarma.42.fr")
+	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(),
+	_name("irc.anclarma.42.fr"), _passwd(), _listen_sd(-1), _port(), _padded()
 {
 	*this = src;
 	return;
@@ -128,7 +129,7 @@ int Server::bind_sock(void)
 	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = INADDR_ANY;
 	addr.sin_port = htons(this->_port);
-	ret = bind(this->_listen_sd, (sockaddr *)&addr, sizeof(addr));
+	ret = bind(this->_listen_sd, reinterpret_cast<sockaddr *>(&addr), sizeof(addr));
 	if (ret < 0)
 	{
 		std::clog << this->logtime() << "bind() failed" << std::endl;
