@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/27 10:16:39 by anclarma          #+#    #+#             */
-/*   Updated: 2022/07/05 17:30:23 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/07/06 16:35:09 by antoine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,61 @@
 
 #define SSTR( x ) static_cast< std::ostringstream & >( \
         ( std::ostringstream() << std::dec << x ) ).str()
+
+std::string     Param::get_client(void) const
+{
+	return (this->_client);
+}
+
+std::string	Param::get_server(void) const
+{
+	return (this->_server);
+}
+
+std::string	Param::get_version(void) const
+{
+	return (this->_version);
+}
+
+std::string	Param::get_comments(void) const
+{
+	return (this->_comments);
+}
+
+std::string	Param::get_debug_level(void) const
+{
+	return (this->_debug_level);
+}
+
+std::string	Param::get_host(void) const
+{
+	return (this->_host);
+}
+
+std::string	Param::get_port(void) const
+{
+	return (this->_port);
+}
+
+std::string	Param::get_host_mask(void) const
+{
+	return (this->_host_mask);
+}
+
+std::string	Param::get_class(void) const
+{
+	return (this->_class);
+}
+
+std::string	Param::get_user(void) const
+{
+	return (this->_user);
+}
+
+std::string	Param::get_nick(void) const
+{
+	return (this->_nick);
+}
 
 static void	test(std::string &msg, Param &p)
 {
@@ -34,19 +89,19 @@ static void	test(std::string &msg, Param &p)
 	}
 }
 
-void	init_bnf_msg(std::map<std::string, std::string (Param::* const)(void)> &map_bnf_funct)
+void	init_bnf_msg(std::map<std::string, std::string (Param::* const)(void) const> &map_bnf_funct)
 {
-	map_bnf_funct["<client>"] = &Param::get_client;
-	map_bnf_funct["<server>"] = &Param::get_client;
-	map_bnf_funct["<version>"] = &Param::get_client;
-	map_bnf_funct["<comments>"] = &Param::get_client;
-	map_bnf_funct["<debug_level>"] = &Param::get_client;
-	map_bnf_funct["<host>"] = &Param::get_client;
-	map_bnf_funct["<port>"] = &Param::get_client;
-	map_bnf_funct["<host_mask>"] = &Param::get_client;
-	map_bnf_funct["<class>"] = &Param::get_client;
-	map_bnf_funct["<user>"] = &Param::get_client;
-	map_bnf_funct["<nick>"] = &get_client;
+	map_bnf_funct.insert(make_pair("<client>", &Param::get_client));
+	map_bnf_funct.insert(make_pair("<server>", &Param::get_server));
+	map_bnf_funct.insert(make_pair("<version>", &Param::get_version));
+	map_bnf_funct.insert(make_pair("<comments>", &Param::get_comments));
+	map_bnf_funct.insert(make_pair("<debug_level>", &Param::get_debug_level));
+	map_bnf_funct.insert(make_pair("<host>", &Param::get_host));
+	map_bnf_funct.insert(make_pair("<port>", &Param::get_port));
+	map_bnf_funct.insert(make_pair("<host_mask>", &Param::get_host_mask));
+	map_bnf_funct.insert(make_pair("<class>", &Param::get_class));
+	map_bnf_funct.insert(make_pair("<user>", &Param::get_user));
+	map_bnf_funct.insert(make_pair("<nick>", &Param::get_nick));
 }
 
 std::string	gen_bnf_msg(const int &id, /*const*/ Param &p)

@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 12:19:46 by bcano             #+#    #+#             */
-/*   Updated: 2022/07/04 20:11:31 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/07/06 16:47:43 by antoine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 	//test
 	{
 		int		id = 1;
-		Param	p = {};
+		Param	p;
 
 		init_bnf_msg(p.map_bnf_msg);
 		std::cout << gen_bnf_msg(id, p);
