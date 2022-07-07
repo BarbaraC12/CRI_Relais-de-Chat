@@ -79,8 +79,6 @@ int			BotBase::recv() {
 	std::string	NICK = "NICK bot\r\n";
 	std::string	USER = "USER bot a a Terminator\r\n";
 
-	size_t test;
-
 	// while ((bytes = ::recv(this->_sock_fd, buf, 4096, 0)) > 0) {
 	// 	if (bytes < 0)
 	// 		return -1;
@@ -91,6 +89,7 @@ int			BotBase::recv() {
 	//bytes = ::recv(this->_sock_fd, buf, 4096, 0);
 	int	i = 2;
 	do {
+		sleep(2);
 		// std::cout << "> ";
 		// getline(std::cin, input);
 		// input += "\r\n";
@@ -103,7 +102,7 @@ int			BotBase::recv() {
 			this->_registred = true;
 		} else {
 			std::cout << "i: " << i << " allez la on envoit un PING" << std::endl;
-			this->send(this->_cmd[i]);
+			this->send(this->_cmd[3]);
 		}
 		memset(buf, 0, 4096);
 		bytes = ::recv(this->_sock_fd, buf, 4096, 0);
