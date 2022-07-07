@@ -6,12 +6,13 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 12:19:46 by bcano             #+#    #+#             */
-/*   Updated: 2022/07/06 17:45:42 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/07/07 02:29:08 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "bnf.hpp"
 #include "Server.hpp"
+#include "Param.hpp"
 #include <cstdlib>
 #include <cstring>
 #include <csignal>

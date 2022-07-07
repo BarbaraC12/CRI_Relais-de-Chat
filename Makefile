@@ -6,7 +6,7 @@
 #    By: bcano <bcano@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/07 18:43:20 by bcano             #+#    #+#              #
-#    Updated: 2022/07/06 18:30:08 by anclarma         ###   ########.fr        #
+#    Updated: 2022/07/07 19:24:11 by anclarma         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,7 +30,8 @@ C_DIR		= srcs
 C_FILES		= main.cpp	\
 			  Server.cpp	\
 			  User.cpp	\
-			  bnf.cpp
+			  bnf.cpp	\
+			  Param.cpp
 SRCS		= $(patsubst %, $(C_DIR)/%, $(C_FILES))
 
 # ################################## #

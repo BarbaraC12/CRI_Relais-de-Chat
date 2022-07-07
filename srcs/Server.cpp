@@ -6,11 +6,13 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/07/06 18:28:11 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/07/07 19:44:30 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
+#include "bnf.hpp"
+#include "Param.hpp"
 #include <algorithm>
 #include <ctime>
 #include <csignal>
@@ -526,9 +528,13 @@ int	Server::ping_msg(std::string params, int fd)
 	std::string	reply;
 
 	(void)params;
+	std::cout << "test: " << params << std::endl;
 	reply += "PONG ";
 	reply += this->_name;
 	reply += "\r\n";
+
+	Param	p;
+	reply = gen_bnf_msg(ERR_NOORIGIN, p);
 	if (send(fd, reply.data(), reply.length(), 0) < 0)
 	{
 		std::clog << this->logtime() << "send() failed" << std::endl;
