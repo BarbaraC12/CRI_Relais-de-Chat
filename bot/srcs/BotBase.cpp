@@ -1,7 +1,13 @@
 # include "../includes/BotBase.hpp"
 
-BotBase::BotBase(std::string ip, uint16_t port): _port(port), _ip(ip) {
+BotBase::BotBase(std::string ip, uint16_t port): _port(port), _ip(ip), _registred(false) {
 	std::cout << "smenkhnef.mooo.com IP: " + this->exec_sript(std::string("smenkhnef.mooo.com")) << std::endl;
+	
+	this->_cmd.push_back("PASS a\r\n");
+	this->_cmd.push_back("NICK bot\r\n");
+	this->_cmd.push_back("USER bot a a Terminator\r\n");
+	this->_cmd.push_back("PING irc.anclarma.42.fr \r\n");
+
 	std::cout << "new Bot created!" << std::endl;
 }
 
@@ -56,7 +62,6 @@ int			BotBase::connect(void) {
 }
 
 int			BotBase::send(std::string const& datas) {
-	std::cout << "datas.length():" << datas.length() << std::endl;
 	int ret = ::send(this->_sock_fd, datas.data(), datas.length(), 0);
 	if (ret < 0) {
 		std::cerr << "GROS CON CA MARCHE PAS LE SEND" << std::endl;
@@ -74,23 +79,37 @@ int			BotBase::recv() {
 	std::string	NICK = "NICK bot\r\n";
 	std::string	USER = "USER bot a a Terminator\r\n";
 
+	size_t test;
+
 	// while ((bytes = ::recv(this->_sock_fd, buf, 4096, 0)) > 0) {
 	// 	if (bytes < 0)
 	// 		return -1;
 	// 	std::cout << "recv()::bytes: " << bytes << std::endl;
 	// 	std::cout << "[SERVER]: " << std::string(buf, bytes) << "\r\n";
 	// }
+	memset(buf, 0, 4096);
+	//bytes = ::recv(this->_sock_fd, buf, 4096, 0);
+	int	i = 2;
 	do {
-		std::cout << "> ";
-		getline(std::cin, input);
-		//std::cout << "Let's send user's input" << std::endl;
-		input += "\r\n";
-		this->send(input);
-		//write(this->_sock_fd, input.c_str(), input.size());
+		// std::cout << "> ";
+		// getline(std::cin, input);
+		// input += "\r\n";
+		// this->send(input);
+		if (!this->_registred) {
+			this->send(this->_cmd[0]);
+			this->send(this->_cmd[1]);
+			this->send(this->_cmd[2]);
+			std::cout << "Send everything for registration" << std::endl;
+			this->_registred = true;
+		} else {
+			std::cout << "i: " << i << " allez la on envoit un PING" << std::endl;
+			this->send(this->_cmd[i]);
+		}
 		memset(buf, 0, 4096);
 		bytes = ::recv(this->_sock_fd, buf, 4096, 0);
 		std::cout << "recv()::bytes: " << bytes << std::endl;
 		std::cout << "[SERVER]: " << std::string(buf, bytes) << "\r\n";
+		i++;
 	} while (1);
 	std::cout << YELL + "Connection Closed!" + NOR << std::endl;
 	return 0;
