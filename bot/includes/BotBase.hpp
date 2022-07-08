@@ -48,6 +48,7 @@ class BotBase
 		int				connect(void);
 		int				send(std::string const& datas);
 		int				recv();
+		int				parse_buffer(std::string & buffer);
 		std::string		exec_sript(std::string const& name);
 };
 

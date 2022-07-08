@@ -70,15 +70,41 @@ int			BotBase::send(std::string const& datas) {
 	return 0;
 }
 
-int			BotBase::recv() {
-	char		buf[4096];
-	int			bytes = 0;
-	std::string	input;
+int			BotBase::parse_buffer(std::string & buffer) {
+	std::size_t	to_find;
 
+	do {
+		to_find = buffer.find("\r\n");
+		if (to_find != std::string::npos)
+		{
+			std::string	sub;
+			sub = buffer.substr(0, to_find);
+			buffer.erase(0, to_find + 2);
+			if (sub[0] == ':') {
+				to_find = sub.find(" ");
+				sub = sub.substr(to_find, sub.length() + 2);
+			}
+			while (sub[0] == ' ') {
+				sub = sub.substr(1, sub.length() + 2);
+			}
+			to_find = sub.find(" ");
+			sub = sub.substr(0, to_find);
+			std::cout << "SUB: " << sub << std::endl;
+		}
+	}
+	while (to_find != std::string::npos);
+	return 0;
+}
+
+int			BotBase::recv() {
+	char		buf[4096 + 1];
+	int			bytes = 0;
+	std::string buffer = "";
 	std::string	PASS = "PASS a\r\n";
 	std::string	NICK = "NICK bot\r\n";
 	std::string	USER = "USER bot a a Terminator\r\n";
 
+	bool pingsent = false;
 	// while ((bytes = ::recv(this->_sock_fd, buf, 4096, 0)) > 0) {
 	// 	if (bytes < 0)
 	// 		return -1;
@@ -87,9 +113,8 @@ int			BotBase::recv() {
 	// }
 	memset(buf, 0, 4096);
 	//bytes = ::recv(this->_sock_fd, buf, 4096, 0);
-	int	i = 2;
 	do {
-		sleep(2);
+		sleep(1);
 		// std::cout << "> ";
 		// getline(std::cin, input);
 		// input += "\r\n";
@@ -100,15 +125,22 @@ int			BotBase::recv() {
 			this->send(this->_cmd[2]);
 			std::cout << "Send everything for registration" << std::endl;
 			this->_registred = true;
-		} else {
-			std::cout << "i: " << i << " allez la on envoit un PING" << std::endl;
+		} else if (!pingsent) {
+			std::cout << "allez la on envoit un PING" << std::endl;
 			this->send(this->_cmd[3]);
+			this->send("WHOIS smenkhnef.mooo.com bot\r\n");
+			pingsent = true;
 		}
-		memset(buf, 0, 4096);
-		bytes = ::recv(this->_sock_fd, buf, 4096, 0);
-		std::cout << "recv()::bytes: " << bytes << std::endl;
-		std::cout << "[SERVER]: " << std::string(buf, bytes) << "\r\n";
-		i++;
+		
+		do {
+			memset(buf, 0, 4096);
+			bytes = ::recv(this->_sock_fd, buf, 4096, 0);
+			buf[bytes] = '\0';
+			buffer.append(buf);
+			std::cout << "recv()::bytes: " << bytes << std::endl;
+			std::cout << "[SERVER]:\n" << std::string(buf, bytes) << "\r\n";
+		} while (::strlen(buf) == 4096);
+		this->parse_buffer(buffer);
 	} while (1);
 	std::cout << YELL + "Connection Closed!" + NOR << std::endl;
 	return 0;
