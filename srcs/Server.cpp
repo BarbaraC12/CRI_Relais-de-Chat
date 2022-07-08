@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/07/07 19:44:30 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/07/08 22:15:24 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,9 +158,9 @@ int Server::listen(void)
 	return (0);
 }
 
-int	Server::receive_msg(std::string line, fd_index_t fd)
+int	Server::receive_msg(const std::string &line, fd_index_t fd)
 {
-	std::map<std::string, int (Server::* const)(std::string, int)>::iterator	it;
+	std::map<std::string, int (Server::* const)(std::string const &, int)>::iterator	it;
 	std::string	fisrt_word;
 
 	fisrt_word = line.substr(0, line.find(" "));
@@ -390,7 +390,7 @@ void	Server::init_map_funct(void)
 
 // BARBARA
 
-int	Server::pass_msg(std::string params, int fd) {
+int	Server::pass_msg(std::string const &params, int fd) {
 	(void)fd;
 	if (params != "\0") {
 		if (params != this->_passwd) {
@@ -406,7 +406,7 @@ int	Server::pass_msg(std::string params, int fd) {
 	return (1);
 }
 
-int	Server::nick_msg(std::string params, int fd) {
+int	Server::nick_msg(std::string const &params, int fd) {
 	if (params != "\0") {
 		//if (noConform(params))
 		//	return (2); //ERR_ERRONEUSNICKNAME
@@ -430,7 +430,7 @@ int	Server::nick_msg(std::string params, int fd) {
 	return (1); //ERR_NONICKNAMEGIVEN
 }
 
-int	Server::user_msg(std::string params, int fd) {
+int	Server::user_msg(std::string const &params, int fd) {
 	(void)fd;
 	if (params != "\0") {
 		std::map<int, User>::iterator it;
@@ -478,25 +478,25 @@ int	Server::user_msg(std::string params, int fd) {
 	return (1); //ERR_NEEDMOREPARAMS
 }
 
-int	Server::server_msg(std::string params, int fd) {
+int	Server::server_msg(std::string const &params, int fd) {
 	(void)params;
 	(void)fd;
 	return (1);
 }
 
-int	Server::oper_msg(std::string params, int fd) {
+int	Server::oper_msg(std::string const &params, int fd) {
 	(void)params;
 	(void)fd;
 	return (1);
 }
 
-int	Server::quit_msg(std::string params, int fd) {
+int	Server::quit_msg(std::string const &params, int fd) {
 	(void)params;
 	(void)fd;
 	return (1);
 }
 
-int	Server::squit_msg(std::string params, int fd) {
+int	Server::squit_msg(std::string const &params, int fd) {
 	(void)params;
 	(void)fd;
 	return (1);
@@ -504,7 +504,7 @@ int	Server::squit_msg(std::string params, int fd) {
 
 // ANTOINE
 
-int	Server::kill_msg(std::string params, int fd)
+int	Server::kill_msg(std::string const &params, int fd)
 {
 	std::string	kill_nickname;
 	std::string	kill_comment;
@@ -522,17 +522,15 @@ int	Server::kill_msg(std::string params, int fd)
 	return (0);
 }
 
-int	Server::ping_msg(std::string params, int fd)
+int	Server::ping_msg(std::string const &params, int fd)
 {
 	//ERR_NOORIGIN or ERR_NOSUCHSERVER
 	std::string	reply;
 
 	(void)params;
 	std::cout << "test: " << params << std::endl;
-	reply += "PONG ";
-	reply += this->_name;
-	reply += "\r\n";
-
+	reply = reply + "PONG " + this->_name + "\r\n";
+	
 	Param	p;
 	reply = gen_bnf_msg(ERR_NOORIGIN, p);
 	if (send(fd, reply.data(), reply.length(), 0) < 0)
@@ -543,7 +541,7 @@ int	Server::ping_msg(std::string params, int fd)
 	return (0);
 }
 
-int	Server::pong_msg(std::string params, int fd)
+int	Server::pong_msg(std::string const &params, int fd)
 {
 	//ERR_NOORIGIN or ERR_NOSUCHSERVER
 	(void)params;
@@ -551,14 +549,14 @@ int	Server::pong_msg(std::string params, int fd)
 	return (0);
 }
 
-int	Server::error_msg(std::string params, int fd)
+int	Server::error_msg(std::string const &params, int fd)
 {
 	(void)params;
 	(void)fd;
 	return (0);
 }
 
-int	Server::cap_msg(std::string params, int fd)
+int	Server::cap_msg(std::string const &params, int fd)
 {
 	(void)params;
 	(void)fd;

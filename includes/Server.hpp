@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 19:39:02 by anclarma          #+#    #+#             */
-/*   Updated: 2022/07/06 18:20:42 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/07/08 22:12:32 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ class Server
 		std::vector<pollfd> 		_fds;
 		std::vector<std::string> 	_fds_buffer;
 		fd_index_t					_ndfs;
-		std::map<std::string, int (Server::* const)(std::string, int)>	_map_funct;
+		std::map<std::string, int (Server::* const)(std::string const &, int)>	_map_funct;
 		std::map<int, User>			_map_users;
 		std::string					_name;
 		std::string					_passwd;
@@ -51,7 +51,7 @@ class Server
 		int		listen(void);
 		int		poll_loop(void);
 		int		receiving(fd_index_t fd);
-		int		receive_msg(std::string line, fd_index_t fd);
+		int		receive_msg(const std::string &line, fd_index_t fd);
 		int		parse_buffer(fd_index_t fd);
 		int		receive_loop(fd_index_t fd);
 		int		listening(void);
@@ -64,45 +64,45 @@ class Server
 
 		void	init_map_funct(void);
 		// Connection Registration
-		int	pass_msg(std::string params, int fd);
-		int	nick_msg(std::string params, int fd);
-		int	user_msg(std::string params, int fd);
-		int	server_msg(std::string params, int fd);
-		int	oper_msg(std::string params, int fd);
-		int	quit_msg(std::string params, int fd);
-		int	squit_msg(std::string params, int fd);
+		int	pass_msg(std::string const &params, int fd);
+		int	nick_msg(std::string const &params, int fd);
+		int	user_msg(std::string const &params, int fd);
+		int	server_msg(std::string const &params, int fd);
+		int	oper_msg(std::string const &params, int fd);
+		int	quit_msg(std::string const &params, int fd);
+		int	squit_msg(std::string const &params, int fd);
 		// Channel operations
-		int	join_msg(std::string params, int fd);
-		int	part_msg(std::string params, int fd);
-		int	mode_msg(std::string params, int fd);
-		int	topic_msg(std::string params, int fd);
-		int	names_msg(std::string params, int fd);
-		int	list_msg(std::string params, int fd);
-		int	invite_msg(std::string params, int fd);
-		int	kick_msg(std::string params, int fd);
+		int	join_msg(std::string const &params, int fd);
+		int	part_msg(std::string const &params, int fd);
+		int	mode_msg(std::string const &params, int fd);
+		int	topic_msg(std::string const &params, int fd);
+		int	names_msg(std::string const &params, int fd);
+		int	list_msg(std::string const &params, int fd);
+		int	invite_msg(std::string const &params, int fd);
+		int	kick_msg(std::string const &params, int fd);
 		// Server queries and commands
-		int	version_msg(std::string params, int fd);
-		int	stats_msg(std::string params, int fd);
-		int	links_msg(std::string params, int fd);
-		int	time_msg(std::string params, int fd);
-		int	connect_msg(std::string params, int fd);
-		int	trace_msg(std::string params, int fd);
-		int	admin_msg(std::string params, int fd);
-		int	info_msg(std::string params, int fd);
+		int	version_msg(std::string const &params, int fd);
+		int	stats_msg(std::string const &params, int fd);
+		int	links_msg(std::string const &params, int fd);
+		int	time_msg(std::string const &params, int fd);
+		int	connect_msg(std::string const &params, int fd);
+		int	trace_msg(std::string const &params, int fd);
+		int	admin_msg(std::string const &params, int fd);
+		int	info_msg(std::string const &params, int fd);
 		// Sending messages
-		int	privmsg_msg(std::string params, int fd);
-		int	notice_msg(std::string params, int fd);
+		int	privmsg_msg(std::string const &params, int fd);
+		int	notice_msg(std::string const &params, int fd);
 		// User-based queries
-		int	who_msg(std::string params, int fd);
-		int	whois_msg(std::string params, int fd);
-		int	whowas_msg(std::string params, int fd);
+		int	who_msg(std::string const &params, int fd);
+		int	whois_msg(std::string const &params, int fd);
+		int	whowas_msg(std::string const &params, int fd);
 		// Miscellaneous messages
-		int	kill_msg(std::string params, int fd);
-		int	ping_msg(std::string params, int fd);
-		int	pong_msg(std::string params, int fd);
-		int	error_msg(std::string params, int fd);
+		int	kill_msg(std::string const &params, int fd);
+		int	ping_msg(std::string const &params, int fd);
+		int	pong_msg(std::string const &params, int fd);
+		int	error_msg(std::string const &params, int fd);
 		// capacity
-		int	cap_msg(std::string params, int fd);
+		int	cap_msg(std::string const &params, int fd);
 };
 
 #endif
