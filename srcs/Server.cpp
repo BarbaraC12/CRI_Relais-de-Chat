@@ -519,7 +519,7 @@ int	Server::ping_msg(std::string const &params, int fd)
 	p.set_nick("test_nick");// a obtenir en fonction du fd et de _map_users
 	if (params.empty())
 		reply = gen_bnf_msg(ERR_NOORIGIN, p);
-	else if (!this->_map_users[fd].getUsername().empty())
+	else if (this->_map_users[fd].getUsername().empty())
 		reply = gen_bnf_msg(ERR_NOTREGISTERED, p);
 	else
 		reply = reply + "PONG " + this->_name + "\r\n";
