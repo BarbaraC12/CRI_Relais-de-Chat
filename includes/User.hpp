@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   User.hpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/24 12:16:22 by bcano             #+#    #+#             */
-/*   Updated: 2022/06/24 21:11:46 by bcano            ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef USER_HPP
 # define USER_HPP
 
@@ -19,13 +7,14 @@
 class User {
 	private:
 		int	_sd;
+		bool		_auth;
 		std::string	_nickName;//
 		std::string	_userName;
 		std::string _hostName;
 		std::string _servName;
 		std::string _realName;
 		std::string	_userMode;
-		std::string *_chan;
+		std::string _chan[10];
 		bool		_online;
 		
 	public:
@@ -35,6 +24,7 @@ class User {
 		virtual ~User(void);
 		std::string	nickname;
 		
+		void	setAuth( bool );
 		void	setNickname( std::string );
 		void	setUsername( std::string );
 		void	setHostname( std::string );
@@ -45,6 +35,7 @@ class User {
 		void	setStatus( bool );
 		
 		int			getSd( void );
+		bool		getAuth( void );
 		std::string	getNickname( void );
 		std::string	getUsername( void );
 		std::string	getHostname( void );
@@ -56,5 +47,7 @@ class User {
 
 		User &operator=(User const &rhs);
 };
+
+
 
 #endif

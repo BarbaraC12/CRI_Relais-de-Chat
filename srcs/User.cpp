@@ -1,34 +1,22 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   User.cpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/24 12:58:28 by bcano             #+#    #+#             */
-/*   Updated: 2022/06/24 21:09:36 by bcano            ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../includes/User.hpp"
 
 User::User( int sd )
-	:_sd(sd), _nickName("Empty"), _userName("Empty"), _hostName("Empty"), _servName("Empty"),
-	_realName("Empty"), _userMode("Empty"), _chan(NULL), _online(false), nickname()
+	:_sd(sd), _auth(false), _nickName(), _userName(), _hostName(), _servName(),
+	_realName(), _userMode(), _chan(), _online(false), nickname()
 {
 	std::cout << "New user create" << std::endl;
 }
 
 User::User(void)
-	:_sd(0), _nickName("Empty"), _userName("Empty"), _hostName("Empty"), _servName("Empty"),
-	_realName("Empty"), _userMode("Empty"), _chan(NULL), _online(false), nickname()
+	:_sd(0), _auth(false),_nickName(), _userName(), _hostName(), _servName(),
+	_realName(), _userMode(), _chan(), _online(false), nickname()
 {
 	return;
 }
 
 User::User(User const &src)
-	:_sd(0), _nickName("Empty"), _userName("Empty"), _hostName("Empty"), _servName("Empty"),
-	_realName("Empty"), _userMode("Empty"), _chan(NULL), _online(false), nickname()
+	:_sd(0), _auth(false), _nickName(), _userName(), _hostName(), _servName(),
+	_realName(), _userMode(), _chan(), _online(false), nickname()
 {
 	*this = src;
 	return;
@@ -44,6 +32,10 @@ User &User::operator=(User const &rhs) {
 		this->nickname = rhs.nickname;
 	}
 	return (*this);
+}
+
+void		User::setAuth( bool auth ) {
+	this->_auth = auth;
 }
 
 void		User::setNickname( std::string nickN) {
@@ -79,6 +71,10 @@ void		User::setStatus( bool status ) {
 
 int				User::getSd( void ) {
 	return this->_sd;
+}
+
+bool			User::getAuth( void ) {
+	return this->_auth;
 }
 
 std::string		User::getNickname( void ) {

@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Server.cpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/07/09 15:20:22 by anclarma         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "Server.hpp"
 #include "bnf.hpp"
 #include "Param.hpp"
@@ -21,7 +9,6 @@
 #include <fcntl.h>
 #include <iostream>
 #include <netinet/in.h>
-#include <sstream>
 #include <sys/ioctl.h>
 #include <sys/poll.h>
 #include <sys/socket.h>
@@ -355,7 +342,7 @@ std::string	Server::logtime(void)
 void	Server::init_map_funct(void)
 {
 	this->_map_funct.insert(make_pair("PASS", &Server::pass_msg));
-	// this->_map_funct.insert(make_pair("NICK", &Server::nick_msg));
+	this->_map_funct.insert(make_pair("NICK", &Server::nick_msg));
 	// this->_map_funct.insert(make_pair("USER", &Server::user_msg));
 	// this->_map_funct.insert(make_pair("SERVER", &Server::server_msg));
 	// this->_map_funct.insert(make_pair("OPER", &Server::oper_msg));
@@ -389,119 +376,119 @@ void	Server::init_map_funct(void)
 	this->_map_funct.insert(make_pair("CAP", &Server::cap_msg));
 }
 
-// BARBARA
+// // BARBARA
 
-int	Server::pass_msg(std::string const &params, int fd) {
-	(void)fd;
-	if (params != "\0") {
-		if (params != this->_passwd) {
-			std::cout << "Incorrect password" << std::endl;
-			return (2);
-		}
-		else {
-			std::cout << "Login successful" << std::endl;
-			return (0);
-		}
-	}
-	std::cout << "No password given" << std::endl;
-	return (1);
-}
+// int	Server::pass_msg(std::string const &params, int fd) {
+// 	(void)fd;
+// 	if (params != "\0") {
+// 		if (params != this->_passwd) {
+// 			std::cout << "Incorrect password" << std::endl;
+// 			return (2);
+// 		}
+// 		else {
+// 			std::cout << "Login successful" << std::endl;
+// 			return (0);
+// 		}
+// 	}
+// 	std::cout << "No password given" << std::endl;
+// 	return (1);
+// }
 
-int	Server::nick_msg(std::string const &params, int fd) {
-	if (params != "\0") {
-		//if (noConform(params))
-		//	return (2); //ERR_ERRONEUSNICKNAME
-		std::map<int, User>::iterator it;
-		for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
-		{
-			if (it->second.getNickname() == params && it->second.getSd() != fd)
-				return (3); //ERR_NICKNAMEINUSE
-			else if (it->second.getNickname() == params && it->second.getSd() == fd)
-				return (4); //ERR_NICKCOLLISION
-		}
-		for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
-		{
-			if (it->second.getSd() == fd)
-			{
-				it->second.setNickname(params);
-				return (0);	//NICKNAME_SET
-			}
-		}
-	}
-	return (1); //ERR_NONICKNAMEGIVEN
-}
+// int	Server::nick_msg(std::string const &params, int fd) {
+// 	if (params != "\0") {
+// 		//if (noConform(params))
+// 		//	return (2); //ERR_ERRONEUSNICKNAME
+// 		std::map<int, User>::iterator it;
+// 		for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
+// 		{
+// 			if (it->second.getNickname() == params && it->second.getSd() != fd)
+// 				return (3); //ERR_NICKNAMEINUSE
+// 			else if (it->second.getNickname() == params && it->second.getSd() == fd)
+// 				return (4); //ERR_NICKCOLLISION
+// 		}
+// 		for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
+// 		{
+// 			if (it->second.getSd() == fd)
+// 			{
+// 				it->second.setNickname(params);
+// 				return (0);	//NICKNAME_SET
+// 			}
+// 		}
+// 	}
+// 	return (1); //ERR_NONICKNAMEGIVEN
+// }
 
-int	Server::user_msg(std::string const &params, int fd) {
-	(void)fd;
-	if (params != "\0") {
-		std::map<int, User>::iterator it;
-		for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
-		{
-			if (it->second.getSd() == fd)
-			{
-				std::stringstream ss(params);
-				std::string str;
-				for (int i(0); i < 4; i++ ) {
-					ss >> str;
-					if (i == 0)
-						it->second.setUsername(str);
-					else if (i == 1)
-						it->second.setHostname(str);
-					else if (i == 2)
-						it->second.setServname(str);
-					else {
-						it->second.setRealname(str);
-						return (0); // USER_SET
-					}
-				}
-			}
-		}
-		std::stringstream ss(params);
-		std::string str;
-		User newUser(fd);
-		for (int i(0); i < 4; i++ ) {
-			ss >> str;
-			if (i == 0)
-				newUser.setUsername(str);
-			else if (i == 1)
-				newUser.setHostname(str);
-			else if (i == 2)
-				newUser.setServname(str);
-			else {
-				newUser.setRealname(str);
-				return (0);
-			}
-		}
-// ########### CREER UN NEW USER ##############
-		this->_map_users.insert(std::make_pair(fd, newUser));
-		return (0); // USER_SET
-	}
-	return (1); //ERR_NEEDMOREPARAMS
-}
+// int	Server::user_msg(std::string const &params, int fd) {
+// 	(void)fd;
+// 	if (params != "\0") {
+// 		std::map<int, User>::iterator it;
+// 		for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
+// 		{
+// 			if (it->second.getSd() == fd)
+// 			{
+// 				std::stringstream ss(params);
+// 				std::string str;
+// 				for (int i(0); i < 4; i++ ) {
+// 					ss >> str;
+// 					if (i == 0)
+// 						it->second.setUsername(str);
+// 					else if (i == 1)
+// 						it->second.setHostname(str);
+// 					else if (i == 2)
+// 						it->second.setServname(str);
+// 					else {
+// 						it->second.setRealname(str);
+// 						return (0); // USER_SET
+// 					}
+// 				}
+// 			}
+// 		}
+// 		std::stringstream ss(params);
+// 		std::string str;
+// 		User newUser(fd);
+// 		for (int i(0); i < 4; i++ ) {
+// 			ss >> str;
+// 			if (i == 0)
+// 				newUser.setUsername(str);
+// 			else if (i == 1)
+// 				newUser.setHostname(str);
+// 			else if (i == 2)
+// 				newUser.setServname(str);
+// 			else {
+// 				newUser.setRealname(str);
+// 				return (0);
+// 			}
+// 		}
+// // ########### CREER UN NEW USER ##############
+// 		this->_map_users.insert(std::make_pair(fd, newUser));
+// 		return (0); // USER_SET
+// 	}
+// 	return (1); //ERR_NEEDMOREPARAMS
+// }
 
-int	Server::server_msg(std::string const &params, int fd) {
-	(void)params;
-	(void)fd;
-	return (1);
-}
+// int	Server::server_msg(std::string const &params, int fd) {
+// 	(void)params;
+// 	(void)fd;
+// 	return (1);
+// }
 
-int	Server::oper_msg(std::string const &params, int fd) {
-	(void)params;
-	(void)fd;
-	return (1);
-}
+// int	Server::oper_msg(std::string const &params, int fd) {
+// 	(void)params;
+// 	(void)fd;
+// 	return (1);
+// }
 
-int	Server::quit_msg(std::string const &params, int fd) {
-	(void)params;
-	(void)fd;
-	return (1);
-}
+// int	Server::quit_msg(std::string const &params, int fd) {
+// 	(void)params;
+// 	(void)fd;
+// 	return (1);
+// }
 
-int	Server::squit_msg(std::string const &params, int fd) {
-	(void)params;
-	(void)fd;
-	return (1);
-}
+// int	Server::squit_msg(std::string const &params, int fd) {
+// 	(void)params;
+// 	(void)fd;
+// 	return (1);
+// }
 
 // ANTOINE
 
@@ -563,5 +550,42 @@ int	Server::cap_msg(std::string const &params, int fd)
 {
 	(void)params;
 	(void)fd;
+	return (0);
+}
+
+/* ########### Server & Queries Commands ########### */
+//RFC 2812 3.4.1. Motd Message
+int	Server::motd_msg(std::string const &params, int fd)
+{
+	(void)params;
+	(void)fd;
+	std::string		reply;
+	// Open ./motd.txt file
+	std::ifstream	ifs;
+	try
+	{
+		ifs.open("motd.txt", std::ifstream::in);
+		if (!ifs)
+		{
+			throw std::exception();
+		}
+		else
+		{
+			//send 375 RPL_MOTDSTART ":- <server> Message of the day - "
+			//TODO: read file with getline to <text>
+			for (std::string line; std::getline(ifs, line); )
+			{
+				reply += line + "\n";
+			}
+			//send 372 RPL_MOTD ":- <text>"
+			//send 376 RPL_ENDOFMOTD ":End of MOTD command"
+			std::cout << reply << std::endl;
+		}
+	}
+	catch (std::exception &e)
+	{
+		std::cerr << e.what() << std::endl;
+		//send 422 ERR_NOMOTD ":MOTD File is missing"
+	}
 	return (0);
 }
