@@ -4,7 +4,7 @@
 #include <utility>
 #include <algorithm>
 
-int	Server::pass_msg(std::string params, int fd) {
+int	Server::pass_msg(std::string const &params, int fd) {
 	std::map<int, User>::iterator it;
 	for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
 	{
@@ -29,7 +29,7 @@ int	Server::pass_msg(std::string params, int fd) {
 	return (1);
 }
 
-int	Server::nick_msg(std::string params, int fd) {
+int	Server::nick_msg(std::string const &params, int fd) {
 	if (params != "\0") {
 		std::map<int, User>::iterator it;
 		for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
@@ -57,7 +57,7 @@ int	Server::nick_msg(std::string params, int fd) {
 	return (1);
 }
 
-int	Server::user_msg(std::string params, int fd) {
+int	Server::user_msg(std::string const &params, int fd) {
 	if (params != "\0") {
 		std::string str;
 		std::string tmp;
@@ -109,19 +109,19 @@ int	Server::user_msg(std::string params, int fd) {
 	return (1); //ERR_NEEDMOREPARAMS
 }
 
-// int	Server::server_msg(std::string params, int fd) {
+// int	Server::server_msg(std::string const &params, int fd) {
 // 	(void)params;
 // 	(void)fd;
 // 	return (1);
 // }
 
-int	Server::oper_msg(std::string params, int fd) {
+int	Server::oper_msg(std::string const &params, int fd) {
 	(void)params;
 	(void)fd;
 	return (1);
 }
 
-int	Server::quit_msg(std::string params, int fd) {
+int	Server::quit_msg(std::string const &params, int fd) {
 	std::cout << "Client " << fd << " leave: " << params << std::endl;
 	return (1);
 }

@@ -2,21 +2,21 @@
 
 User::User( int sd )
 	:_sd(sd), _auth(false), _nickName(), _userName(), _hostName(), _servName(),
-	_realName(), _userMode(), _chan(NULL), _online(false), nickname()
+	_realName(), _userMode(), _chan(), _online(false), nickname()
 {
 	std::cout << "New user create" << std::endl;
 }
 
 User::User(void)
 	:_sd(0), _auth(false),_nickName(), _userName(), _hostName(), _servName(),
-	_realName(), _userMode(), _chan(NULL), _online(false), nickname()
+	_realName(), _userMode(), _chan(), _online(false), nickname()
 {
 	return;
 }
 
 User::User(User const &src)
 	:_sd(0), _auth(false), _nickName(), _userName(), _hostName(), _servName(),
-	_realName(), _userMode(), _chan(NULL), _online(false), nickname()
+	_realName(), _userMode(), _chan(), _online(false), nickname()
 {
 	*this = src;
 	return;

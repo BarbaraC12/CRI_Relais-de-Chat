@@ -18,7 +18,9 @@ C_DIR		= srcs
 C_FILES		= main.cpp	\
 			  Server.cpp	\
 			  User.cpp	\
-			  connect_msg.cpp
+			  connect_msg.cpp \
+			  bnf.cpp	\
+			  Param.cpp
 SRCS		= $(patsubst %, $(C_DIR)/%, $(C_FILES))
 
 # ################################## #
@@ -33,6 +35,7 @@ OBJS		= $(patsubst %, $(O_DIR)/%, $(O_FILES))
 # ################################## #
 CXXFLAGS	= -Wall -Wextra -Werror -MMD -MP
 CXXFLAGS	+= -std=c++98
+# CXXFLAGS	+= -Weverything
 LFLAGS		= 
 CINCLUDES	= -I ./includes
 CLIBS		= 
