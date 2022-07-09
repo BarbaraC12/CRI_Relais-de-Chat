@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/07/09 02:28:08 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/07/09 15:20:22 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,7 +173,7 @@ int	Server::receive_msg(const std::string &line, fd_index_t fd)
 		
 		if (new_line.find_first_not_of(" ") != std::string::npos)
 			new_line = new_line.substr(new_line.find_first_not_of(" "));
-		(this->*(it->second))(new_line, static_cast<int>(fd));
+		return ((this->*(it->second))(new_line, static_cast<int>(fd)));
 	}
 	return (0);
 }
@@ -528,6 +528,8 @@ int	Server::ping_msg(std::string const &params, int fd)
 	std::string	reply;
 	Param		p;
 
+	p.set_server(this->_name);
+	p.set_nick("test_nick");// a obtenir en fonction du fd et de _map_users
 	if (params.empty())
 		reply = gen_bnf_msg(ERR_NOORIGIN, p);
 	else if (!this->_map_users[fd].getUsername().empty())

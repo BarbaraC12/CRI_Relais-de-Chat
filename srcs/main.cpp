@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 12:19:46 by bcano             #+#    #+#             */
-/*   Updated: 2022/07/08 22:56:25 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/07/09 13:51:07 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,15 +61,6 @@ int main(int argc, char **argv)
 		return (1);
 	port = static_cast<uint16_t>(atoi(argv[1]));
 	pwd = argv[2];
-	std::cout << port << " " << pwd << std::endl;
-	//test
-	{
-		Param	p;
-
-		init_bnf_msg(p.map_bnf_msg);
-		std::cout << gen_bnf_msg(1, p);
-	}
-	//fin test
 	{
 		Server s(port, pwd);
 

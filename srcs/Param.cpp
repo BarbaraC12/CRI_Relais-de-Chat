@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/27 10:16:39 by anclarma          #+#    #+#             */
-/*   Updated: 2022/07/08 23:18:14 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/07/09 15:28:01 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,14 +22,15 @@
 
 Param::Param(void)
 	: _client(), _server(), _version(), _comments(), _debug_level(), _host(),
-	_port(), _host_mask(), _class(), _user(), _nick(), map_bnf_msg()
+	_port(), _host_mask(), _class(), _user(), _nick(), map_bnf_msg(), map_bnf_funct()
 {
 	init_bnf_msg(this->map_bnf_msg);
+	init_bnf_funct(this->map_bnf_funct);
 	return ;
 }
 Param::Param(Param const &src)
 	: _client(), _server(), _version(), _comments(), _debug_level(), _host(),
-	_port(), _host_mask(), _class(), _user(), _nick(), map_bnf_msg()
+	_port(), _host_mask(), _class(), _user(), _nick(), map_bnf_msg(), map_bnf_funct()
 {
 	*this = src;
 	return ;
@@ -54,11 +55,30 @@ Param	&Param::operator=(Param const &rhs)
 		this->_user = rhs._user;
 		this->_nick = rhs._nick;
 		this->map_bnf_msg = rhs.map_bnf_msg;
+		this->map_bnf_funct = rhs.map_bnf_funct;
 	}
 	return (*this);
 }
 
-std::string     Param::get_client(void) const
+//void	Param::set_client(std::string const &client);
+void	Param::set_server(std::string const &server)
+{
+	this->_server = server;
+}
+//void	Param::set_version(std::string const &version);
+//void	Param::set_comments(std::string const &comments);
+//void	Param::set_debug_level(std::string const &debug_level);
+//void	Param::set_host(std::string const &host);
+//void	Param::set_port(std::string const &port);
+//void	Param::set_host_mask(std::string const &host_mask);
+//void	Param::set_class(std::string const &class_);
+//void	Param::set_user(std::string const &user);
+void	Param::set_nick(std::string const &nick)
+{
+	this->_nick = nick;
+}
+
+std::string	Param::get_client(void) const
 {
 	return (this->_client);
 }
@@ -123,12 +143,17 @@ static void	test(std::string &msg, Param const &p)
 		std::string::size_type pos_end = 0u;
 		pos_end = msg.find(">", pos);
 		if (pos_end != std::string::npos)
-			msg.replace(pos, pos_end - pos + 1, "test");
+		{
+			std::map<std::string, std::string (Param::* const)(void) const>::const_iterator    it;
+			it = p.map_bnf_funct.find(msg.substr(pos, pos_end - pos + 1));
+			if (it != p.map_bnf_funct.end())
+				msg.replace(pos, pos_end - pos + 1, (p.*(it->second))());
+		}
 		pos += 4;
 	}
 }
 
-void	init_bnf_msg(std::map<std::string, std::string (Param::* const)(void) const> &map_bnf_funct)
+void	init_bnf_funct(std::map<std::string, std::string (Param::* const)(void) const> &map_bnf_funct)
 {
 	map_bnf_funct.insert(make_pair("<client>", &Param::get_client));
 	map_bnf_funct.insert(make_pair("<server>", &Param::get_server));
