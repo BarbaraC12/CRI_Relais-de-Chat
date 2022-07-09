@@ -1,16 +1,6 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Server.cpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jdidier <jdidier@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/06/27 22:18:40 by jdidier          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "Server.hpp"
+#include "bnf.hpp"
+#include "Param.hpp"
 #include <algorithm>
 #include <ctime>
 #include <csignal>
@@ -33,24 +23,25 @@
 #define BUFFER_SIZE_IRC	512
 
 Server::Server(uint16_t &port, std::string const &passwd)
-	: _port(port), _passwd(passwd), _listen_sd(-1), _fds(200), _fds_buffer(200),
-	_ndfs(0), _map_funct(), _map_users(), _name("irc.anclarma.42.fr")
+	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(),
+	_name("irc.anclarma.42.fr"), _passwd(passwd), _listen_sd(-1), _port(port),
+	_padded()
 {
 	this->init_map_funct();
 	return;
 }
 
 Server::Server(void)
-	: _port(), _passwd(), _listen_sd(-1), _fds(200), _fds_buffer(200),
-	_ndfs(0), _map_funct(), _map_users(), _name("irc.anclarma.42.fr")
+	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(),
+	_name("irc.anclarma.42.fr"), _passwd(), _listen_sd(-1), _port(), _padded()
 {
 	this->init_map_funct();
 	return;
 }
 
 Server::Server(Server const &src)
-	: _port(), _passwd(), _listen_sd(-1), _fds(200), _fds_buffer(200), _ndfs(0),
-	_map_funct(), _map_users(), _name("irc.anclarma.42.fr")
+	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(),
+	_name("irc.anclarma.42.fr"), _passwd(), _listen_sd(-1), _port(), _padded()
 {
 	*this = src;
 	return;
@@ -74,6 +65,14 @@ Server &Server::operator=(Server const &rhs)
 		this->_passwd = rhs._passwd;
 	}
 	return (*this);
+}
+
+int Server::start(void)
+{
+	return (this->create_sock()
+			|| this->set_sock()
+			|| this->bind_sock()
+			|| this->listen());
 }
 
 int Server::create_sock(void)
@@ -120,7 +119,7 @@ int Server::bind_sock(void)
 	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = INADDR_ANY;
 	addr.sin_port = htons(this->_port);
-	ret = bind(this->_listen_sd, (sockaddr *)&addr, sizeof(addr));
+	ret = bind(this->_listen_sd, reinterpret_cast<sockaddr *>(&addr), sizeof(addr));
 	if (ret < 0)
 	{
 		std::clog << this->logtime() << "bind() failed" << std::endl;
@@ -147,9 +146,9 @@ int Server::listen(void)
 	return (0);
 }
 
-int	Server::receive_msg(std::string line, fd_index_t fd)
+int	Server::receive_msg(const std::string &line, fd_index_t fd)
 {
-	std::map<std::string, int (Server::* const)(std::string, int)>::iterator	it;
+	std::map<std::string, int (Server::* const)(std::string const &, int)>::iterator	it;
 	std::string	fisrt_word;
 
 	fisrt_word = line.substr(0, line.find(" "));
@@ -158,11 +157,12 @@ int	Server::receive_msg(std::string line, fd_index_t fd)
 	{
 		std::string	new_line;
 
-		new_line = line.substr(line.find(" ") + 1);
+		new_line = line.substr(line.find(fisrt_word) + fisrt_word.length());
+		
+		if (new_line.find_first_not_of(" ") != std::string::npos)
+			new_line = new_line.substr(new_line.find_first_not_of(" "));
 		(this->*(it->second))(new_line, static_cast<int>(fd));
 	}
-	(void)fd;
-	(void)it;
 	return (0);
 }
 
@@ -379,7 +379,7 @@ void	Server::init_map_funct(void)
 
 // BARBARA
 
-int	Server::pass_msg(std::string params, int fd) {
+int	Server::pass_msg(std::string const &params, int fd) {
 	(void)fd;
 	if (params != "\0") {
 		if (params != this->_passwd) {
@@ -395,7 +395,7 @@ int	Server::pass_msg(std::string params, int fd) {
 	return (1);
 }
 
-int	Server::nick_msg(std::string params, int fd) {
+int	Server::nick_msg(std::string const &params, int fd) {
 	if (params != "\0") {
 		//if (noConform(params))
 		//	return (2); //ERR_ERRONEUSNICKNAME
@@ -419,7 +419,7 @@ int	Server::nick_msg(std::string params, int fd) {
 	return (1); //ERR_NONICKNAMEGIVEN
 }
 
-int	Server::user_msg(std::string params, int fd) {
+int	Server::user_msg(std::string const &params, int fd) {
 	(void)fd;
 	if (params != "\0") {
 		std::map<int, User>::iterator it;
@@ -467,25 +467,25 @@ int	Server::user_msg(std::string params, int fd) {
 	return (1); //ERR_NEEDMOREPARAMS
 }
 
-int	Server::server_msg(std::string params, int fd) {
+int	Server::server_msg(std::string const &params, int fd) {
 	(void)params;
 	(void)fd;
 	return (1);
 }
 
-int	Server::oper_msg(std::string params, int fd) {
+int	Server::oper_msg(std::string const &params, int fd) {
 	(void)params;
 	(void)fd;
 	return (1);
 }
 
-int	Server::quit_msg(std::string params, int fd) {
+int	Server::quit_msg(std::string const &params, int fd) {
 	(void)params;
 	(void)fd;
 	return (1);
 }
 
-int	Server::squit_msg(std::string params, int fd) {
+int	Server::squit_msg(std::string const &params, int fd) {
 	(void)params;
 	(void)fd;
 	return (1);
@@ -493,7 +493,7 @@ int	Server::squit_msg(std::string params, int fd) {
 
 // ANTOINE
 
-int	Server::kill_msg(std::string params, int fd)
+int	Server::kill_msg(std::string const &params, int fd)
 {
 	std::string	kill_nickname;
 	std::string	kill_comment;
@@ -511,14 +511,17 @@ int	Server::kill_msg(std::string params, int fd)
 	return (0);
 }
 
-int	Server::ping_msg(std::string params, int fd)
+int	Server::ping_msg(std::string const &params, int fd)
 {
 	std::string	reply;
+	Param		p;
 
-	(void)params;
-	reply += "PONG ";
-	reply += this->_name;
-	reply += "\r\n";
+	if (params.empty())
+		reply = gen_bnf_msg(ERR_NOORIGIN, p);
+	else if (!this->_map_users[fd].getUsername().empty())
+		reply = gen_bnf_msg(ERR_NOTREGISTERED, p);
+	else
+		reply = reply + "PONG " + this->_name + "\r\n";
 	if (send(fd, reply.data(), reply.length(), 0) < 0)
 	{
 		std::clog << this->logtime() << "send() failed" << std::endl;
@@ -527,21 +530,22 @@ int	Server::ping_msg(std::string params, int fd)
 	return (0);
 }
 
-int	Server::pong_msg(std::string params, int fd)
+int	Server::pong_msg(std::string const &params, int fd)
+{
+	//ERR_NOORIGIN or ERR_NOSUCHSERVER
+	(void)params;
+	(void)fd;
+	return (0);
+}
+
+int	Server::error_msg(std::string const &params, int fd)
 {
 	(void)params;
 	(void)fd;
 	return (0);
 }
 
-int	Server::error_msg(std::string params, int fd)
-{
-	(void)params;
-	(void)fd;
-	return (0);
-}
-
-int	Server::cap_msg(std::string params, int fd)
+int	Server::cap_msg(std::string const &params, int fd)
 {
 	(void)params;
 	(void)fd;
@@ -550,7 +554,7 @@ int	Server::cap_msg(std::string params, int fd)
 
 /* ########### Server & Queries Commands ########### */
 //RFC 2812 3.4.1. Motd Message
-int	Server::motd_msg(std::string params, int fd)
+int	Server::motd_msg(std::string const &params, int fd)
 {
 	(void)params;
 	(void)fd;

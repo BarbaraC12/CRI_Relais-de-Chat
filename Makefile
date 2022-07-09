@@ -1,15 +1,3 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: bcano <bcano@student.42.fr>                +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2022/06/07 18:43:20 by bcano             #+#    #+#              #
-#    Updated: 2022/06/24 17:07:49 by anclarma         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
 # ################################## #
 #               COMMAND              #
 # ################################## #
@@ -29,7 +17,9 @@ NAME		= ircserv
 C_DIR		= srcs
 C_FILES		= main.cpp	\
 			  Server.cpp	\
-			  User.cpp
+			  User.cpp	\
+			  bnf.cpp	\
+			  Param.cpp
 SRCS		= $(patsubst %, $(C_DIR)/%, $(C_FILES))
 
 # ################################## #
@@ -44,6 +34,7 @@ OBJS		= $(patsubst %, $(O_DIR)/%, $(O_FILES))
 # ################################## #
 CXXFLAGS	= -Wall -Wextra -Werror -MMD -MP
 CXXFLAGS	+= -std=c++98
+# CXXFLAGS	+= -Weverything
 LFLAGS		= 
 CINCLUDES	= -I ./includes
 CLIBS		= 
