@@ -14,7 +14,7 @@ class User {
 		std::string _servName;
 		std::string _realName;
 		std::string	_userMode;
-		std::string *_chan;
+		std::string _chan[10];
 		bool		_online;
 		
 	public:
@@ -47,5 +47,7 @@ class User {
 
 		User &operator=(User const &rhs);
 };
+
+
 
 #endif

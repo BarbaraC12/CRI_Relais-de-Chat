@@ -57,10 +57,10 @@ class Server
 		int	pass_msg(std::string params, int fd);
 		int	nick_msg(std::string params, int fd);
 		int	user_msg(std::string params, int fd);
-		int	server_msg(std::string params, int fd);
+		// int	server_msg(std::string params, int fd);
 		int	oper_msg(std::string params, int fd);
 		int	quit_msg(std::string params, int fd);
-		int	squit_msg(std::string params, int fd);
+		// int	squit_msg(std::string params, int fd);
 		// Channel operations
 		int	join_msg(std::string params, int fd);
 		int	part_msg(std::string params, int fd);
