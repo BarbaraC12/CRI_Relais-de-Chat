@@ -6,7 +6,7 @@
 /*   By: bcano <bcano@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 20:36:27 by anclarma          #+#    #+#             */
-/*   Updated: 2022/07/08 22:15:24 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/07/09 02:28:08 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,11 +169,12 @@ int	Server::receive_msg(const std::string &line, fd_index_t fd)
 	{
 		std::string	new_line;
 
-		new_line = line.substr(line.find(" ") + 1);
+		new_line = line.substr(line.find(fisrt_word) + fisrt_word.length());
+		
+		if (new_line.find_first_not_of(" ") != std::string::npos)
+			new_line = new_line.substr(new_line.find_first_not_of(" "));
 		(this->*(it->second))(new_line, static_cast<int>(fd));
 	}
-	(void)fd;
-	(void)it;
 	return (0);
 }
 
@@ -524,15 +525,15 @@ int	Server::kill_msg(std::string const &params, int fd)
 
 int	Server::ping_msg(std::string const &params, int fd)
 {
-	//ERR_NOORIGIN or ERR_NOSUCHSERVER
 	std::string	reply;
+	Param		p;
 
-	(void)params;
-	std::cout << "test: " << params << std::endl;
-	reply = reply + "PONG " + this->_name + "\r\n";
-	
-	Param	p;
-	reply = gen_bnf_msg(ERR_NOORIGIN, p);
+	if (params.empty())
+		reply = gen_bnf_msg(ERR_NOORIGIN, p);
+	else if (!this->_map_users[fd].getUsername().empty())
+		reply = gen_bnf_msg(ERR_NOTREGISTERED, p);
+	else
+		reply = reply + "PONG " + this->_name + "\r\n";
 	if (send(fd, reply.data(), reply.length(), 0) < 0)
 	{
 		std::clog << this->logtime() << "send() failed" << std::endl;

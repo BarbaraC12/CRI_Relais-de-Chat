@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/26 22:07:21 by anclarma          #+#    #+#             */
-/*   Updated: 2022/07/07 19:19:58 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/07/08 23:07:36 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,6 @@ class	Param
 		std::string	get_nick(void) const;
 };
 
-std::string	gen_bnf_msg(const int &id, /*const*/ Param &p);
+std::string	gen_bnf_msg(const int &id, Param const &p);
 
 #endif
