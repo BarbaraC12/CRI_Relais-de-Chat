@@ -9,23 +9,14 @@ UNAME		= $(shell uname)
 # ################################## #
 #              EXEC NAME             #
 # ################################## #
-NAME		= ircserv
-
-# ################################## #
-#              OVER EXEC             #
-# ################################## #
-NAME2		= bot
+NAME		= bot
 
 # ################################## #
 #               SOURCES              #
 # ################################## #
 C_DIR		= srcs
 C_FILES		= main.cpp	\
-			  Server.cpp	\
-			  User.cpp	\
-			  connect_msg.cpp \
-			  bnf.cpp	\
-			  Param.cpp
+			  BotBase.cpp
 SRCS		= $(patsubst %, $(C_DIR)/%, $(C_FILES))
 
 # ################################## #
@@ -49,7 +40,7 @@ CLIBS		=
 #                RULES               #
 # ################################## #
 
-all:		$(NAME) $(NAME2)
+all:		$(NAME)
 
 check:	CXX			=  g++
 check:	CXXFLAGS	+=  -Weffc++ -pedantic
@@ -60,12 +51,10 @@ check:	CXXFLAGS	+=  -g3
 check:	LFLAGS		+=  -fsanitize=address
 check:	LFLAGS		+=  -fsanitize=undefined
 check:	LFLAGS		+=  -g3
-check:	fclean $(NAME) $(NAME2)
+check:	fclean $(NAME)
 
 $(NAME):	$(O_DIR) $(OBJS)
 			$(CXX) $(OBJS) $(LFLAGS) $(CLIBS) -o $@
-$(NAME2):
-			make -C ./bot all CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS)" LFLAGS="$(LFLAGS)"
 
 $(O_DIR)/%.o: $(C_DIR)/%.cpp
 			$(CXX) $(CXXFLAGS) $(CINCLUDES) -c $< -o $@
@@ -75,7 +64,6 @@ $(O_DIR):
 
 clean:
 			$(RM) $(O_DIR)
-			make -C ./bot fclean
 
 fclean:		clean
 			$(RM) $(NAME)
@@ -84,4 +72,4 @@ re:			fclean all
 
 -include	$(OBJS:.o=.d)
 
-.PHONY: all check clean fclean re bot
+.PHONY: all check clean fclean re
