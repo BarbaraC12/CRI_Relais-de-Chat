@@ -142,7 +142,7 @@ int			BotBase::recv() {
 			buf[bytes] = '\0';
 			buffer.append(buf);
 			std::cout << "recv()::bytes: " << bytes << std::endl;
-			std::cout << "[SERVER]:\n" << std::string(buf, bytes) << "\r\n";
+			std::cout << "[SERVER]:\n" << std::string(buf, static_cast<std::string::size_type>(bytes)) << "\r\n";
 		} while (::strlen(buf) == 4096);
 		this->parse_buffer(buffer);
 	} while (1);
