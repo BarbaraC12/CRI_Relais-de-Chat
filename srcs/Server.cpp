@@ -56,6 +56,14 @@ Server::~Server(void)
 	return;
 }
 
+
+// ########### CREER UN NEW USER ##############
+void Server::addUser(int fd) {
+	User newUser(fd);
+	this->_map_users.insert(std::make_pair(fd, newUser));
+	return ;
+}
+
 Server &Server::operator=(Server const &rhs)
 {
 	if (this != &rhs)
@@ -375,120 +383,6 @@ void	Server::init_map_funct(void)
 	this->_map_funct.insert(make_pair("ERROR", &Server::error_msg));
 	this->_map_funct.insert(make_pair("CAP", &Server::cap_msg));
 }
-
-// // BARBARA
-
-// int	Server::pass_msg(std::string const &params, int fd) {
-// 	(void)fd;
-// 	if (params != "\0") {
-// 		if (params != this->_passwd) {
-// 			std::cout << "Incorrect password" << std::endl;
-// 			return (2);
-// 		}
-// 		else {
-// 			std::cout << "Login successful" << std::endl;
-// 			return (0);
-// 		}
-// 	}
-// 	std::cout << "No password given" << std::endl;
-// 	return (1);
-// }
-
-// int	Server::nick_msg(std::string const &params, int fd) {
-// 	if (params != "\0") {
-// 		//if (noConform(params))
-// 		//	return (2); //ERR_ERRONEUSNICKNAME
-// 		std::map<int, User>::iterator it;
-// 		for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
-// 		{
-// 			if (it->second.getNickname() == params && it->second.getSd() != fd)
-// 				return (3); //ERR_NICKNAMEINUSE
-// 			else if (it->second.getNickname() == params && it->second.getSd() == fd)
-// 				return (4); //ERR_NICKCOLLISION
-// 		}
-// 		for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
-// 		{
-// 			if (it->second.getSd() == fd)
-// 			{
-// 				it->second.setNickname(params);
-// 				return (0);	//NICKNAME_SET
-// 			}
-// 		}
-// 	}
-// 	return (1); //ERR_NONICKNAMEGIVEN
-// }
-
-// int	Server::user_msg(std::string const &params, int fd) {
-// 	(void)fd;
-// 	if (params != "\0") {
-// 		std::map<int, User>::iterator it;
-// 		for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
-// 		{
-// 			if (it->second.getSd() == fd)
-// 			{
-// 				std::stringstream ss(params);
-// 				std::string str;
-// 				for (int i(0); i < 4; i++ ) {
-// 					ss >> str;
-// 					if (i == 0)
-// 						it->second.setUsername(str);
-// 					else if (i == 1)
-// 						it->second.setHostname(str);
-// 					else if (i == 2)
-// 						it->second.setServname(str);
-// 					else {
-// 						it->second.setRealname(str);
-// 						return (0); // USER_SET
-// 					}
-// 				}
-// 			}
-// 		}
-// 		std::stringstream ss(params);
-// 		std::string str;
-// 		User newUser(fd);
-// 		for (int i(0); i < 4; i++ ) {
-// 			ss >> str;
-// 			if (i == 0)
-// 				newUser.setUsername(str);
-// 			else if (i == 1)
-// 				newUser.setHostname(str);
-// 			else if (i == 2)
-// 				newUser.setServname(str);
-// 			else {
-// 				newUser.setRealname(str);
-// 				return (0);
-// 			}
-// 		}
-// // ########### CREER UN NEW USER ##############
-// 		this->_map_users.insert(std::make_pair(fd, newUser));
-// 		return (0); // USER_SET
-// 	}
-// 	return (1); //ERR_NEEDMOREPARAMS
-// }
-
-// int	Server::server_msg(std::string const &params, int fd) {
-// 	(void)params;
-// 	(void)fd;
-// 	return (1);
-// }
-
-// int	Server::oper_msg(std::string const &params, int fd) {
-// 	(void)params;
-// 	(void)fd;
-// 	return (1);
-// }
-
-// int	Server::quit_msg(std::string const &params, int fd) {
-// 	(void)params;
-// 	(void)fd;
-// 	return (1);
-// }
-
-// int	Server::squit_msg(std::string const &params, int fd) {
-// 	(void)params;
-// 	(void)fd;
-// 	return (1);
-// }
 
 // ANTOINE
 

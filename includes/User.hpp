@@ -4,18 +4,38 @@
 # include <string>
 # include <iostream>
 
+enum e_user_status
+{
+	NOPASS,
+	REGISTER,
+	LOGGED_IN,
+	DESACTIVE,
+	DELETE
+};
+
+enum e_user_mode
+{
+	W,
+	O,
+	I,
+	S,
+	X
+};
+
 class User {
+
 	private:
 		int	_sd;
-		bool		_auth;
-		std::string	_nickName;//
-		std::string	_userName;
-		std::string _hostName;
-		std::string _servName;
-		std::string _realName;
-		std::string	_userMode;
-		std::string _chan[10];
-		bool		_online;
+		std::string		_nickName;
+		std::string		_userName;
+		std::string 	_hostName;
+		std::string 	_servName;
+		std::string 	_realName;
+		bool			_userMode[5];
+		std::string 	_chan[10];
+		e_user_status	_status;
+		//time			_lastPong;
+		//time			_connectTime;
 		
 	public:
 		User( void );
@@ -24,26 +44,24 @@ class User {
 		virtual ~User(void);
 		std::string	nickname;
 		
-		void	setAuth( bool );
+		void	setUsermode( e_user_mode, bool );
+		void	setStatus( e_user_status);
 		void	setNickname( std::string );
 		void	setUsername( std::string );
 		void	setHostname( std::string );
+		void	addChanel( std::string );
 		void	setServname( std::string );
 		void	setRealname( std::string );
-		void	setUsermode( std::string );
-		void	addChanel( std::string );
-		void	setStatus( bool );
 		
-		int			getSd( void );
-		bool		getAuth( void );
-		std::string	getNickname( void );
-		std::string	getUsername( void );
-		std::string	getHostname( void );
-		std::string	getServname( void );
-		std::string	getRealname( void );
-		std::string	getUsermode( void );
-		std::string	getChanels( void );
-		bool		getStatus( void );
+		int				getSd( void );
+		e_user_status	getStatus( void );
+		bool			getUsermode( void );
+		std::string		getNickname( void );
+		std::string		getUsername( void );
+		std::string		getHostname( void );
+		std::string		getServname( void );
+		std::string		getRealname( void );
+		std::string		getChanels( void );
 
 		User &operator=(User const &rhs);
 };
