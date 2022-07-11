@@ -492,8 +492,16 @@ void	Server::init_map_funct(void)
 
 // ANTOINE
 
+//Command: KILL
+//Parameters: <nickname> <comment>
+//Numeric Replies:
+//   ERR_NOPRIVILEGES
+//   ERR_NEEDMOREPARAMS
+//   ERR_NOSUCHNICK
+//   ERR_CANTKILLSERVER
 int	Server::kill_msg(std::string const &params, int fd)
 {
+	//
 	std::string	kill_nickname;
 	std::string	kill_comment;
 
@@ -510,13 +518,18 @@ int	Server::kill_msg(std::string const &params, int fd)
 	return (0);
 }
 
+//Command: PING
+//Parameters: <server1> [ <server2> ]
+//Numeric Replies:
+//   ERR_NOORIGIN
+//   ERR_NOSUCHSERVER
 int	Server::ping_msg(std::string const &params, int fd)
 {
 	std::string	reply;
 	Param		p;
 
 	p.set_server(this->_name);
-	p.set_nick("test_nick");// a obtenir en fonction du fd et de _map_users
+	p.set_nick(this->_map_users[fd].getNickname());// a obtenir en fonction du fd et de _map_users
 	if (params.empty())
 		reply = gen_bnf_msg(ERR_NOORIGIN, p);
 	else if (this->_map_users[fd].getUsername().empty())
@@ -531,6 +544,11 @@ int	Server::ping_msg(std::string const &params, int fd)
 	return (0);
 }
 
+//Command: PONG
+//Parameters: <server1> [ <server2> ]
+//Numeric Replies:
+//   ERR_NOORIGIN
+//   ERR_NOSUCHSERVER
 int	Server::pong_msg(std::string const &params, int fd)
 {
 	//ERR_NOORIGIN or ERR_NOSUCHSERVER
@@ -539,6 +557,9 @@ int	Server::pong_msg(std::string const &params, int fd)
 	return (0);
 }
 
+//Command: ERROR
+//Parameters: <error message>
+//Numeric Replies: None
 int	Server::error_msg(std::string const &params, int fd)
 {
 	(void)params;
