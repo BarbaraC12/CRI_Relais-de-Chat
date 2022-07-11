@@ -9,6 +9,7 @@ enum e_user_status
 	NOPASS,
 	REGISTER,
 	LOGGED_IN,
+	DESACTIVE,
 	DELETE
 };
 
@@ -33,6 +34,8 @@ class User {
 		bool			_userMode[5];
 		std::string 	_chan[10];
 		e_user_status	_status;
+		//time			_lastPong;
+		//time			_connectTime;
 		
 	public:
 		User( void );
