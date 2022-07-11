@@ -144,7 +144,7 @@ void	init_bnf_msg(std::map<int, std::string> &map_bnf_msg)
 	map_bnf_msg[ERR_USERSDISABLED] = ":<reason>";
 	map_bnf_msg[ERR_NOTREGISTERED] = ":You have not registered";
 	map_bnf_msg[ERR_NEEDMOREPARAMS] = "<command> :Not enough parameters";
-	map_bnf_msg[ERR_ALREADYREGISTERED] = ":<reason>";
+	map_bnf_msg[ERR_ALREADYREGISTRED] = ":<reason>";
 	map_bnf_msg[ERR_NOPERMFORHOST] = ":<reason>";
 	map_bnf_msg[ERR_PASSWDMISMATCH] = ":<reason>";
 	map_bnf_msg[ERR_YOUREBANNEDCREEP] = ":<reason>";

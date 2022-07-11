@@ -1,22 +1,22 @@
 #include "../includes/User.hpp"
 
 User::User( int sd )
-	:_sd(sd), _auth(false), _nickName(), _userName(), _hostName(), _servName(),
-	_realName(), _userMode(), _chan(), _online(false), nickname()
+	:_sd(sd), _nickName(), _userName(), _hostName(), _servName(),
+	_realName(), _userMode(), _chan(), _status(NOPASS), nickname()
 {
 	std::cout << "New user create" << std::endl;
 }
 
 User::User(void)
-	:_sd(0), _auth(false),_nickName(), _userName(), _hostName(), _servName(),
-	_realName(), _userMode(), _chan(), _online(false), nickname()
+	:_sd(0),_nickName(), _userName(), _hostName(), _servName(),
+	_realName(), _userMode(), _chan(), _status(NOPASS), nickname()
 {
 	return;
 }
 
 User::User(User const &src)
-	:_sd(0), _auth(false), _nickName(), _userName(), _hostName(), _servName(),
-	_realName(), _userMode(), _chan(), _online(false), nickname()
+	:_sd(0), _nickName(), _userName(), _hostName(), _servName(),
+	_realName(), _userMode(), _chan(), _status(NOPASS), nickname()
 {
 	*this = src;
 	return;
@@ -34,8 +34,8 @@ User &User::operator=(User const &rhs) {
 	return (*this);
 }
 
-void		User::setAuth( bool auth ) {
-	this->_auth = auth;
+void		User::setStatus( e_user_status stat ) {
+	this->_status = stat;	
 }
 
 void		User::setNickname( std::string nickN) {
@@ -58,23 +58,19 @@ void		User::setRealname( std::string realN ) {
 	this->_realName = realN;
 	}
 
-void		User::setUsermode( std::string userM ) {
-	this->_userMode = userM;
+void		User::setUsermode( e_user_mode userM, bool status ) {
+	this->_userMode[userM] = status;
 	}
 
 void		User::addChanel( std::string ) {
 	}
 
-void		User::setStatus( bool status ) {
-	this->_online = status;	
-}
-
 int				User::getSd( void ) {
 	return this->_sd;
 }
 
-bool			User::getAuth( void ) {
-	return this->_auth;
+e_user_status	User::getStatus( void ) {
+	return this->_status;
 }
 
 std::string		User::getNickname( void ) {
@@ -97,16 +93,12 @@ std::string		User::getRealname( void ) {
 	return this->_realName;
 }
 
-std::string		User::getUsermode( void ) {
-	return this->_userName;
+bool		User::getUsermode( void ) {
+	return this->_userMode[O];
 }
 
 std::string		User::getChanels( void ) {	
 	std::string st("this chan");
 	(void)this->_chan;
 	return st;
-}
-
-bool			User::getStatus( void ) {
-	return this->_online;
 }

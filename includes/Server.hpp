@@ -12,6 +12,10 @@
 #include <fstream>
 #include <stdexcept>
 
+#define NICK_LENGTH 9
+#define CHAN_LENGTH 13
+#define PASS_OPER "password"
+
 class Server
 {
 	private:
@@ -32,6 +36,8 @@ class Server
 		Server(void);
 		Server(Server const &src);
 		virtual ~Server(void);
+		
+		void	addUser(int fd);
 
 		Server &operator=(Server const &rhs);
 
