@@ -49,15 +49,6 @@ int main(int argc, char **argv)
 		return (1);
 	port = static_cast<uint16_t>(atoi(argv[1]));
 	pwd = argv[2];
-	std::cout << port << " " << pwd << std::endl;
-	//test
-	{
-		Param	p;
-
-		init_bnf_msg(p.map_bnf_msg);
-		std::cout << gen_bnf_msg(1, p);
-	}
-	//fin test
 	{
 		Server s(port, pwd);
 

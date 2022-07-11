@@ -31,6 +31,9 @@ class Server
 		int							_listen_sd; // sd for Socket Descriptor
 		uint16_t					_port;
 		uint16_t					_padded; // for flag -Wpadded
+		//std::string					_version;
+		//std::string					_debuglevel;
+
 	public:
 		Server(uint16_t &port, std::string const &passwd);
 		Server(void);
