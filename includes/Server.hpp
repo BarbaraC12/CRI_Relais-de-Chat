@@ -41,6 +41,7 @@ class Server
 		virtual ~Server(void);
 		
 		void	addUser(int fd);
+		size_t	userMapSize( void );
 
 		Server &operator=(Server const &rhs);
 

@@ -64,6 +64,13 @@ void Server::addUser(int fd) {
 	return ;
 }
 
+size_t		Server::userMapSize( void ) {
+	size_t size(0);
+	for (std::map<int, User>::iterator it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
+		size++;
+	return size;
+}
+
 Server &Server::operator=(Server const &rhs)
 {
 	if (this != &rhs)
@@ -351,10 +358,10 @@ void	Server::init_map_funct(void)
 {
 	this->_map_funct.insert(make_pair("PASS", &Server::pass_msg));
 	this->_map_funct.insert(make_pair("NICK", &Server::nick_msg));
-	// this->_map_funct.insert(make_pair("USER", &Server::user_msg));
+	this->_map_funct.insert(make_pair("USER", &Server::user_msg));
 	// this->_map_funct.insert(make_pair("SERVER", &Server::server_msg));
 	// this->_map_funct.insert(make_pair("OPER", &Server::oper_msg));
-	// this->_map_funct.insert(make_pair("QUIT", &Server::quit_msg));
+	this->_map_funct.insert(make_pair("QUIT", &Server::quit_msg));
 	// this->_map_funct.insert(make_pair("SQUIT", &Server::squit_msg));
 	// this->_map_funct.insert(make_pair("JOIN", &Server::join_msg));
 	// this->_map_funct.insert(make_pair("PART", &Server::part_msg));

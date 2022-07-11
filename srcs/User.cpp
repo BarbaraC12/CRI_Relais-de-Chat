@@ -2,7 +2,7 @@
 
 User::User( int sd )
 	:_sd(sd), _nickName(), _userName(), _hostName(), _servName(),
-	_realName(), _userMode(), _chan(), _status(NOPASS), nickname()
+	_realName(), _userMode(), _chan(), _status(REGISTER), nickname()
 {
 	std::cout << "New user create" << std::endl;
 }
@@ -63,7 +63,7 @@ void		User::setUsermode( e_user_mode userM, bool status ) {
 	}
 
 void		User::addChanel( std::string ) {
-	}
+}
 
 int				User::getSd( void ) {
 	return this->_sd;
