@@ -44,6 +44,7 @@ class User {
 		virtual ~User(void);
 		std::string	nickname;
 		
+		void	setSd( int);
 		void	setUsermode( e_user_mode, bool );
 		void	setStatus( e_user_status);
 		void	setNickname( std::string );

@@ -1,21 +1,21 @@
 #include "../includes/User.hpp"
 
-User::User( int sd )
-	:_sd(sd), _nickName(), _userName(), _hostName(), _servName(),
-	_realName(), _userMode(), _chan(), _status(REGISTER), nickname()
+User::User( int fd )
+	:_sd(fd), _nickName(""), _userName(""), _hostName(""), _servName(""),
+	_realName(""), _userMode(), _chan(), _status(REGISTER), nickname("")
 {
 	std::cout << "New user create" << std::endl;
 }
 
 User::User(void)
-	:_sd(0),_nickName(), _userName(), _hostName(), _servName(),
-	_realName(), _userMode(), _chan(), _status(NOPASS), nickname()
+	:_sd(0),_nickName(""), _userName(""), _hostName(""), _servName(""),
+	_realName(""), _userMode(), _chan(), _status(NOPASS), nickname("")
 {
 	return;
 }
 
 User::User(User const &src)
-	:_sd(0), _nickName(), _userName(), _hostName(), _servName(),
+	:_sd(src._sd), _nickName(), _userName(), _hostName(), _servName(),
 	_realName(), _userMode(), _chan(), _status(NOPASS), nickname()
 {
 	*this = src;
@@ -32,6 +32,10 @@ User &User::operator=(User const &rhs) {
 		this->nickname = rhs.nickname;
 	}
 	return (*this);
+}
+
+void 		User::setSd(int fd) {
+	this->_sd = fd;
 }
 
 void		User::setStatus( e_user_status stat ) {

@@ -15,6 +15,7 @@ int	Server::pass_msg(std::string const &params, int fd) {
 	std::string reply;
 	Param 		p;
 
+	std::cout << "pass_msg " << fd << std::endl;
 	if (params.empty())
 		reply = gen_bnf_msg(ERR_NEEDMOREPARAMS, p);
 	else {
@@ -47,6 +48,7 @@ int	Server::nick_msg(std::string const &params, int fd) {
 	std::string reply;
 	Param 		p;
 
+	std::cout << "nick_msg " << fd << std::endl;
 	if (params.empty())
 		reply = gen_bnf_msg(ERR_NONICKNAMEGIVEN, p);
 	else {
@@ -54,15 +56,18 @@ int	Server::nick_msg(std::string const &params, int fd) {
 		for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
 		{
 			if (it->second.getNickname() == params && it->second.getSd() != fd)
+			{
+				std::cout << "Nick fd KO: " << params << std::endl;
 				reply = gen_bnf_msg(ERR_NICKCOLLISION, p);
-			else if (it->second.getSd() == fd) {
+			}
+			else {
 				if (params.length() > NICK_LENGTH || valid_nick(params) == false)
 					reply = gen_bnf_msg(ERR_ERRONEUSNICKNAME, p);
 				else if (it->second.getNickname() == params && it->second.getSd() == fd)
 					reply = gen_bnf_msg(ERR_NICKNAMEINUSE, p);
 				else {
 					it->second.setNickname(params);
-					std::cout << "Nickname set to " << params << std::endl;
+					std::cout << "Nick OK: " << it->second.getNickname() << std::endl;
 					return (0);
 				}
 			}
@@ -80,41 +85,47 @@ int	Server::user_msg(std::string const &params, int fd) {
 	std::string reply;
 	Param 		p;
 
+	std::cout << "user_msg " << fd << std::endl;
 	if (params.empty())
 		reply = gen_bnf_msg(ERR_NEEDMOREPARAMS, p);
 	else {
 		std::string tmp;
 		std::size_t found(0);
+		std::size_t found2(0);
 		std::map<int, User>::iterator it;
 		for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
 		{
-			if (it->second.getSd() == fd && it->second.getStatus() == REGISTER)
+				std::cout << it->second.getNickname() << " . " << it->second.getSd() << std::endl;
+			if (it->second.getSd() == fd)
 			{
-				tmp = params.substr(0);
-				for (int i(0); i < 4; i++ ) {
-					found = params.find(" ") + 1;
-					if (i == 0)
-						it->second.setUsername(tmp.substr(0, found - 1));
-					else if (i == 1)
-						it->second.setHostname(tmp.substr(0, found - 1));
-					else if (i == 2)
-						it->second.setServname(tmp.substr(0, found - 1));
-					else {
-						found = params.find(":");
-						if (found != std::string::npos) {
-
-							it->second.setRealname(params.substr(found + 1));
-							std::cout << "Config user finish " << params << std::endl;
-							return (0);
-						}
-						reply = gen_bnf_msg(ERR_NEEDMOREPARAMS, p);
-					}
-					tmp = tmp.substr(found);
-				}
-			}
-			else
-				reply = gen_bnf_msg(ERR_ALREADYREGISTRED, p);
+			break;}
 		}
+		if (it->second.getSd() == fd && it->second.getStatus() == REGISTER)
+		{
+			tmp = params.substr(0);
+			for (int i(0); i < 4; i++ ) {
+				std::cout << "Config user " << i << std::endl;
+				found2 = found;
+				found = params.find(" ") + 1;
+				if (i == 0)
+					it->second.setUsername(tmp.substr(found2, found - 1));
+				else if (i == 1)
+					it->second.setHostname(tmp.substr(found2, found - 1));
+				else if (i == 2)
+					it->second.setServname(tmp.substr(found2, found - 1));
+				else {
+					found = params.find(":");
+					if (found != std::string::npos) {
+						it->second.setRealname(params.substr(found + 1));
+						return (0);
+					}
+					reply = gen_bnf_msg(ERR_NEEDMOREPARAMS, p);
+				}
+				tmp = tmp.substr(found);
+			}
+		}
+		else
+			reply = gen_bnf_msg(ERR_ALREADYREGISTRED, p);
 	}
 	if (send(fd, reply.data(), reply.length(), 0) < 0)
 	{
@@ -128,6 +139,7 @@ int	Server::user_msg(std::string const &params, int fd) {
 // 	std::string reply;
 // 	Param 		p;
 
+// std::cout << "oper_msg " << fd << std::endl;
 // 	if (params.empty())
 // 		reply = gen_bnf_msg(ERR_NEEDMOREPARAMS, p);
 // 	else {
@@ -156,6 +168,7 @@ int	Server::user_msg(std::string const &params, int fd) {
 int	Server::quit_msg(std::string const &params, int fd) {
 	
 	std::map<int, User>::iterator it;
+	std::cout << "quit_msg " << fd << std::endl;
 	for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
 		if (it->second.getSd() == fd)
 			break;

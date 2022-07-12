@@ -60,6 +60,8 @@ Server::~Server(void)
 // ########### CREER UN NEW USER ##############
 void Server::addUser(int fd) {
 	User newUser(fd);
+
+	newUser.setSd(fd);
 	this->_map_users.insert(std::make_pair(fd, newUser));
 	return ;
 }
