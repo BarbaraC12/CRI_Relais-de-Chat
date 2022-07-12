@@ -411,6 +411,11 @@ int	Server::kill_msg(std::string const &params, int fd)
 	return (0);
 }
 
+//Command: PING
+//Parameters: <server1> [ <server2> ]
+//Numeric Replies:
+//   ERR_NOORIGIN
+//   ERR_NOSUCHSERVER
 int	Server::ping_msg(std::string const &params, int fd)
 {
 	std::string	reply;
@@ -455,11 +460,18 @@ int	Server::cap_msg(std::string const &params, int fd)
 }
 
 /* ########### Server & Queries Commands ########### */
-//RFC 2812 3.4.1. Motd Message
+//Command: MOTD
+//Parameters: [ <target> ]
+//Numeric Replies:
+//   RPL_MOTDSTART
+//   RPL_MOTD
+//   RPL_ENDOFMOTD
+//   ERR_NOMOTD
 int	Server::motd_msg(std::string const &params, int fd)
 {
 	(void)params;
 	(void)fd;
+	Param			p;
 	std::string		reply;
 	std::string		text;
 	// Open ./motd.txt file
@@ -474,42 +486,88 @@ int	Server::motd_msg(std::string const &params, int fd)
 		else
 		{
 			//send 375 RPL_MOTDSTART ":- <server> Message of the day - "
+			p.set_server(this->_name);
+			reply = gen_bnf_msg(RPL_MOTDSTART, p);
+			if (send(fd, reply.data(), reply.length(), 0) < 0)
+			{
+				std::clog << this->logtime() << "send() failed" << std::endl;
+				return (-1);
+			}
 			//TODO: read file with getline to <text>
 			for (std::string line; std::getline(ifs, line); )
 			{
-				text += line;
-				//send 372 RPL_MOTD ":- <text>"
-				reply += text; //to do some test
+				p.set_text(line);
+				reply = gen_bnf_msg(RPL_MOTD, p);
+				if (send(fd, reply.data(), reply.length(), 0) < 0)
+				{
+					std::clog << this->logtime() << "send() failed" << std::endl;
+					return (-1);
+				}
 			}
 			//send 376 RPL_ENDOFMOTD ":End of MOTD command"
-			std::cout << reply << std::endl;
+			reply = gen_bnf_msg(RPL_ENDOFMOTD, p);
+			if (send(fd, reply.data(), reply.length(), 0) < 0)
+			{
+				std::clog << this->logtime() << "send() failed" << std::endl;
+				return (-1);
+			}
+			//std::cout << reply << std::endl;
 		}
 	}
 	catch (std::exception &e)
 	{
-		std::cerr << e.what() << std::endl;
 		//send 422 ERR_NOMOTD ":MOTD File is missing"
+		reply = gen_bnf_msg(ERR_NOMOTD, p);
+		if (send(fd, reply.data(), reply.length(), 0) < 0)
+		{
+			std::clog << this->logtime() << "send() failed" << std::endl;
+			return (-1);
+		}
 	}
 	return (0);
 }
 
-int	version_msg(std::string params, int fd)
+//Command: VERSION
+//Parameters: [ <target> ]
+//Numeric Replies:
+//   RPL_VERSION
+//   ERR_NOSUCHSERVER
+int	Server::version_msg(std::string const& params, int fd)
 {
-	(void)params;
 	(void)fd;
-	std::string		server = "";
-	if (server != "") 
+	Param	p;
+	std::string	reply;
+
+	
+	if (!params.empty()) 
 	{
+		p.set_server(params);
 		//send 402 ERR_NOSUCHSERVER "<server name>:No such server"
+		reply = gen_bnf_msg(ERR_NOSUCHSERVER, p);
+		if (send(fd, reply.data(), reply.length(), 0) < 0)
+		{
+			std::clog << this->logtime() << "send() failed" << std::endl;
+			return (-1);
+		}
 	}
 	else //no server in params
 	{
+		p.set_version("FT_IRC_42_FINAL");
+		p.set_debug_level("");
+		p.set_server(this->_name);
+		p.set_comments("Bonuses included. @anclamar @bcano @jdidier");
 		//send 351 RPL_VERSION "<version>.<debuglevel> <server> :<comments>"
+		reply = gen_bnf_msg(RPL_VERSION, p);
+		if (send(fd, reply.data(), reply.length(), 0) < 0)
+		{
+			std::clog << this->logtime() << "send() failed" << std::endl;
+			return (-1);
+		}
 	}
 	return (0);
 }
 
-int	stats_msg(std::string params, int fd)
+int	Server::stats_msg(std::string const& params, int fd)
 {
 	(void)params;
 	(void)fd;
@@ -573,7 +631,7 @@ int	stats_msg(std::string params, int fd)
 	return (0);
 }
 
-int	time_msg(std::string params, int fd)
+int	Server::time_msg(std::string const& params, int fd)
 {
 	(void)params;
 	(void)fd;
@@ -590,7 +648,7 @@ int	time_msg(std::string params, int fd)
 	return (0);
 }
 
-int	connect_msg(std::string params, int fd)
+int	Server::connect_msg(std::string const& params, int fd)
 {
 	(void)params;
 	(void)fd;
@@ -612,14 +670,14 @@ int	connect_msg(std::string params, int fd)
 	return (0);
 }
 
-int	trace_msg(std::string params, int fd)
+int	Server::trace_msg(std::string const& params, int fd)
 {
 	(void)params;
 	(void)fd;
 	return (0);
 }
 
-int	admin_msg(std::string params, int fd)
+int	Server::admin_msg(std::string const& params, int fd)
 {
 	(void)params;
 	(void)fd;
@@ -639,7 +697,7 @@ int	admin_msg(std::string params, int fd)
 	return (0);
 }
 
-int	info_msg(std::string params, int fd)
+int	Server::info_msg(std::string const& params, int fd)
 {
 	(void)params;
 	(void)fd;
@@ -661,7 +719,7 @@ int	info_msg(std::string params, int fd)
 
 /* ########### User based Queries ########### */
 
-int	who_msg(std::string params, int fd)
+int	Server::who_msg(std::string const& params, int fd)
 {
 	(void)params;
 	(void)fd;
@@ -683,7 +741,7 @@ int	who_msg(std::string params, int fd)
 	return (0);
 }
 
-int	whois_msg(std::string params, int fd)
+int	Server::whois_msg(std::string const& params, int fd)
 {
 	(void)params;
 	(void)fd;
@@ -716,7 +774,7 @@ int	whois_msg(std::string params, int fd)
 	return (0);
 }
 
-int	whowas_msg(std::string params, int fd)
+int	Server::whowas_msg(std::string const& params, int fd)
 {
 	(void)params;
 	(void)fd;

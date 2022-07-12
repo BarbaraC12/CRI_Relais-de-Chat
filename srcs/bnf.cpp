@@ -128,7 +128,7 @@ void	init_bnf_msg(std::map<int, std::string> &map_bnf_msg)
 	map_bnf_msg[ERR_WILDTOPLEVEL] = "<mask> :<reason>";
 	map_bnf_msg[ERR_BADMASK] = "<mask> :<reason>";
 	map_bnf_msg[ERR_UNKNOWNCOMMAND] = "<command> :<reason>";
-	map_bnf_msg[ERR_NOMOTD] = ":<reason>";
+	map_bnf_msg[ERR_NOMOTD] = ":MOTD File is missing";
 	map_bnf_msg[ERR_NOADMININFO] = "<server> :<reason>";
 	map_bnf_msg[ERR_FILEERROR] = ":<reason>";
 	map_bnf_msg[ERR_NONICKNAMEGIVEN] = ":<reason>";

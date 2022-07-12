@@ -10,7 +10,8 @@
 
 Param::Param(void)
 	: _client(), _server(), _version(), _comments(), _debug_level(), _host(),
-	_port(), _host_mask(), _class(), _user(), _nick(), map_bnf_msg(), map_bnf_funct()
+	_port(), _host_mask(), _class(), _user(), _nick(), map_bnf_msg(), map_bnf_funct(),
+	_text()
 {
 	init_bnf_msg(this->map_bnf_msg);
 	init_bnf_funct(this->map_bnf_funct);
@@ -18,7 +19,8 @@ Param::Param(void)
 }
 Param::Param(Param const &src)
 	: _client(), _server(), _version(), _comments(), _debug_level(), _host(),
-	_port(), _host_mask(), _class(), _user(), _nick(), map_bnf_msg(), map_bnf_funct()
+	_port(), _host_mask(), _class(), _user(), _nick(), map_bnf_msg(), map_bnf_funct(),
+	_text()
 {
 	*this = src;
 	return ;
@@ -42,6 +44,7 @@ Param	&Param::operator=(Param const &rhs)
 		this->_class = rhs._class;
 		this->_user = rhs._user;
 		this->_nick = rhs._nick;
+		this->_text = rhs._text;
 		this->map_bnf_msg = rhs.map_bnf_msg;
 		this->map_bnf_funct = rhs.map_bnf_funct;
 	}
@@ -64,6 +67,11 @@ void	Param::set_server(std::string const &server)
 void	Param::set_nick(std::string const &nick)
 {
 	this->_nick = nick;
+}
+
+void	Param::set_text(std::string const &text)
+{
+	this->_text = text;
 }
 
 std::string	Param::get_client(void) const
@@ -119,6 +127,11 @@ std::string	Param::get_user(void) const
 std::string	Param::get_nick(void) const
 {
 	return (this->_nick);
+}
+
+std::string	Param::get_nick(void) const
+{
+	return (this->_text);
 }
 
 static void	test(std::string &msg, Param const &p)

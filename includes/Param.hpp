@@ -18,6 +18,8 @@ class	Param
 		std::string					_class;
 		std::string					_user;
 		std::string					_nick;
+		std::string					_text;
+		std::string					_target;
 	public:
 		std::map<int, std::string>	map_bnf_msg;
 		std::map<std::string, std::string (Param::* const)(void) const>	map_bnf_funct;
@@ -38,6 +40,8 @@ class	Param
 		void	set_class(std::string const &class_);
 		void	set_user(std::string const &user);
 		void	set_nick(std::string const &nick);
+		void	set_text(std::string const &nick);
+		void	set_target(std::string const &target);
 		
 		std::string	get_client(void) const;
 		std::string	get_server(void) const;
@@ -50,6 +54,7 @@ class	Param
 		std::string	get_class(void) const;
 		std::string	get_user(void) const;
 		std::string	get_nick(void) const;
+		std::string get_text(void) const;
 };
 
 std::string	gen_bnf_msg(const int &id, Param const &p);
