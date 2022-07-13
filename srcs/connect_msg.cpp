@@ -95,13 +95,16 @@ int	Server::user_msg(std::string const &params, int fd) {
 		std::map<int, User>::iterator it;
 		for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
 		{
-				std::cout << it->second.getNickname() << " . " << it->second.getSd() << std::endl;
-			if (it->second.getSd() == fd)
-			{
-			break;}
+			std::cout << it->second.getNickname() << " . " << it->second.getSd() << std::endl;
+			if (it->second.getSd() == fd) {
+				std::cout << "fd OK" << std::endl;
+				std::cout << "status: " << it->second.getStatus() << std::endl;
+				break;
+			}
 		}
 		if (it->second.getSd() == fd && it->second.getStatus() == REGISTER)
 		{
+			std::cout << it->second.getNickname() << " . " << it->second.getSd() << std::endl;
 			tmp = params.substr(0);
 			for (int i(0); i < 4; i++ ) {
 				std::cout << "Config user " << i << std::endl;
@@ -117,6 +120,10 @@ int	Server::user_msg(std::string const &params, int fd) {
 					found = params.find(":");
 					if (found != std::string::npos) {
 						it->second.setRealname(params.substr(found + 1));
+						std::cout << "Username: " << it->second.getUsername() << std::endl;
+						std::cout << "Hostname: " << it->second.getHostname() << std::endl;
+						std::cout << "Servname: " << it->second.getServname() << std::endl;
+						std::cout << "Realname: " << it->second.getRealname() << std::endl;
 						return (0);
 					}
 					reply = gen_bnf_msg(ERR_NEEDMOREPARAMS, p);

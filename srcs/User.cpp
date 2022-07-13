@@ -9,14 +9,14 @@ User::User( int fd )
 
 User::User(void)
 	:_sd(0),_nickName(""), _userName(""), _hostName(""), _servName(""),
-	_realName(""), _userMode(), _chan(), _status(NOPASS), nickname("")
+	_realName(""), _userMode(), _chan(), _status(REGISTER), nickname("")
 {
 	return;
 }
 
 User::User(User const &src)
 	:_sd(src._sd), _nickName(), _userName(), _hostName(), _servName(),
-	_realName(), _userMode(), _chan(), _status(NOPASS), nickname()
+	_realName(), _userMode(), _chan(), _status(REGISTER), nickname()
 {
 	*this = src;
 	return;
