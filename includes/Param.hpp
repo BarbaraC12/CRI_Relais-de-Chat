@@ -55,6 +55,7 @@ class	Param
 		std::string	get_user(void) const;
 		std::string	get_nick(void) const;
 		std::string get_text(void) const;
+		std::string get_target(void) const;
 };
 
 std::string	gen_bnf_msg(const int &id, Param const &p);

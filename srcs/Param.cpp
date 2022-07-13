@@ -10,8 +10,7 @@
 
 Param::Param(void)
 	: _client(), _server(), _version(), _comments(), _debug_level(), _host(),
-	_port(), _host_mask(), _class(), _user(), _nick(), map_bnf_msg(), map_bnf_funct(),
-	_text()
+	_port(), _host_mask(), _class(), _user(), _nick(), _text(), _target(), map_bnf_msg(), map_bnf_funct()
 {
 	init_bnf_msg(this->map_bnf_msg);
 	init_bnf_funct(this->map_bnf_funct);
@@ -19,8 +18,7 @@ Param::Param(void)
 }
 Param::Param(Param const &src)
 	: _client(), _server(), _version(), _comments(), _debug_level(), _host(),
-	_port(), _host_mask(), _class(), _user(), _nick(), map_bnf_msg(), map_bnf_funct(),
-	_text()
+	_port(), _host_mask(), _class(), _user(), _nick(), _text(), _target(), map_bnf_msg(), map_bnf_funct()
 {
 	*this = src;
 	return ;
@@ -56,9 +54,18 @@ void	Param::set_server(std::string const &server)
 {
 	this->_server = server;
 }
-//void	Param::set_version(std::string const &version);
-//void	Param::set_comments(std::string const &comments);
-//void	Param::set_debug_level(std::string const &debug_level);
+void	Param::set_version(std::string const &version)
+{
+	this->_version = version;
+}
+void	Param::set_comments(std::string const &comments)
+{
+	this->_comments = comments;
+}
+void	Param::set_debug_level(std::string const &debug_level)
+{
+	this->_debug_level = debug_level;
+}
 //void	Param::set_host(std::string const &host);
 //void	Param::set_port(std::string const &port);
 //void	Param::set_host_mask(std::string const &host_mask);
@@ -72,6 +79,11 @@ void	Param::set_nick(std::string const &nick)
 void	Param::set_text(std::string const &text)
 {
 	this->_text = text;
+}
+
+void	Param::set_target(std::string const &target)
+{
+	this->_target = target;
 }
 
 std::string	Param::get_client(void) const
@@ -129,9 +141,14 @@ std::string	Param::get_nick(void) const
 	return (this->_nick);
 }
 
-std::string	Param::get_nick(void) const
+std::string	Param::get_text(void) const
 {
 	return (this->_text);
+}
+
+std::string	Param::get_target(void) const
+{
+	return (this->_target);
 }
 
 static void	test(std::string &msg, Param const &p)
