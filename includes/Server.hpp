@@ -11,6 +11,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
+#include <ctime>
 
 #define NICK_LENGTH 9
 #define CHAN_LENGTH 13
@@ -33,6 +34,8 @@ class Server
 		uint16_t					_padded; // for flag -Wpadded
 		//std::string					_version;
 		//std::string					_debuglevel;
+		std::string					*_days;
+		std::string					*_month;
 
 	public:
 		Server(uint16_t &port, std::string const &passwd);
@@ -105,6 +108,10 @@ class Server
 		int	error_msg(std::string const &params, int fd);
 		// capacity
 		int	cap_msg(std::string const &params, int fd);
+		// Time related function
+		std::string	*init_days(void);
+		std::string	*init_month(void);
+		std::string	get_local_time(void) const;
 };
 
 #endif

@@ -10,7 +10,7 @@
 
 Param::Param(void)
 	: _client(), _server(), _version(), _comments(), _debug_level(), _host(),
-	_port(), _host_mask(), _class(), _user(), _nick(), _text(), _target(), map_bnf_msg(), map_bnf_funct()
+	_port(), _host_mask(), _class(), _user(), _nick(), _text(), _target(), _time_string(), map_bnf_msg(), map_bnf_funct()
 {
 	init_bnf_msg(this->map_bnf_msg);
 	init_bnf_funct(this->map_bnf_funct);
@@ -18,7 +18,7 @@ Param::Param(void)
 }
 Param::Param(Param const &src)
 	: _client(), _server(), _version(), _comments(), _debug_level(), _host(),
-	_port(), _host_mask(), _class(), _user(), _nick(), _text(), _target(), map_bnf_msg(), map_bnf_funct()
+	_port(), _host_mask(), _class(), _user(), _nick(), _text(), _target(), _time_string(), map_bnf_msg(), map_bnf_funct()
 {
 	*this = src;
 	return ;
@@ -86,6 +86,16 @@ void	Param::set_target(std::string const &target)
 	this->_target = target;
 }
 
+void	Param::set_time_string(std::string const &time_string)
+{
+	this->_time_string = time_string;
+}
+
+void	Param::set_command(std::string const &command)
+{
+	this->_command = command;
+}
+
 std::string	Param::get_client(void) const
 {
 	return (this->_client);
@@ -149,6 +159,16 @@ std::string	Param::get_text(void) const
 std::string	Param::get_target(void) const
 {
 	return (this->_target);
+}
+
+std::string	Param::get_time_string(void) const
+{
+	return (this->_time_string);
+}
+
+std::string	Param::get_command(void) const
+{
+	return (this->_command);
 }
 
 static void	test(std::string &msg, Param const &p)

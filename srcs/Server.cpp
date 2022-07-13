@@ -24,7 +24,7 @@
 Server::Server(uint16_t &port, std::string const &passwd)
 	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(),
 	_name("irc.anclarma.42.fr"), _passwd(passwd), _listen_sd(-1), _port(port),
-	_padded()
+	_padded(), _days(this->init_days()), _month(this->init_month())
 {
 	this->init_map_funct();
 	return;
@@ -32,7 +32,8 @@ Server::Server(uint16_t &port, std::string const &passwd)
 
 Server::Server(void)
 	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(),
-	_name("irc.anclarma.42.fr"), _passwd(), _listen_sd(-1), _port(), _padded()
+	_name("irc.anclarma.42.fr"), _passwd(), _listen_sd(-1), _port(), _padded(),
+	_days(this->init_days()), _month(this->init_month())
 {
 	this->init_map_funct();
 	return;
@@ -48,6 +49,8 @@ Server::Server(Server const &src)
 
 Server::~Server(void)
 {
+	delete []this->_days;
+	delete []this->_month;
 	for (std::vector<pollfd>::size_type i = 0; i < this->_ndfs; i++)
 	{
 		if (this->_fds[i].fd >= 0)
@@ -459,6 +462,56 @@ int	Server::cap_msg(std::string const &params, int fd)
 	return (0);
 }
 
+// JEAN-PHILIPPE
+
+std::string	*Server::init_days(void)
+{
+	std::string	*days = new std::string[7];
+	days[0] = "Sun";
+	days[1] = "Mon";
+	days[2] = "Tue";
+	days[3] = "Wed";
+	days[4] = "Thu";
+	days[5] = "Fri";
+	days[6] = "Sat";
+	return days;
+}
+
+std::string	*Server::init_month(void)
+{
+	std::string	*month = new std::string[12];
+	month[0] = "Jan";
+	month[1] = "Feb";
+	month[2] = "Mar";
+	month[3] = "Apr";
+	month[4] = "May";
+	month[5] = "Jun";
+	month[6] = "Jul";
+	month[7] = "Aug";
+	month[8] = "Sep";
+	month[9] = "Oct";
+	month[10] = "Nov";
+	month[11] = "Dec";
+	return month;
+}
+
+std::string	Server::get_local_time(void) const
+{
+	std::string	time_string;
+	time_t	curr_time;
+	tm		*tm_local;
+
+	curr_time = time(NULL);
+	tm_local = localtime(&curr_time);
+	time_string += this->_days[tm_local->tm_wday] + " ";
+	time_string += this->_month[tm_local->tm_mon] + " ";
+	time_string += std::to_string(tm_local->tm_year) + " ";
+	time_string += std::to_string(tm_local->tm_hour) + ":";
+	time_string += std::to_string(tm_local->tm_min) + ":";
+	time_string += std::to_string(tm_local->tm_sec);
+	return (time_string);
+}
+
 /* ########### Server & Queries Commands ########### */
 //Command: MOTD
 //Parameters: [ <target> ]
@@ -567,45 +620,45 @@ int	Server::version_msg(std::string const& params, int fd)
 	return (0);
 }
 
+//Command: STATS
+//Parameters: [ <query> [ <target> ] ]
+//Numeric replies:
+//   ERR_NOSUCHSERVER
+//   RPL_STATSLINKINFO
+//   RPL_STATSUPTIME
+//   RPL_STATSCOMMANDS
+//   RPL_STATSOLINE
+//   RPL_ENDOFSTATS
 int	Server::stats_msg(std::string const& params, int fd)
 {
 	(void)params;
 	(void)fd;
-	char			request = 'a';
-	std::string		server = "";
+	char			query = 'a';
+	std::string		reply;
+	Param			p;
 
-	if (server != "")
+	int	to_find = params.find(" ");
+	query = params[0];
+	p.set_target(params.substr(to_find + 1, params.length()));
+	if (params != "")
 	{
-		// send 402 ERR_NOSUCHSERVER "<server name>:No such server"
+		//send 402 ERR_NOSUCHSERVER "<server name>:No such server"
+		p.set_server(params);
+		reply = gen_bnf_msg(ERR_NOSUCHSERVER, p);
+		if (send(fd, reply.data(), reply.length(), 0) < 0)
+		{
+			std::clog << this->logtime() << "send() failed" << std::endl;
+			return (-1);
+		}
 	}
 	else
 	{
-		switch (request)
+		switch (query)
 		{
-		case 'c':
-			/* send 213 RPL_STATSCLINE "C <host> * <name> <port> <class>" */ 
-			// NO NEED BECAUSE SERVER TO SERVER COMMUNICATION IS FORBIDDEN
-			// As final implementation : just ignore message ?
-			// send 402 ERR_NOSUCHSERVER "<server name>:No such server"
-			break;
-		
-		case 'h':
-			/* send 244 RPL_STATSHLINE "H <hostmask> * <servername>" */
-			// NO NEED BECAUSE SERVER TO SERVER COMMUNICATION IS FORBIDDEN
-			// As final implementation : just ignore message ?
-			// send 402 ERR_NOSUCHSERVER "<server name>:No such server"
-			break;
-		
-		case 'i':
-			/* send 215 RPL_STATSILINE "I <host> * <host> <port> <class>" */
-			break;
-		
-		case 'k':
-			/* send 216 RPL_STATSKLINE "K <host> * <username> <port> <class>" */
-			break;
-		
 		case 'l':
-			/* send 241 RPL_STATSLLINE "L <hostmask> * <servername> <maxdepth>" */
+			/* send 211 RPL_STATSLINKINFO <linkname> <sendq> <sent messages> 
+										  <sent Kbytes> <received messages>
+										  <received Kbytes> <time open>" */
 			break;
 
 		case 'm':
@@ -618,7 +671,7 @@ int	Server::stats_msg(std::string const& params, int fd)
 			/* send 243 RPL_STATSOLINE "O <hostmask> * <name>" */
 			break;
 
-		case 'y':
+		case 'u':
 			/* sen 218 218 RPL_STATSYLINE "Y <class> <ping frequency> <connect frequency> <max sendq>" */
 			break;
 
@@ -631,41 +684,89 @@ int	Server::stats_msg(std::string const& params, int fd)
 	return (0);
 }
 
+//Command: TIME
+//Parameters: [ <target> ]
+//Numeric Replies:
+//   RPL_TIME
+//   ERR_NOSUCHSERVER
 int	Server::time_msg(std::string const& params, int fd)
 {
-	(void)params;
 	(void)fd;
-	std::string		server = "";
+	Param			p;
+	std::string		reply;
 
-	if (server != "")
+	if (!params.empty())
 	{
 		// send 402 ERR_NOSUCHSERVER "<server name>:No such server"
+		p.set_server(params);
+		reply = gen_bnf_msg(ERR_NOSUCHSERVER, p);
+		if (send(fd, reply.data(), reply.length(), 0) < 0)
+		{
+			std::clog << this->logtime() << "send() failed" << std::endl;
+			return (-1);
+		}
 	}
 	else
 	{
 		// send 392 RPL_TIME "<server> :<string showing server's local time>"
+		p.set_server(this->_name);
+		p.set_time_string(this->get_local_time());
+		reply = gen_bnf_msg(RPL_TIME, p);
+		if (send(fd, reply.data(), reply.length(), 0) < 0)
+		{
+			std::clog << this->logtime() << "send() failed" << std::endl;
+			return (-1);
+		}
 	}
 	return (0);
 }
 
+//Command: CONNECT
+//Parameters: <target server> <port> [ <remote server> ]
+//   ERR_NOSUCHSERVER
+//   ERR_NOPRIVILEGES
+//   ERR_NEEDMOREPARAMS
 int	Server::connect_msg(std::string const& params, int fd)
 {
-	(void)params;
 	(void)fd;
-	std::string		server = "";
+	Param			p;
+	std::string		target_server = "";
 	std::string		port = "";
+	std::string		reply;
 	//Alternative solution : always send ERR_NOPRIVILEGES
 
 	// IF User is not an operator
-	// send 481 ERR_NOPRIVILEGES ":Permission Denied- You're not an IRC operator"
-
-	if (port == "" || server == "")
+	if (this->_map_users[fd].getUsermode() < 1)
 	{
-		// send 461 ERR_NEEDMOREPARAMS "<command> :Not enough parameters"
+		// send 481 ERR_NOPRIVILEGES ":Permission Denied- You're not an IRC operator"
+		reply = gen_bnf_msg(ERR_NOPRIVILEGES, p);
+		if (send(fd, reply.data(), reply.length(), 0) < 0)
+		{
+			std::clog << this->logtime() << "send() failed" << std::endl;
+			return (-1);
+		}
 	}
-	else if (server != "")
+	else if (port.empty() || target_server.empty())
+	{
+		p.set_command("CONNECT");
+		// send 461 ERR_NEEDMOREPARAMS "<command> :Not enough parameters"
+		reply = gen_bnf_msg(ERR_NEEDMOREPARAMS, p);
+		if (send(fd, reply.data(), reply.length(), 0) < 0)
+		{
+			std::clog << this->logtime() << "send() failed" << std::endl;
+			return (-1);
+		}
+	}
+	else if (!target_server.empty())
 	{
 		// send 402 ERR_NOSUCHSERVER "<server name>:No such server"
+		p.set_server(params);
+		reply = gen_bnf_msg(ERR_NOSUCHSERVER, p);
+		if (send(fd, reply.data(), reply.length(), 0) < 0)
+		{
+			std::clog << this->logtime() << "send() failed" << std::endl;
+			return (-1);
+		}
 	}
 	return (0);
 }
@@ -683,7 +784,7 @@ int	Server::admin_msg(std::string const& params, int fd)
 	(void)fd;
 	std::string		server = "";
 
-	if (server != "")
+	if (!server.empty())
 	{
 		// send 402 ERR_NOSUCHSERVER "<server name>:No such server"
 	}
