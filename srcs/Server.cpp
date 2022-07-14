@@ -25,7 +25,7 @@
 Server::Server(uint16_t &port, std::string const &passwd)
 	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(),
 	_name("irc.anclarma.42.fr"), _passwd(passwd), _listen_sd(-1), _port(port),
-	_padded()
+	_padded(), _start_time()
 {
 	time(&this->_start_time);
 	this->init_map_funct();
@@ -34,7 +34,8 @@ Server::Server(uint16_t &port, std::string const &passwd)
 
 Server::Server(void)
 	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(),
-	_name("irc.anclarma.42.fr"), _passwd(), _listen_sd(-1), _port(), _padded()
+	_name("irc.anclarma.42.fr"), _passwd(), _listen_sd(-1), _port(), _padded(),
+	_start_time()
 {
 	time(&this->_start_time);
 	this->init_map_funct();
@@ -80,6 +81,7 @@ Server &Server::operator=(Server const &rhs)
 	{
 		this->_port = rhs._port;
 		this->_passwd = rhs._passwd;
+		this->_start_time = rhs._start_time;
 	}
 	return (*this);
 }
@@ -674,7 +676,7 @@ int	Server::stats_msg(std::string const& params, int fd)
 	std::string		reply;
 	std::vector<std::string>	p;
 
-	int	to_find = params.find(" ");
+	size_t	to_find = params.find(" ");
 	query = params[0];
 	server = params.substr(to_find + 1, params.length());
 	p.push_back(server);
