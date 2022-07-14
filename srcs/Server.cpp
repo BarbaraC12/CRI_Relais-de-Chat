@@ -24,18 +24,21 @@
 Server::Server(uint16_t &port, std::string const &passwd)
 	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(),
 	_name("irc.anclarma.42.fr"), _passwd(passwd), _listen_sd(-1), _port(port),
-	_padded(), _days(this->init_days()), _month(this->init_month())
+	_padded()
 {
+	time(&this->_start_time);
 	this->init_map_funct();
+	std::cout << this->get_local_time() << std::endl;
 	return;
 }
 
 Server::Server(void)
 	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(),
-	_name("irc.anclarma.42.fr"), _passwd(), _listen_sd(-1), _port(), _padded(),
-	_days(this->init_days()), _month(this->init_month())
+	_name("irc.anclarma.42.fr"), _passwd(), _listen_sd(-1), _port(), _padded()
 {
+	time(&this->_start_time);
 	this->init_map_funct();
+	std::cout << this->get_local_time() << std::endl;
 	return;
 }
 
@@ -49,8 +52,6 @@ Server::Server(Server const &src)
 
 Server::~Server(void)
 {
-	delete []this->_days;
-	delete []this->_month;
 	for (std::vector<pollfd>::size_type i = 0; i < this->_ndfs; i++)
 	{
 		if (this->_fds[i].fd >= 0)
@@ -422,10 +423,10 @@ int	Server::kill_msg(std::string const &params, int fd)
 int	Server::ping_msg(std::string const &params, int fd)
 {
 	std::string	reply;
-	Param		p;
+	std::vector<std::string>	p;
 
-	p.set_server(this->_name);
-	p.set_nick("test_nick");// a obtenir en fonction du fd et de _map_users
+	p.push_back(this->_name);
+	p.push_back("test_nick");// a obtenir en fonction du fd et de _map_users
 	if (params.empty())
 		reply = gen_bnf_msg(ERR_NOORIGIN, p);
 	else if (this->_map_users[fd].getUsername().empty())
@@ -463,53 +464,50 @@ int	Server::cap_msg(std::string const &params, int fd)
 }
 
 // JEAN-PHILIPPE
-
-std::string	*Server::init_days(void)
+int	Server::send_msg(int fd, std::string const &reply)
 {
-	std::string	*days = new std::string[7];
-	days[0] = "Sun";
-	days[1] = "Mon";
-	days[2] = "Tue";
-	days[3] = "Wed";
-	days[4] = "Thu";
-	days[5] = "Fri";
-	days[6] = "Sat";
-	return days;
+	if (send(fd, reply.data(), reply.length(), 0) < 0)
+	{
+		std::clog << this->logtime() << "send() failed" << std::endl;
+		return (-1);
+	}
+	return (0);
 }
 
-std::string	*Server::init_month(void)
-{
-	std::string	*month = new std::string[12];
-	month[0] = "Jan";
-	month[1] = "Feb";
-	month[2] = "Mar";
-	month[3] = "Apr";
-	month[4] = "May";
-	month[5] = "Jun";
-	month[6] = "Jul";
-	month[7] = "Aug";
-	month[8] = "Sep";
-	month[9] = "Oct";
-	month[10] = "Nov";
-	month[11] = "Dec";
-	return month;
-}
-
-std::string	Server::get_local_time(void) const
+std::string	Server::get_local_time(void)
 {
 	std::string	time_string;
-	time_t	curr_time;
-	tm		*tm_local;
 
-	curr_time = time(NULL);
-	tm_local = localtime(&curr_time);
-	time_string += this->_days[tm_local->tm_wday] + " ";
-	time_string += this->_month[tm_local->tm_mon] + " ";
-	time_string += std::to_string(tm_local->tm_year) + " ";
-	time_string += std::to_string(tm_local->tm_hour) + ":";
-	time_string += std::to_string(tm_local->tm_min) + ":";
-	time_string += std::to_string(tm_local->tm_sec);
-	return (time_string);
+	time_string = this->logtime();
+	return (time_string.substr(1, time_string.length() - 2));
+}
+
+std::string	Server::get_run_time(void)
+{
+	time_t		now;
+	std::string	result;
+	int	seconds;
+	int	rest;
+
+	time(&now);
+	seconds = int(difftime(now, this->_start_time));
+	rest = seconds % (3600 * 24);
+	result += "Server Up ";
+	result += std::to_string(int(seconds / (3600 * 24))) + " days ";
+	seconds = rest;
+	rest = seconds % 3600;
+	if (int(seconds / 3600) < 10)
+		result += "0";
+	result += std::to_string(int(seconds / 3600)) + ":";
+	seconds = rest;
+	rest = seconds % 60;
+	if (int(seconds / 60) < 10)
+		result += "0";
+	result += std::to_string(int(seconds / 60)) + ":";
+	if (rest < 10)
+		result += "0";
+	result += std::to_string(rest);
+	return result;
 }
 
 /* ########### Server & Queries Commands ########### */
@@ -523,15 +521,13 @@ std::string	Server::get_local_time(void) const
 int	Server::motd_msg(std::string const &params, int fd)
 {
 	(void)params;
-	(void)fd;
-	Param			p;
+	std::vector<std::string>	p;
 	std::string		reply;
-	std::string		text;
 	// Open ./motd.txt file
 	std::ifstream	ifs;
 	try
 	{
-		ifs.open("motd.txt", std::ifstream::in);
+		ifs.open("../motd.txt", std::ifstream::in);
 		if (!ifs)
 		{
 			throw std::exception();
@@ -539,31 +535,22 @@ int	Server::motd_msg(std::string const &params, int fd)
 		else
 		{
 			//send 375 RPL_MOTDSTART ":- <server> Message of the day - "
-			p.set_server(this->_name);
+			p.push_back(this->_name);
 			reply = gen_bnf_msg(RPL_MOTDSTART, p);
-			if (send(fd, reply.data(), reply.length(), 0) < 0)
-			{
-				std::clog << this->logtime() << "send() failed" << std::endl;
-				return (-1);
-			}
+			if (this->send_msg(fd, reply) < 0)
+					return (-1);
 			//TODO: read file with getline to <text>
 			for (std::string line; std::getline(ifs, line); )
 			{
-				p.set_text(line);
+				p.clear();
+				p.push_back(line);
 				reply = gen_bnf_msg(RPL_MOTD, p);
-				if (send(fd, reply.data(), reply.length(), 0) < 0)
-				{
-					std::clog << this->logtime() << "send() failed" << std::endl;
+				if (this->send_msg(fd, reply) < 0)
 					return (-1);
-				}
 			}
 			//send 376 RPL_ENDOFMOTD ":End of MOTD command"
+			p.clear();
 			reply = gen_bnf_msg(RPL_ENDOFMOTD, p);
-			if (send(fd, reply.data(), reply.length(), 0) < 0)
-			{
-				std::clog << this->logtime() << "send() failed" << std::endl;
-				return (-1);
-			}
 			//std::cout << reply << std::endl;
 		}
 	}
@@ -571,13 +558,66 @@ int	Server::motd_msg(std::string const &params, int fd)
 	{
 		//send 422 ERR_NOMOTD ":MOTD File is missing"
 		reply = gen_bnf_msg(ERR_NOMOTD, p);
-		if (send(fd, reply.data(), reply.length(), 0) < 0)
-		{
-			std::clog << this->logtime() << "send() failed" << std::endl;
-			return (-1);
-		}
 	}
-	return (0);
+	return (this->send_msg(fd, reply));
+}
+
+//Command: LUSERS
+//Parameters: [ <mask> [ <target> ] ]
+//   RPL_LUSERCLIENT
+//   RPL_LUSEROP
+//   RPL_LUSERUNKOWN
+//   RPL_LUSERCHANNELS
+//   RPL_LUSERME
+//   ERR_NOSUCHSERVER
+int	Server::lusers_msg(std::string const &params, int fd)
+{
+	std::vector<std::string>	p;
+	std::string	reply;
+
+	if (!params.empty())
+	{
+		p.push_back(params);
+		//send 402 ERR_NOSUCHSERVER "<server name>:No such server"
+		reply = gen_bnf_msg(ERR_NOSUCHSERVER, p);
+	}
+	else
+	{
+		//send 251 RPL_LUSERCLIENT
+		p.push_back(std::to_string(this->_map_users.size()));
+		p.push_back("1");
+		p.push_back("1");
+		reply = gen_bnf_msg(RPL_LUSERCLIENT, p);
+		if (this->send_msg(fd, reply) < 0)
+			return (-1);
+		p.clear();
+		//send 252 RPL_LUSEROP
+		//get User operator
+		p.push_back("[USERS OPE]");
+		reply = gen_bnf_msg(RPL_LUSEROP, p);
+		if (this->send_msg(fd, reply) < 0)
+			return (-1);
+		p.clear();
+		//send 253 RPL_LUSERUNKNOWN
+		// get unknown connections
+		p.push_back("[UNKNOWED CON]");
+		reply = gen_bnf_msg(RPL_LUSERUNKNOWN, p);
+		if (this->send_msg(fd, reply) < 0)
+			return (-1);
+		p.clear();
+		//send 254 RPL_LUSERCHANNELS
+		//get number of channels
+		p.push_back("[NUMBER OF CHAN]");
+		reply = gen_bnf_msg(RPL_LUSERCHANNELS, p);
+		if (this->send_msg(fd, reply) < 0)
+			return (-1);
+		p.clear();
+		//send 255 RPL_LUSERME
+		p.push_back(std::to_string(this->_map_users.size()));
+		p.push_back("1");
+		reply = gen_bnf_msg(RPL_LUSERME, p);
+	}
+	return (this->send_msg(fd, reply));
 }
 
 //Command: VERSION
@@ -587,37 +627,26 @@ int	Server::motd_msg(std::string const &params, int fd)
 //   ERR_NOSUCHSERVER
 int	Server::version_msg(std::string const& params, int fd)
 {
-	(void)fd;
-	Param	p;
+	std::vector<std::string>	p;
 	std::string	reply;
 
 	
 	if (!params.empty()) 
 	{
-		p.set_server(params);
+		p.push_back(params);
 		//send 402 ERR_NOSUCHSERVER "<server name>:No such server"
 		reply = gen_bnf_msg(ERR_NOSUCHSERVER, p);
-		if (send(fd, reply.data(), reply.length(), 0) < 0)
-		{
-			std::clog << this->logtime() << "send() failed" << std::endl;
-			return (-1);
-		}
 	}
 	else //no server in params
 	{
-		p.set_version("FT_IRC_42_FINAL");
-		p.set_debug_level("");
-		p.set_server(this->_name);
-		p.set_comments("Bonuses included. @anclamar @bcano @jdidier");
+		p.push_back("FT_IRC_42_FINAL");
+		p.push_back("");
+		p.push_back(this->_name);
+		p.push_back("Bonuses included. @anclamar @bcano @jdidier");
 		//send 351 RPL_VERSION "<version>.<debuglevel> <server> :<comments>"
 		reply = gen_bnf_msg(RPL_VERSION, p);
-		if (send(fd, reply.data(), reply.length(), 0) < 0)
-		{
-			std::clog << this->logtime() << "send() failed" << std::endl;
-			return (-1);
-		}
 	}
-	return (0);
+	return (this->send_msg(fd, reply));
 }
 
 //Command: STATS
@@ -631,25 +660,21 @@ int	Server::version_msg(std::string const& params, int fd)
 //   RPL_ENDOFSTATS
 int	Server::stats_msg(std::string const& params, int fd)
 {
-	(void)params;
-	(void)fd;
 	char			query = 'a';
+	std::string		server;
 	std::string		reply;
-	Param			p;
+	std::vector<std::string>	p;
 
 	int	to_find = params.find(" ");
 	query = params[0];
-	p.set_target(params.substr(to_find + 1, params.length()));
-	if (params != "")
+	server = params.substr(to_find + 1, params.length());
+	p.push_back(server);
+	if (this->send_msg(fd, reply) < 0)
+			return (-1);
+	if (!params.empty())
 	{
 		//send 402 ERR_NOSUCHSERVER "<server name>:No such server"
-		p.set_server(params);
 		reply = gen_bnf_msg(ERR_NOSUCHSERVER, p);
-		if (send(fd, reply.data(), reply.length(), 0) < 0)
-		{
-			std::clog << this->logtime() << "send() failed" << std::endl;
-			return (-1);
-		}
 	}
 	else
 	{
@@ -672,7 +697,12 @@ int	Server::stats_msg(std::string const& params, int fd)
 			break;
 
 		case 'u':
-			/* sen 218 218 RPL_STATSYLINE "Y <class> <ping frequency> <connect frequency> <max sendq>" */
+			//send 242 RPL_STATSUPTIME ":Server Up %d days %d:20d:%02d"
+			p.clear();
+			p.push_back(this->get_run_time());
+			reply = gen_bnf_msg(RPL_STATSUPTIME, p);
+			if (this->send_msg(fd, reply) < 0)
+				return (-1);
 			break;
 
 		default: //u
@@ -681,7 +711,10 @@ int	Server::stats_msg(std::string const& params, int fd)
 		}
 	}
 	// send 219 RPL_ENDOFSTATS "<stats letter> :End of /STATS report"
-	return (0);
+	p.clear();
+	p.push_back(params.substr(0, to_find));
+	reply = gen_bnf_msg(RPL_ENDOFSTATS, p);
+	return (this->send_msg(fd, reply));
 }
 
 //Command: TIME
@@ -691,34 +724,38 @@ int	Server::stats_msg(std::string const& params, int fd)
 //   ERR_NOSUCHSERVER
 int	Server::time_msg(std::string const& params, int fd)
 {
-	(void)fd;
-	Param			p;
+	std::vector<std::string>	p;
 	std::string		reply;
 
 	if (!params.empty())
 	{
 		// send 402 ERR_NOSUCHSERVER "<server name>:No such server"
-		p.set_server(params);
+		p.push_back(params);
 		reply = gen_bnf_msg(ERR_NOSUCHSERVER, p);
-		if (send(fd, reply.data(), reply.length(), 0) < 0)
-		{
-			std::clog << this->logtime() << "send() failed" << std::endl;
-			return (-1);
-		}
 	}
 	else
 	{
 		// send 392 RPL_TIME "<server> :<string showing server's local time>"
-		p.set_server(this->_name);
-		p.set_time_string(this->get_local_time());
+		p.push_back(this->_name);
+		p.push_back(this->get_local_time());
 		reply = gen_bnf_msg(RPL_TIME, p);
-		if (send(fd, reply.data(), reply.length(), 0) < 0)
-		{
-			std::clog << this->logtime() << "send() failed" << std::endl;
-			return (-1);
-		}
 	}
-	return (0);
+	return (this->send_msg(fd, reply));
+}
+
+//Command: LINKS
+//Parameters: [ [ <remote server> ] <server mask> ]
+//   ERR_NOSUCHSERVER
+//   RPL_LINKS
+//   RPL_ENDOFLINKS
+int	Server::links_msg(std::string const &params, int fd)
+{
+	(void)params;
+	std::string	reply;
+	std::vector<std::string>	p;;
+
+	reply = gen_bnf_msg(ERR_NOTMANDATORY, p);
+	return (this->send_msg(fd, reply));
 }
 
 //Command: CONNECT
@@ -728,8 +765,7 @@ int	Server::time_msg(std::string const& params, int fd)
 //   ERR_NEEDMOREPARAMS
 int	Server::connect_msg(std::string const& params, int fd)
 {
-	(void)fd;
-	Param			p;
+	std::vector<std::string>	p;
 	std::string		target_server = "";
 	std::string		port = "";
 	std::string		reply;
@@ -740,82 +776,135 @@ int	Server::connect_msg(std::string const& params, int fd)
 	{
 		// send 481 ERR_NOPRIVILEGES ":Permission Denied- You're not an IRC operator"
 		reply = gen_bnf_msg(ERR_NOPRIVILEGES, p);
-		if (send(fd, reply.data(), reply.length(), 0) < 0)
-		{
-			std::clog << this->logtime() << "send() failed" << std::endl;
-			return (-1);
-		}
 	}
 	else if (port.empty() || target_server.empty())
 	{
-		p.set_command("CONNECT");
+		p.push_back("CONNECT");
 		// send 461 ERR_NEEDMOREPARAMS "<command> :Not enough parameters"
 		reply = gen_bnf_msg(ERR_NEEDMOREPARAMS, p);
-		if (send(fd, reply.data(), reply.length(), 0) < 0)
-		{
-			std::clog << this->logtime() << "send() failed" << std::endl;
-			return (-1);
-		}
 	}
 	else if (!target_server.empty())
 	{
 		// send 402 ERR_NOSUCHSERVER "<server name>:No such server"
-		p.set_server(params);
+		p.push_back(params);
 		reply = gen_bnf_msg(ERR_NOSUCHSERVER, p);
-		if (send(fd, reply.data(), reply.length(), 0) < 0)
-		{
-			std::clog << this->logtime() << "send() failed" << std::endl;
-			return (-1);
-		}
 	}
-	return (0);
+	return (this->send_msg(fd, reply));
 }
 
+// Command: TRACE
+// Parameters: [ <target> ]
+//   RPL_TRACELINK
+//   ERR_NOSUCHSERVER
 int	Server::trace_msg(std::string const& params, int fd)
 {
 	(void)params;
-	(void)fd;
-	return (0);
+	std::string	reply;
+	std::vector<std::string>	p;
+
+	reply = gen_bnf_msg(ERR_NOTMANDATORY, p);
+	return (this->send_msg(fd, reply));
 }
 
+//Command: ADMIN
+//Parameters: [ <target> ]
+//   ERR_NOSUCHSERVER
+//   RPL_ADMINME
+//   RPL_ADMINLOC1
+//   RPL_ADMINLOC2
+//   RPL_ADMINEMAIL
 int	Server::admin_msg(std::string const& params, int fd)
 {
-	(void)params;
-	(void)fd;
-	std::string		server = "";
+	std::vector<std::string>	p;
+	std::string		reply;
 
-	if (!server.empty())
+	if (!params.empty())
 	{
 		// send 402 ERR_NOSUCHSERVER "<server name>:No such server"
+		p.push_back(params);
+		reply = gen_bnf_msg(ERR_NOSUCHSERVER, p);
 	}
 	else
 	{
+		p.push_back(this->_name);
 		// send 256 RPL_ADMINME "<server> :Administrative info"
+		reply = gen_bnf_msg(RPL_ADMINME, p);
+		if (this->send_msg(fd, reply) < 0)
+			return (-1);
 		// send 257 RPL_ADMINLOC1 ":<admin info>"
+		p.clear();
+		p.push_back("CRI_Relais-de-Chat");
+		reply = gen_bnf_msg(RPL_ADMINLOC1, p);
+		if (this->send_msg(fd, reply) < 0)
+			return (-1);
 		// send 258 RPL_ADMINLOC2 ":<admin info>"
+		p.clear();
+		p.push_back("anclarma, bacano & jdidier");
+		reply = gen_bnf_msg(RPL_ADMINLOC2, p);
+		if (this->send_msg(fd, reply) < 0)
+			return (-1);
 		// send 259 RPL_ADMINEMAIL ":<admin info>"
+		p.clear();
+		p.push_back("anclarma@student.42.fr");
+		reply = gen_bnf_msg(RPL_ADMINEMAIL, p);
 	}
-	return (0);
+	return (this->send_msg(fd, reply));
 }
 
+//Command: INFO
+//Parameters: [ <target> ]
+//   ERR_NOSUCHSERVER
+//   RPL_INFO
+//   RPL_ENDOFINFO
 int	Server::info_msg(std::string const& params, int fd)
 {
-	(void)params;
-	(void)fd;
-	std::string		server = "";
+	std::vector<std::string>	p;
+	std::string		reply;
+	std::ifstream	ifs;
 
-	if (server != "")
+	if (!params.empty())
 	{
 		// send 402 ERR_NOSUCHSERVER "<server name>:No such server"
+		p.push_back(params);
+		reply = gen_bnf_msg(ERR_NOSUCHSERVER, p);
 	}
 	else
 	{
-		// for each line of INFO
-		// send 371 RPL_INFO ":<string>"
-
-		// send 374 RPL_ENDOFINFO ":End of /INFO list"
+		try
+		{
+			ifs.open("../infos.txt", std::ifstream::in);
+			if (!ifs)
+			{
+				throw std::exception();
+			}
+			else
+			{
+				//TODO: read file with getline to <text>
+				for (std::string line; std::getline(ifs, line); )
+				{
+					// send 371 RPL_INFO ":<text>"
+					p.clear();
+					p.push_back(line);
+					reply = gen_bnf_msg(RPL_INFO, p);
+					if (this->send_msg(fd, reply) < 0)
+						return (-1);
+				}
+				// send 374 RPL_ENDOFINFO ":End of /INFO list"
+				reply = gen_bnf_msg(RPL_ENDOFINFO, p);
+				//std::cout << reply << std::endl;
+			}
+		}
+		catch (std::exception &e)
+		{
+			p.push_back("error with infos.txt file!");
+			reply = gen_bnf_msg(RPL_INFO, p);
+			if (this->send_msg(fd, reply) < 0)
+				return (-1);
+			// send 374 RPL_ENDOFINFO ":End of /INFO list"
+			reply = gen_bnf_msg(RPL_ENDOFMOTD, p);
+		}
 	}
-	return (0);
+	return (this->send_msg(fd, reply));
 }
 
 /* ########### User based Queries ########### */

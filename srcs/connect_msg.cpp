@@ -13,7 +13,7 @@ static bool valid_nick(std::string const &str) {
 
 int	Server::pass_msg(std::string const &params, int fd) {
 	std::string reply;
-	Param 		p;
+	std::vector<std::string>	p;
 
 	if (params.empty())
 		reply = gen_bnf_msg(ERR_NEEDMOREPARAMS, p);
@@ -45,7 +45,7 @@ int	Server::pass_msg(std::string const &params, int fd) {
 
 int	Server::nick_msg(std::string const &params, int fd) {
 	std::string reply;
-	Param 		p;
+	std::vector<std::string>	p;
 
 	if (params.empty())
 		reply = gen_bnf_msg(ERR_NONICKNAMEGIVEN, p);
@@ -78,7 +78,7 @@ int	Server::nick_msg(std::string const &params, int fd) {
 
 int	Server::user_msg(std::string const &params, int fd) {
 	std::string reply;
-	Param 		p;
+	std::vector<std::string>	p;
 
 	if (params.empty())
 		reply = gen_bnf_msg(ERR_NEEDMOREPARAMS, p);

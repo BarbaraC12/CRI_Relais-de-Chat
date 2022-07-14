@@ -2,6 +2,7 @@
 #define SERVER_HPP
 
 #include "User.hpp"
+#include "Param.hpp"
 #include <stdint.h>
 #include <poll.h>
 #include <string>
@@ -12,6 +13,8 @@
 #include <fstream>
 #include <stdexcept>
 #include <ctime>
+#include <stdio.h>
+#include <sys/time.h>
 
 #define NICK_LENGTH 9
 #define CHAN_LENGTH 13
@@ -32,10 +35,9 @@ class Server
 		int							_listen_sd; // sd for Socket Descriptor
 		uint16_t					_port;
 		uint16_t					_padded; // for flag -Wpadded
+		time_t						_start_time;
 		//std::string					_version;
 		//std::string					_debuglevel;
-		std::string					*_days;
-		std::string					*_month;
 
 	public:
 		Server(uint16_t &port, std::string const &passwd);
@@ -67,6 +69,7 @@ class Server
 		std::string	logtime(void);
 
 		void	init_map_funct(void);
+		int		send_msg(int fd, std::string const &reply);
 		// Connection Registration
 		int	pass_msg(std::string const &params, int fd);
 		int	nick_msg(std::string const &params, int fd);
@@ -86,6 +89,7 @@ class Server
 		int	kick_msg(std::string const &params, int fd);
 		// Server queries and commands
 		int	motd_msg(std::string const &params, int fd);
+		int	lusers_msg(std::string const &params, int fd);
 		int	version_msg(std::string const &params, int fd);
 		int	stats_msg(std::string const &params, int fd);
 		int	links_msg(std::string const &params, int fd);
@@ -109,9 +113,8 @@ class Server
 		// capacity
 		int	cap_msg(std::string const &params, int fd);
 		// Time related function
-		std::string	*init_days(void);
-		std::string	*init_month(void);
-		std::string	get_local_time(void) const;
+		std::string	get_local_time(void);
+		std::string	get_run_time(void);
 };
 
 #endif
