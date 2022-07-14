@@ -44,7 +44,8 @@ Server::Server(void)
 
 Server::Server(Server const &src)
 	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(),
-	_name("irc.anclarma.42.fr"), _passwd(), _listen_sd(-1), _port(), _padded()
+	_name("irc.anclarma.42.fr"), _passwd(), _listen_sd(-1), _port(), _padded(),
+	_start_time()
 {
 	*this = src;
 	return;
