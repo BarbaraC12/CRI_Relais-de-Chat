@@ -11,10 +11,12 @@
 #include <map>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <stdexcept>
 #include <ctime>
 #include <stdio.h>
 #include <sys/time.h>
+#include <stdlib.h>
 
 #define NICK_LENGTH 9
 #define CHAN_LENGTH 13

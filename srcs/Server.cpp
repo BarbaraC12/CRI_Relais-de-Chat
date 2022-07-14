@@ -15,6 +15,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <utility>
+#include <stdlib.h>
 
 #ifndef SOCK_NONBLOCK
 # define SOCK_NONBLOCK O_NONBLOCK
@@ -28,7 +29,6 @@ Server::Server(uint16_t &port, std::string const &passwd)
 {
 	time(&this->_start_time);
 	this->init_map_funct();
-	std::cout << this->get_local_time() << std::endl;
 	return;
 }
 
@@ -38,7 +38,6 @@ Server::Server(void)
 {
 	time(&this->_start_time);
 	this->init_map_funct();
-	std::cout << this->get_local_time() << std::endl;
 	return;
 }
 
@@ -486,6 +485,10 @@ std::string	Server::get_run_time(void)
 {
 	time_t		now;
 	std::string	result;
+	std::stringstream	days;
+	std::stringstream	hours;
+	std::stringstream	min;
+	std::stringstream	sec;
 	int	seconds;
 	int	rest;
 
@@ -493,20 +496,24 @@ std::string	Server::get_run_time(void)
 	seconds = int(difftime(now, this->_start_time));
 	rest = seconds % (3600 * 24);
 	result += "Server Up ";
-	result += std::to_string(int(seconds / (3600 * 24))) + " days ";
+	days << int(seconds / (3600 * 24));
+	result += days.str() + " days ";
 	seconds = rest;
 	rest = seconds % 3600;
 	if (int(seconds / 3600) < 10)
 		result += "0";
-	result += std::to_string(int(seconds / 3600)) + ":";
+	hours << int(seconds / 3600);
+	result += hours.str() + ":";
 	seconds = rest;
 	rest = seconds % 60;
 	if (int(seconds / 60) < 10)
 		result += "0";
-	result += std::to_string(int(seconds / 60)) + ":";
+	min << int(seconds / 60);
+	result += min.str() + ":";
 	if (rest < 10)
 		result += "0";
-	result += std::to_string(rest);
+	sec << rest;
+	result += sec.str();
 	return result;
 }
 
@@ -574,6 +581,7 @@ int	Server::lusers_msg(std::string const &params, int fd)
 {
 	std::vector<std::string>	p;
 	std::string	reply;
+	std::stringstream ss;
 
 	if (!params.empty())
 	{
@@ -584,7 +592,8 @@ int	Server::lusers_msg(std::string const &params, int fd)
 	else
 	{
 		//send 251 RPL_LUSERCLIENT
-		p.push_back(std::to_string(this->_map_users.size()));
+		ss << this->_map_users.size();
+		p.push_back(ss.str());
 		p.push_back("1");
 		p.push_back("1");
 		reply = gen_bnf_msg(RPL_LUSERCLIENT, p);
@@ -613,7 +622,7 @@ int	Server::lusers_msg(std::string const &params, int fd)
 			return (-1);
 		p.clear();
 		//send 255 RPL_LUSERME
-		p.push_back(std::to_string(this->_map_users.size()));
+		p.push_back(ss.str());
 		p.push_back("1");
 		reply = gen_bnf_msg(RPL_LUSERME, p);
 	}
