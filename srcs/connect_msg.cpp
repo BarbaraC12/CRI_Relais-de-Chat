@@ -188,12 +188,8 @@ int	Server::user_msg(std::string const &params, int fd) {
 
 int	Server::quit_msg(std::string const &params, int fd) {
 	
-	std::map<int, User>::iterator it;
 	std::cout << "quit_msg " << fd << std::endl;
-	for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
-		if (it->second.getSd() == fd)
-			break;
-	it->second.setStatus(DELETE);
+	this->_map_users[fd].setStatus(DELETE);
 	std::cout << "Client " << fd << " leave.";
 	if (params.empty())
 		std::cout << params;
