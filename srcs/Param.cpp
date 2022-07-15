@@ -185,7 +185,7 @@ std::string	Param::get_admin_info(void) const
 	return (this->_admin_info);
 }
 
-static void	test(std::string &msg, Param const &p)
+static void	test(std::string &msg, std::vector<std::string> &p)
 {
 	std::string::size_type pos = 0u;
 
@@ -197,11 +197,13 @@ static void	test(std::string &msg, Param const &p)
 		if (pos_end != std::string::npos)
 		{
 			std::map<std::string, std::string (Param::* const)(void) const>::const_iterator    it;
-			it = p.map_bnf_funct.find(msg.substr(pos, pos_end - pos + 1));
-			if (it != p.map_bnf_funct.end())
-				msg.replace(pos, pos_end - pos + 1, (p.*(it->second))());
+			if (p.size() > 0)
+			{
+				msg.replace(pos, pos_end - pos + 1, p.back());
+				p.pop_back();
+			}
 		}
-		pos += 4;
+		pos += 1;
 	}
 }
 
@@ -225,12 +227,10 @@ void	init_bnf_funct(std::map<std::string, std::string (Param::* const)(void) con
 	map_bnf_funct.insert(make_pair("<admin_info>", &Param::get_admin_info));
 }
 
-std::string	gen_bnf_msg(const int &id, const std::vector<std::string> &p)
+std::string	gen_bnf_msg(const int &id, std::vector<std::string> &p)
 {
 	std::string	msg;
-	(void)p;
-	Param prout;
 	msg = msg + ":<server> " + SSTR(id).c_str() + " <nick> " + "\r\n";
-	test(msg, prout);
+	test(msg, p);
 	return (msg);
 }

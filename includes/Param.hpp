@@ -68,7 +68,7 @@ class	Param
 		std::string	get_admin_info(void) const;
 };
 
-std::string	gen_bnf_msg(const int &id, std::vector<std::string> const &p);
+std::string	gen_bnf_msg(const int &id, std::vector<std::string> &p);
 void	init_bnf_funct(std::map<std::string, std::string (Param::* const)(void) const> &map_bnf_funct);
 
 #endif

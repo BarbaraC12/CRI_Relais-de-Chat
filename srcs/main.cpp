@@ -26,13 +26,13 @@ static bool	str_isdigit(const std::string &str)
 	return (str.find_first_not_of("0123456789") == std::string::npos);
 }
 
-static int	arg_error(int argc, const std::string &port)
+static int	arg_error(int argc, const char *port)
 {
 	if (argc != 3)
 		display_error("Wrong numbers of Parameters");
 	else if (!str_isdigit(port))
 		display_error("Port must be a number");
-	else if (atoi(port.data()) <= 0)
+	else if (atoi(port) <= 0)
 		display_error("Port must be strictly number");
 	else
 		return (0);

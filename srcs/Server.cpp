@@ -437,8 +437,8 @@ int	Server::ping_msg(std::string const &params, int fd)
 	std::string	reply;
 	std::vector<std::string>	p;
 
-	p.push_back(this->_name);
 	p.push_back(this->_map_users[fd].getNickname());
+	p.push_back(this->_name);
 	if (params.empty())
 		reply = gen_bnf_msg(ERR_NOORIGIN, p);
 	else if (this->_map_users[fd].getUsername().empty())
