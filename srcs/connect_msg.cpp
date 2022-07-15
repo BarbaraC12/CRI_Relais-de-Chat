@@ -91,7 +91,7 @@ int	Server::user_msg(std::string const &params, int fd) {
 	else {
 		std::string tmp;
 		std::size_t found(0);
-		std::size_t found2(0);
+		// std::size_t found2(0);
 		std::map<int, User>::iterator it;
 		for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
 		{
@@ -106,29 +106,43 @@ int	Server::user_msg(std::string const &params, int fd) {
 		{
 			std::cout << it->second.getNickname() << " . " << it->second.getSd() << std::endl;
 			tmp = params.substr(0);
+			std::string uname;
+			std::string host;
+			std::string server;
+			std::string realname;
+			std::string c(" ");
 			for (int i(0); i < 4; i++ ) {
-				std::cout << "Config user " << i << std::endl;
-				found2 = found;
-				found = params.find(" ") + 1;
-				if (i == 0)
-					it->second.setUsername(tmp.substr(found2, found - 1));
-				else if (i == 1)
-					it->second.setHostname(tmp.substr(found2, found - 1));
-				else if (i == 2)
-					it->second.setServname(tmp.substr(found2, found - 1));
-				else {
-					found = params.find(":");
-					if (found != std::string::npos) {
-						it->second.setRealname(params.substr(found + 1));
-						std::cout << "Username: " << it->second.getUsername() << std::endl;
-						std::cout << "Hostname: " << it->second.getHostname() << std::endl;
-						std::cout << "Servname: " << it->second.getServname() << std::endl;
-						std::cout << "Realname: " << it->second.getRealname() << std::endl;
-						return (0);
+				if (i < 2) {
+					found = tmp.find(" ");
+					if (found == std::string::npos && i < 2) {
+						reply = gen_bnf_msg(ERR_NEEDMOREPARAMS, p);
+						break;
 					}
-					reply = gen_bnf_msg(ERR_NEEDMOREPARAMS, p);
 				}
-				tmp = tmp.substr(found);
+				else if (i == 2) {
+					found = tmp.find(":");
+					if (found == std::string::npos) {
+						reply = gen_bnf_msg(ERR_NEEDMOREPARAMS, p);
+						break;
+					}
+				}
+				std::cout << "tmp: " << tmp << std::endl;
+				if (i == 0)
+					uname = tmp.substr(0, found);
+				else if (i == 1)
+					host = tmp.substr(0, found);
+				else if (i == 2)
+					server = tmp.substr(0, found);
+				else {
+					realname = tmp.substr(0);
+					it->second.set_user_params(uname, host, server, realname);
+					std::cout << "Username: " << it->second.getUsername() << std::endl;
+					std::cout << "Hostname: " << it->second.getHostname() << std::endl;
+					std::cout << "Servname: " << it->second.getServname() << std::endl;
+					std::cout << "Realname: " << it->second.getRealname() << std::endl;
+					return (0);
+				}
+				tmp = tmp.substr(found +1);
 			}
 		}
 		else

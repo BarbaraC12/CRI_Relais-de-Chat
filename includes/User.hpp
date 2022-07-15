@@ -2,6 +2,7 @@
 # define USER_HPP
 
 # include <string>
+# include <ctime>
 # include <iostream>
 
 enum e_user_status
@@ -34,8 +35,8 @@ class User {
 		bool			_userMode[5];
 		std::string 	_chan[10];
 		e_user_status	_status;
-		//time			_lastPong;
-		//time			_connectTime;
+		std::time_t		_connectTime;
+		// std::time_t		_lastPong;
 		
 	public:
 		User( void );
@@ -53,6 +54,8 @@ class User {
 		void	addChanel( std::string );
 		void	setServname( std::string );
 		void	setRealname( std::string );
+		void	setConnectTime( std::time_t );
+		// void	setLastPong( std::time_t );
 		
 		int				getSd( void );
 		e_user_status	getStatus( void );
@@ -63,7 +66,11 @@ class User {
 		std::string		getServname( void );
 		std::string		getRealname( void );
 		std::string		getChanels( void );
+		std::string		get_nickname_history( void );
+		std::time_t		getConnectTime( void );
+		// std::time_t		getLastPong( void );
 
+		void  set_user_params(std::string, std::string, std::string, std::string);
 
 		User &operator=(User const &rhs);
 };
