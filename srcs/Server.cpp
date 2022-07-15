@@ -434,23 +434,18 @@ int	Server::kill_msg(std::string const &params, int fd)
 //   ERR_NOSUCHSERVER
 int	Server::ping_msg(std::string const &params, int fd)
 {
-	std::string	reply;
+	std::string					reply;
 	std::vector<std::string>	p;
 
 	p.push_back(this->_map_users[fd].getNickname());
 	p.push_back(this->_name);
 	if (params.empty())
 		reply = gen_bnf_msg(ERR_NOORIGIN, p);
-	else if (this->_map_users[fd].getUsername().empty())
+	else if (this->_map_users[fd].getStatus() != REGISTER)//check if user if not registered
 		reply = gen_bnf_msg(ERR_NOTREGISTERED, p);
 	else
 		reply = reply + "PONG " + this->_name + "\r\n";
-	if (send(fd, reply.data(), reply.length(), 0) < 0)
-	{
-		std::clog << this->logtime() << "send() failed" << std::endl;
-		return (-1);
-	}
-	return (0);
+	return (this->send_msg(fd, reply));
 }
 
 //Command: PONG
@@ -461,8 +456,15 @@ int	Server::ping_msg(std::string const &params, int fd)
 int	Server::pong_msg(std::string const &params, int fd)
 {
 	//ERR_NOORIGIN or ERR_NOSUCHSERVER
-	(void)params;
-	(void)fd;
+	std::string					reply;
+	std::vector<std::string>	p;
+
+	p.push_back(this->_map_users[fd].getNickname());
+	p.push_back(this->_name);
+	if (params.empty())
+		return (this->send_msg(fd, gen_bnf_msg(ERR_NOORIGIN, p)));
+	if (this->_map_users[fd].getStatus() != REGISTER)//check if user if not registered
+		return (this->send_msg(fd, gen_bnf_msg(ERR_NOTREGISTERED, p)));
 	return (0);
 }
 
