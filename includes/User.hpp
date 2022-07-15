@@ -63,6 +63,7 @@ class User {
 		std::string		getRealname( void );
 		std::string		getChanels( void );
 
+
 		User &operator=(User const &rhs);
 };
 

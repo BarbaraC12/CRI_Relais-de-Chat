@@ -37,8 +37,9 @@ class BotBase
 
 
 	//"109.220.252.214"
+	//"130.239.18.120"
 	public :
-		BotBase(std::string ip = "109.220.252.214", uint16_t port = 6667);
+		BotBase(std::string ip = "130.239.18.120", uint16_t port = 6697);
 		BotBase(BotBase const& src);
 		~BotBase(void);
 		BotBase		&operator=(BotBase const& rhs);

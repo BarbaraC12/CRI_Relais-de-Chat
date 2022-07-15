@@ -13,28 +13,25 @@ static bool valid_nick(std::string const &str) {
 
 int	Server::pass_msg(std::string const &params, int fd) {
 	std::string reply;
-	Param 		p;
+	std::vector<std::string>	p;
 
 	if (params.empty())
 		reply = gen_bnf_msg(ERR_NEEDMOREPARAMS, p);
 	else {
-		std::map<int, User>::iterator it;
-		for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
-		{
-			if (it->second.getSd() == fd)
-				break;
-		}
-		if (it->second.getSd() != fd) {
-			addUser(fd);
-			it++;
-		}
 		if (params != this->_passwd) {
 			reply = gen_bnf_msg(ERR_ALREADYREGISTRED, p);
-			it->second.setStatus(NOPASS);
 		}
 		else {
+			std::map<int, User>::iterator it;
+			for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
+			{
+				if (it->second.getSd() == fd)
+					break;
+			}
+			if (this->userMapSize() < 1 || it->second.getSd() != fd) {
+				addUser(fd);
+			}
 			std::cout << "Login successful" << std::endl;
-			it->second.setStatus(REGISTER);
 			return (0);
 		}
 	}
@@ -48,7 +45,7 @@ int	Server::pass_msg(std::string const &params, int fd) {
 
 int	Server::nick_msg(std::string const &params, int fd) {
 	std::string reply;
-	Param 		p;
+	std::vector<std::string>	p;
 
 	if (params.empty())
 		reply = gen_bnf_msg(ERR_NONICKNAMEGIVEN, p);
@@ -65,6 +62,7 @@ int	Server::nick_msg(std::string const &params, int fd) {
 					reply = gen_bnf_msg(ERR_NICKNAMEINUSE, p);
 				else {
 					it->second.setNickname(params);
+					std::cout << "Nickname set to " << params << std::endl;
 					return (0);
 				}
 			}
@@ -80,7 +78,7 @@ int	Server::nick_msg(std::string const &params, int fd) {
 
 int	Server::user_msg(std::string const &params, int fd) {
 	std::string reply;
-	Param 		p;
+	std::vector<std::string>	p;
 
 	if (params.empty())
 		reply = gen_bnf_msg(ERR_NEEDMOREPARAMS, p);
@@ -106,6 +104,7 @@ int	Server::user_msg(std::string const &params, int fd) {
 						if (found != std::string::npos) {
 
 							it->second.setRealname(params.substr(found + 1));
+							std::cout << "Config user finish " << params << std::endl;
 							return (0);
 						}
 						reply = gen_bnf_msg(ERR_NEEDMOREPARAMS, p);

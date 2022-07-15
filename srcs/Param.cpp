@@ -10,7 +10,7 @@
 
 Param::Param(void)
 	: _client(), _server(), _version(), _comments(), _debug_level(), _host(),
-	_port(), _host_mask(), _class(), _user(), _nick(), map_bnf_msg(), map_bnf_funct()
+	_port(), _host_mask(), _class(), _user(), _nick(), _text(), _target(), _time_string(), _command(), _admin_info(), map_bnf_msg(), map_bnf_funct()
 {
 	init_bnf_msg(this->map_bnf_msg);
 	init_bnf_funct(this->map_bnf_funct);
@@ -18,7 +18,7 @@ Param::Param(void)
 }
 Param::Param(Param const &src)
 	: _client(), _server(), _version(), _comments(), _debug_level(), _host(),
-	_port(), _host_mask(), _class(), _user(), _nick(), map_bnf_msg(), map_bnf_funct()
+	_port(), _host_mask(), _class(), _user(), _nick(), _text(), _target(), _time_string(), _command(), _admin_info(), map_bnf_msg(), map_bnf_funct()
 {
 	*this = src;
 	return ;
@@ -42,6 +42,11 @@ Param	&Param::operator=(Param const &rhs)
 		this->_class = rhs._class;
 		this->_user = rhs._user;
 		this->_nick = rhs._nick;
+		this->_text = rhs._text;
+		this->_target = rhs._target;
+		this->_time_string = rhs._time_string;
+		this->_command = rhs._command;
+		this->_admin_info = rhs._admin_info;
 		this->map_bnf_msg = rhs.map_bnf_msg;
 		this->map_bnf_funct = rhs.map_bnf_funct;
 	}
@@ -53,9 +58,18 @@ void	Param::set_server(std::string const &server)
 {
 	this->_server = server;
 }
-//void	Param::set_version(std::string const &version);
-//void	Param::set_comments(std::string const &comments);
-//void	Param::set_debug_level(std::string const &debug_level);
+void	Param::set_version(std::string const &version)
+{
+	this->_version = version;
+}
+void	Param::set_comments(std::string const &comments)
+{
+	this->_comments = comments;
+}
+void	Param::set_debug_level(std::string const &debug_level)
+{
+	this->_debug_level = debug_level;
+}
 //void	Param::set_host(std::string const &host);
 //void	Param::set_port(std::string const &port);
 //void	Param::set_host_mask(std::string const &host_mask);
@@ -64,6 +78,31 @@ void	Param::set_server(std::string const &server)
 void	Param::set_nick(std::string const &nick)
 {
 	this->_nick = nick;
+}
+
+void	Param::set_text(std::string const &text)
+{
+	this->_text = text;
+}
+
+void	Param::set_target(std::string const &target)
+{
+	this->_target = target;
+}
+
+void	Param::set_time_string(std::string const &time_string)
+{
+	this->_time_string = time_string;
+}
+
+void	Param::set_command(std::string const &command)
+{
+	this->_command = command;
+}
+
+void	Param::set_admin_info(std::string const &admin_info)
+{
+	this->_admin_info = admin_info;
 }
 
 std::string	Param::get_client(void) const
@@ -121,6 +160,31 @@ std::string	Param::get_nick(void) const
 	return (this->_nick);
 }
 
+std::string	Param::get_text(void) const
+{
+	return (this->_text);
+}
+
+std::string	Param::get_target(void) const
+{
+	return (this->_target);
+}
+
+std::string	Param::get_time_string(void) const
+{
+	return (this->_time_string);
+}
+
+std::string	Param::get_command(void) const
+{
+	return (this->_command);
+}
+
+std::string	Param::get_admin_info(void) const
+{
+	return (this->_admin_info);
+}
+
 static void	test(std::string &msg, Param const &p)
 {
 	std::string::size_type pos = 0u;
@@ -154,14 +218,19 @@ void	init_bnf_funct(std::map<std::string, std::string (Param::* const)(void) con
 	map_bnf_funct.insert(make_pair("<class>", &Param::get_class));
 	map_bnf_funct.insert(make_pair("<user>", &Param::get_user));
 	map_bnf_funct.insert(make_pair("<nick>", &Param::get_nick));
+	map_bnf_funct.insert(make_pair("<text>", &Param::get_text));
+	map_bnf_funct.insert(make_pair("<target>", &Param::get_target));
+	map_bnf_funct.insert(make_pair("<time string>", &Param::get_time_string));
+	map_bnf_funct.insert(make_pair("<command>", &Param::get_command));
+	map_bnf_funct.insert(make_pair("<admin_info>", &Param::get_admin_info));
 }
 
-std::string	gen_bnf_msg(const int &id, Param const &p)
+std::string	gen_bnf_msg(const int &id, const std::vector<std::string> &p)
 {
 	std::string	msg;
-
-	msg = msg + ":<server> " + SSTR(id).c_str() + " <nick> "
-		+ p.map_bnf_msg.find(id)->second + "\r\n";
-	test(msg, p);
+	(void)p;
+	Param prout;
+	msg = msg + ":<server> " + SSTR(id).c_str() + " <nick> " + "\r\n";
+	test(msg, prout);
 	return (msg);
 }
