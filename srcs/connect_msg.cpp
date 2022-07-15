@@ -110,14 +110,23 @@ int	Server::user_msg(std::string const &params, int fd) {
 			std::string host;
 			std::string server;
 			std::string realname;
+			std::string c(" ");
 			for (int i(0); i < 4; i++ ) {
-				// found2 = found;
-				found = tmp.find(" :");
-				if (found == std::string::npos && i < 2) {
-					reply = gen_bnf_msg(ERR_NEEDMOREPARAMS, p);
-					break;
+				if (i < 2) {
+					found = tmp.find(" ");
+					if (found == std::string::npos && i < 2) {
+						reply = gen_bnf_msg(ERR_NEEDMOREPARAMS, p);
+						break;
+					}
 				}
-
+				else if (i == 2) {
+					found = tmp.find(":");
+					if (found == std::string::npos) {
+						reply = gen_bnf_msg(ERR_NEEDMOREPARAMS, p);
+						break;
+					}
+				}
+				std::cout << "tmp: " << tmp << std::endl;
 				if (i == 0)
 					uname = tmp.substr(0, found);
 				else if (i == 1)
@@ -125,12 +134,7 @@ int	Server::user_msg(std::string const &params, int fd) {
 				else if (i == 2)
 					server = tmp.substr(0, found);
 				else {
-					found = params.find(":");
-					if (found == std::string::npos) {
-						reply = gen_bnf_msg(ERR_NEEDMOREPARAMS, p);
-						break;
-					}
-					realname = params.substr(found + 1);
+					realname = tmp.substr(0);
 					it->second.set_user_params(uname, host, server, realname);
 					std::cout << "Username: " << it->second.getUsername() << std::endl;
 					std::cout << "Hostname: " << it->second.getHostname() << std::endl;
@@ -139,7 +143,6 @@ int	Server::user_msg(std::string const &params, int fd) {
 					return (0);
 				}
 				tmp = tmp.substr(found +1);
-				std::cout << "tmp: " << tmp << std::endl;
 			}
 		}
 		else
