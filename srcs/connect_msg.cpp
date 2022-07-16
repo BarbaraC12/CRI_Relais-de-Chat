@@ -19,19 +19,25 @@ int	Server::pass_msg(std::string const &params, int fd) {
 	if (params.empty())
 		reply = gen_bnf_msg(ERR_NEEDMOREPARAMS, p);
 	else {
+		std::map<int, User>::iterator it;
+		for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
+		{
+			if (it->second.getSd() == fd)
+				break;
+		}
+		if (this->userMapSize() < 1 || it->second.getSd() != fd) {
+			addUser(fd);
+		}
+		for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
+		{
+			if (it->second.getSd() == fd)
+				break;
+		}
 		if (params != this->_passwd) {
 			reply = gen_bnf_msg(ERR_ALREADYREGISTRED, p);
 		}
 		else {
-			std::map<int, User>::iterator it;
-			for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
-			{
-				if (it->second.getSd() == fd)
-					break;
-			}
-			if (this->userMapSize() < 1 || it->second.getSd() != fd) {
-				addUser(fd);
-			}
+			it->second.setStatus(PASSWORD);
 			std::cout << "Login successful" << std::endl;
 			return (0);
 		}
@@ -61,12 +67,15 @@ int	Server::nick_msg(std::string const &params, int fd) {
 				reply = gen_bnf_msg(ERR_NICKCOLLISION, p);
 			}
 			else {
-				if (params.length() > NICK_LENGTH || valid_nick(params) == false)
+				if ( it->second.getStatus() < PASSWORD)
+					reply = gen_bnf_msg(ERR_ALREADYREGISTRED, p); // NOT REGISTER
+				else if (params.length() > NICK_LENGTH || valid_nick(params) == false)
 					reply = gen_bnf_msg(ERR_ERRONEUSNICKNAME, p);
 				else if (it->second.getNickname() == params && it->second.getSd() == fd)
 					reply = gen_bnf_msg(ERR_NICKNAMEINUSE, p);
 				else {
 					it->second.setNickname(params);
+					it->second.setStatus(NICKNAME);
 					std::cout << "Nick OK: " << it->second.getNickname() << std::endl;
 					return (0);
 				}
@@ -102,7 +111,7 @@ int	Server::user_msg(std::string const &params, int fd) {
 				break;
 			}
 		}
-		if (it->second.getSd() == fd && it->second.getStatus() == REGISTER)
+		if (it->second.getSd() == fd && it->second.getStatus() >= NICKNAME)
 		{
 			std::cout << it->second.getNickname() << " . " << it->second.getSd() << std::endl;
 			tmp = params.substr(0);
@@ -194,9 +203,9 @@ int	Server::quit_msg(std::string const &params, int fd) {
 		if (it->second.getSd() == fd)
 			break;
 	it->second.setStatus(DELETE);
-	std::cout << "Client " << fd << " leave.";
-	if (params.empty())
-		std::cout << params;
+	std::cout << "Client " << fd << " leave";
+	if (!params.empty())
+		std::cout << ": " << params;
 	std::cout << std::endl;
 	return (0);
 }

@@ -8,8 +8,9 @@
 enum e_user_status
 {
 	NOPASS,
+	PASSWORD,
+	NICKNAME,
 	REGISTER,
-	LOGGED_IN,
 	DESACTIVE,
 	DELETE
 };
