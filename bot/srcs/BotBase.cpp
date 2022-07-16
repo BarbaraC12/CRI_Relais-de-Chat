@@ -118,7 +118,7 @@ int			BotBase::recv() {
 	memset(buf, 0, 4096);
 	//bytes = ::recv(this->_sock_fd, buf, 4096, 0);
 	do {
-		sleep(1);
+		sleep(2);
 		// std::cout << "> ";
 		// getline(std::cin, input);
 		// input += "\r\n";

@@ -13,7 +13,7 @@ static bool valid_nick(std::string const &str) {
 
 int	Server::pass_msg(std::string const &params, int fd) {
 	std::string reply;
-	Param 		p;
+	std::vector<std::string>	p;
 
 	std::cout << "pass_msg " << fd << std::endl;
 	if (params.empty())
@@ -28,16 +28,11 @@ int	Server::pass_msg(std::string const &params, int fd) {
 		if (this->userMapSize() < 1 || it->second.getSd() != fd) {
 			addUser(fd);
 		}
-		for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
-		{
-			if (it->second.getSd() == fd)
-				break;
-		}
 		if (params != this->_passwd) {
 			reply = gen_bnf_msg(ERR_ALREADYREGISTRED, p);
 		}
 		else {
-			it->second.setStatus(PASSWORD);
+			this->_map_users[fd].setStatus(PASSWORD);
 			std::cout << "Login successful" << std::endl;
 			return (0);
 		}
@@ -52,7 +47,7 @@ int	Server::pass_msg(std::string const &params, int fd) {
 
 int	Server::nick_msg(std::string const &params, int fd) {
 	std::string reply;
-	Param 		p;
+	std::vector<std::string>	p;
 
 	std::cout << "nick_msg " << fd << std::endl;
 	if (params.empty())
@@ -62,23 +57,21 @@ int	Server::nick_msg(std::string const &params, int fd) {
 		for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
 		{
 			if (it->second.getNickname() == params && it->second.getSd() != fd)
-			{
-				std::cout << "Nick fd KO: " << params << std::endl;
 				reply = gen_bnf_msg(ERR_NICKCOLLISION, p);
-			}
+			else if ( it->second.getSd() == fd ) 
+					break;
+		}
+		if ( it->second.getSd() == fd ) {
+			if ( this->_map_users[fd].getStatus() < PASSWORD)
+				reply = gen_bnf_msg(ERR_ALREADYREGISTRED, p); // NOT REGISTER
+			else if (params.length() > NICK_LENGTH || valid_nick(params) == false)
+				reply = gen_bnf_msg(ERR_ERRONEUSNICKNAME, p);
+			else if (this->_map_users[fd].getNickname() == params && this->_map_users[fd].getSd() == fd)
+				reply = gen_bnf_msg(ERR_NICKNAMEINUSE, p);
 			else {
-				if ( it->second.getStatus() < PASSWORD)
-					reply = gen_bnf_msg(ERR_ALREADYREGISTRED, p); // NOT REGISTER
-				else if (params.length() > NICK_LENGTH || valid_nick(params) == false)
-					reply = gen_bnf_msg(ERR_ERRONEUSNICKNAME, p);
-				else if (it->second.getNickname() == params && it->second.getSd() == fd)
-					reply = gen_bnf_msg(ERR_NICKNAMEINUSE, p);
-				else {
-					it->second.setNickname(params);
-					it->second.setStatus(NICKNAME);
-					std::cout << "Nick OK: " << it->second.getNickname() << std::endl;
-					return (0);
-				}
+				this->_map_users[fd].setNickname(params);
+				this->_map_users[fd].setStatus(NICKNAME);
+				return (0);
 			}
 		}
 	}
@@ -92,7 +85,7 @@ int	Server::nick_msg(std::string const &params, int fd) {
 
 int	Server::user_msg(std::string const &params, int fd) {
 	std::string reply;
-	Param 		p;
+	std::vector<std::string>	p;
 
 	std::cout << "user_msg " << fd << std::endl;
 	if (params.empty())
@@ -100,20 +93,15 @@ int	Server::user_msg(std::string const &params, int fd) {
 	else {
 		std::string tmp;
 		std::size_t found(0);
-		// std::size_t found2(0);
+		// HOW TAKE OFF ITERATOR ?
 		std::map<int, User>::iterator it;
 		for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
 		{
-			std::cout << it->second.getNickname() << " . " << it->second.getSd() << std::endl;
-			if (it->second.getSd() == fd) {
-				std::cout << "fd OK" << std::endl;
-				std::cout << "status: " << it->second.getStatus() << std::endl;
+			if (it->second.getSd() == fd)
 				break;
-			}
 		}
-		if (it->second.getSd() == fd && it->second.getStatus() >= NICKNAME)
+		if (it->second.getSd() == fd && this->_map_users[fd].getStatus() <= NICKNAME)
 		{
-			std::cout << it->second.getNickname() << " . " << it->second.getSd() << std::endl;
 			tmp = params.substr(0);
 			std::string uname;
 			std::string host;
@@ -135,7 +123,6 @@ int	Server::user_msg(std::string const &params, int fd) {
 						break;
 					}
 				}
-				std::cout << "tmp: " << tmp << std::endl;
 				if (i == 0)
 					uname = tmp.substr(0, found);
 				else if (i == 1)
@@ -144,11 +131,7 @@ int	Server::user_msg(std::string const &params, int fd) {
 					server = tmp.substr(0, found);
 				else {
 					realname = tmp.substr(0);
-					it->second.set_user_params(uname, host, server, realname);
-					std::cout << "Username: " << it->second.getUsername() << std::endl;
-					std::cout << "Hostname: " << it->second.getHostname() << std::endl;
-					std::cout << "Servname: " << it->second.getServname() << std::endl;
-					std::cout << "Realname: " << it->second.getRealname() << std::endl;
+					this->_map_users[fd].set_user_params(uname, host, server, realname);
 					return (0);
 				}
 				tmp = tmp.substr(found +1);
@@ -197,14 +180,10 @@ int	Server::user_msg(std::string const &params, int fd) {
 
 int	Server::quit_msg(std::string const &params, int fd) {
 	
-	std::map<int, User>::iterator it;
 	std::cout << "quit_msg " << fd << std::endl;
-	for (it = this->_map_users.begin(); it != this->_map_users.end(); ++it)
-		if (it->second.getSd() == fd)
-			break;
-	it->second.setStatus(DELETE);
+	this->_map_users[fd].setStatus(DELETE);
 	std::cout << "Client " << fd << " leave";
-	if (!params.empty())
+	if (params.empty())
 		std::cout << ": " << params;
 	std::cout << std::endl;
 	return (0);

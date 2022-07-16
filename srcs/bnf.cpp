@@ -37,7 +37,7 @@ void	init_bnf_msg(std::map<int, std::string> &map_bnf_msg)
 	map_bnf_msg[RPL_SERVLISTEND] = "<mask> <type> :End of service listing";
 	map_bnf_msg[RPL_STATSVLINE] = "";
 	map_bnf_msg[RPL_STATSLLINE] = "";
-	map_bnf_msg[RPL_STATSUPTIME] = ":Server Up %d days %d:%02d:%02d";
+	map_bnf_msg[RPL_STATSUPTIME] = ":<Server Up %d days %d:%02d:%02d>";
 	map_bnf_msg[RPL_STATSOLINE] = "O <hostmask> * <name>";
 	map_bnf_msg[RPL_STATSHLINE] = "";
 	map_bnf_msg[RPL_STATSSLINE] = "";
@@ -128,7 +128,7 @@ void	init_bnf_msg(std::map<int, std::string> &map_bnf_msg)
 	map_bnf_msg[ERR_WILDTOPLEVEL] = "<mask> :<reason>";
 	map_bnf_msg[ERR_BADMASK] = "<mask> :<reason>";
 	map_bnf_msg[ERR_UNKNOWNCOMMAND] = "<command> :<reason>";
-	map_bnf_msg[ERR_NOMOTD] = ":<reason>";
+	map_bnf_msg[ERR_NOMOTD] = ":MOTD File is missing";
 	map_bnf_msg[ERR_NOADMININFO] = "<server> :<reason>";
 	map_bnf_msg[ERR_FILEERROR] = ":<reason>";
 	map_bnf_msg[ERR_NONICKNAMEGIVEN] = ":<reason>";
@@ -167,4 +167,5 @@ void	init_bnf_msg(std::map<int, std::string> &map_bnf_msg)
 	map_bnf_msg[ERR_NOSERVICEHOST] = ":Unknown MODE flag";
 	map_bnf_msg[ERR_UMODEUNKNOWNFLAG] = ":Unknown MODE flag";
 	map_bnf_msg[ERR_USERSDONTMATCH] = ":Cannot change mode for other users";
+	map_bnf_msg[ERR_NOTMANDATORY] = ":This Feature isn't implemented as mandatory";
 }
