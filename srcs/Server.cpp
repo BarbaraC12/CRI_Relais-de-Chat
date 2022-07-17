@@ -190,7 +190,7 @@ int	Server::receive_msg(const std::string &line, fd_index_t fd)
 
 int Server::parse_buffer(fd_index_t fd)
 {
-	std::size_t	found;
+	std::size_t	found = 0;
 
 	do
 	{
@@ -213,10 +213,9 @@ int Server::parse_buffer(fd_index_t fd)
 int Server::receiving(fd_index_t fd)
 {
 	ssize_t	ret;
-	char	buffer[BUFFER_SIZE_IRC + 1];
+	char	buffer[BUFFER_SIZE_IRC + 1] = {0};
 
 	ret = recv(static_cast<int>(fd), buffer, BUFFER_SIZE_IRC, 0);
-	buffer[ret] = '\0';
 	if (ret < 0)
 	{
 		if (errno != EWOULDBLOCK)
@@ -990,6 +989,7 @@ int	Server::whois_msg(std::string const& params, int fd)
 		// IF USER JOIN CHANNEL AND FOR EACH CHANNEL 
 			// 319 RPL_WHOISCHANNELS "<nick> :{[@|+]<channel><space>}"
 	}
+			// 319 RPL_WHOISCHANNELS "<nick> :{[@|+]<channel><space>}"
 
 	// send 318 RPL_ENDOFWHOIS "<nick> :End of /WHOIS list"
 

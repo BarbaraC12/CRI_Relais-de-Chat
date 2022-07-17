@@ -16,7 +16,22 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Install dependencies
+      run: |
+        set -x
+        if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq cppcheck
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+            brew install cppcheck
+            echo "/usr/X11/bin" >> $GITHUB_PATH
+        else
+            echo "$RUNNER_OS not supported"
+            exit 1
+        fi
     - name: make
       run: make
     - name: make check
       run: make check
+    - name: static code analysis
+      run: cppcheck -I includes . --error-exitcode=1
