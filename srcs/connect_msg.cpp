@@ -61,36 +61,7 @@ int	Server::nick_msg(std::string const &params, int fd) {
 		std::cout << "NICK ok" << std::endl;
 		return (0);
 	}
-	if (send(fd, reply.data(), reply.length(), 0) < 0)
-	{
-		std::clog << this->logtime() << "send failed" << std::endl;
-		return (-1);
-	}
-	return (0);
-}
-
-static int register_reply(int fd, std::string reply) {
-	std::vector<std::string>	p;
-
-	reply = gen_bnf_msg(RPL_WELCOME, p);
-	if (send(fd, reply.data(), reply.length(), 0) < 0)
-	{
-		std::clog << "send failed" << std::endl;
-		return (-1);
-	}
-	reply = gen_bnf_msg(RPL_YOURHOST, p);
-	if (send(fd, reply.data(), reply.length(), 0) < 0)
-	{
-		std::clog << "send failed" << std::endl;
-		return (-1);
-	}
-	reply = gen_bnf_msg(RPL_CREATED, p);
-	if (send(fd, reply.data(), reply.length(), 0) < 0)
-	{
-		std::clog << "send failed" << std::endl;
-		return (-1);
-	}
-	return (0);
+	return (this->send_msg(fd, reply));
 }
 
 int	Server::user_msg(std::string const &params, int fd) {
@@ -139,8 +110,10 @@ int	Server::user_msg(std::string const &params, int fd) {
 					this->_map_users[fd].set_user_params(uname, host, server, realname);
 					this->_map_users[fd].setStatus(REGISTER);
 					std::cout << "USER ok" << std::endl;
-					return (register_reply(fd, reply));
-					reply = gen_bnf_msg(register_reply(fd, reply), p);
+					reply = gen_bnf_msg(RPL_WELCOME, p);
+					reply += gen_bnf_msg(RPL_YOURHOST, p);
+					reply += gen_bnf_msg(RPL_CREATED, p);
+					return (this->send_msg(fd, reply));
 				}
 				tmp = tmp.substr(found +1);
 			}
@@ -152,12 +125,7 @@ int	Server::user_msg(std::string const &params, int fd) {
 		else
 			reply = gen_bnf_msg(ERR_ALREADYREGISTRED, p);
 	}
-	if (send(fd, reply.data(), reply.length(), 0) < 0)
-	{
-		std::clog << this->logtime() << "send failed" << std::endl;
-		return (-1);
-	}
-	return (0);
+	return (this->send_msg(fd, reply));
 }
 
 // int	Server::oper_msg(std::string const &params, int fd) {
@@ -212,10 +180,5 @@ int	Server::quit_msg(std::string const &params, int fd) {
 		std::cout << std::endl;
 		return 0;
 	}
-	if (send(fd, reply.data(), reply.length(), 0) < 0)
-	{
-		std::clog << this->logtime() << "send failed" << std::endl;
-		return (-1);
-	}
-	return (0);
+	return (this->send_msg(fd, reply));
 }
