@@ -92,9 +92,9 @@ Server &Server::operator=(Server const &rhs)
 int Server::start(void)
 {
 	return (this->create_sock()
-			| this->set_sock()
-			| this->bind_sock()
-			| this->listen());
+			|| this->set_sock()
+			|| this->bind_sock()
+			|| this->listen());
 }
 
 int Server::create_sock(void)
@@ -190,9 +190,10 @@ int	Server::receive_msg(const std::string &line, fd_index_t fd)
 
 int Server::parse_buffer(fd_index_t fd)
 {
+	std::size_t	found = 0;
+
 	do
 	{
-		std::size_t	found;
 		found = this->_fds_buffer[fd].find("\r\n");
 		if (found != std::string::npos)
 		{
@@ -988,6 +989,7 @@ int	Server::whois_msg(std::string const& params, int fd)
 		// IF USER JOIN CHANNEL AND FOR EACH CHANNEL 
 			// 319 RPL_WHOISCHANNELS "<nick> :{[@|+]<channel><space>}"
 	}
+			// 319 RPL_WHOISCHANNELS "<nick> :{[@|+]<channel><space>}"
 
 	// send 318 RPL_ENDOFWHOIS "<nick> :End of /WHOIS list"
 
