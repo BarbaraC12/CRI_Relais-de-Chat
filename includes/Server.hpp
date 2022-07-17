@@ -77,7 +77,7 @@ class Server
 		int	nick_msg(std::string const &params, int fd);
 		int	user_msg(std::string const &params, int fd);
 		int	server_msg(std::string const &params, int fd);
-		int	oper_msg(std::string const &params, int fd);
+		// int	oper_msg(std::string const &params, int fd);
 		int	quit_msg(std::string const &params, int fd);
 		int	squit_msg(std::string const &params, int fd);
 		// Channel operations

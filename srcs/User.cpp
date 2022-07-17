@@ -121,4 +121,5 @@ void  User::set_user_params(std::string uname, std::string host, std::string ser
 	this->_hostName = host;
 	this->_servName = server;
 	this->_realName = realname;
+	this->_status = REGISTER;
 }

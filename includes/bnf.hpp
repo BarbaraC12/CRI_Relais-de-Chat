@@ -507,6 +507,7 @@
 # define ERR_TEXTTOOSHORT	983
 # define ERR_NUMERIC_ERR	999
 
+
 void	init_bnf_msg(std::map<int, std::string> &map_bnf_msg);
 
 #endif
