@@ -92,9 +92,9 @@ Server &Server::operator=(Server const &rhs)
 int Server::start(void)
 {
 	return (this->create_sock()
-			|| this->set_sock()
-			|| this->bind_sock()
-			|| this->listen());
+			| this->set_sock()
+			| this->bind_sock()
+			| this->listen());
 }
 
 int Server::create_sock(void)
@@ -190,10 +190,9 @@ int	Server::receive_msg(const std::string &line, fd_index_t fd)
 
 int Server::parse_buffer(fd_index_t fd)
 {
-	std::size_t	found;
-
 	do
 	{
+		std::size_t	found;
 		found = this->_fds_buffer[fd].find("\r\n");
 		if (found != std::string::npos)
 		{
@@ -213,10 +212,9 @@ int Server::parse_buffer(fd_index_t fd)
 int Server::receiving(fd_index_t fd)
 {
 	ssize_t	ret;
-	char	buffer[BUFFER_SIZE_IRC + 1];
+	char	buffer[BUFFER_SIZE_IRC + 1] = {0};
 
 	ret = recv(static_cast<int>(fd), buffer, BUFFER_SIZE_IRC, 0);
-	buffer[ret] = '\0';
 	if (ret < 0)
 	{
 		if (errno != EWOULDBLOCK)
