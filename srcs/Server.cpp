@@ -949,37 +949,77 @@ int	Server::info_msg(std::string const& params, int fd)
 //   RPL_TOPIC
 int	Server::join_msg(std::string const &params, int fd)
 {
+	(void)fd;
 	size_t		to_find;
+	std::string	channels;
+	std::string	chan;
+	std::string	keys;
+	std::string	k;
 	//parsing params
-	std::string 
+	to_find = params.find(" ");
+	channels = params.substr(0, to_find);
+	keys = params.substr(to_find + 1, params.length());
+	do {
+		to_find = channels.find(",");
+		chan = channels.substr(0, to_find);
+		channels.erase(0, to_find + 1);
+		to_find = keys.find(",");
+		k = keys.substr(0, to_find);
+		keys.erase(0, to_find + 1);
+		//checking if chan exist or not
+		if (this->_map_channels.find(chan) != this->_map_channels.end())
+		{
+			if (this->_map_channels[chan].get_key() == k)
+				std::cout << "OK" << std::endl;
+		}
+		else
+		{
+			//create a new chan
+		}
+	} while (to_find != std::string::npos);
+	return (0);
 }
 int	Server::part_msg(std::string const &params, int fd)
 {
-
+	(void)params;
+	(void)fd;
+	return (0);
 }
 int	Server::mode_msg(std::string const &params, int fd)
 {
-
+	(void)params;
+	(void)fd;
+	return (0);
 }
 int	Server::topic_msg(std::string const &params, int fd)
 {
-
+	(void)params;
+	(void)fd;
+	return (0);
 }
 int	Server::names_msg(std::string const &params, int fd)
 {
-
+	(void)params;
+	(void)fd;
+	return (0);
 }
 int	Server::list_msg(std::string const &params, int fd)
 {
-
+	(void)params;
+	(void)fd;
+	return (0);
 }
 int	Server::invite_msg(std::string const &params, int fd)
 {
-
+	(void)params;
+	(void)fd;
+	return (0);
 }
 int	Server::kick_msg(std::string const &params, int fd)
 {
-
+	(void)params;
+	(void)fd;
+	return (0);
 }
 
 /* ########### User based Queries ########### */

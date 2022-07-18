@@ -1,6 +1,7 @@
 # include "Channel.hpp"
 
-Channel::Channel(std::string const &name): _name(name)
+Channel::Channel(std::string const &name, std::string const &key): _name(name),
+	_key(key)
 {
 
 }
@@ -22,4 +23,14 @@ Channel		&Channel::operator=(Channel const &rhs)
 
 	}
 	return *this;
+}
+
+std::string		Channel::get_name(void) const
+{
+	return this->_name;
+}
+
+std::string		Channel::get_key(void) const
+{
+	return this->_key;
 }
