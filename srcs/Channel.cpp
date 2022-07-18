@@ -6,14 +6,13 @@ Channel::Channel(std::string const &name, std::string const &key): _name(name),
 
 }
 
-Channel::Channel(Channel const &src): _name(name), 
-	_key(key), _users()
+Channel::Channel(Channel const &src): _name(), 
+	_key(), _users()
 {
 	*this = src;
 }
 
-Channel::~Channel(void): _name(name), 
-	_key(key), _users()
+Channel::~Channel(void)
 {
 
 }
