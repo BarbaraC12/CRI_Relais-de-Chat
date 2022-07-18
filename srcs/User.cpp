@@ -1,4 +1,5 @@
 #include "../includes/User.hpp"
+#include "../includes/Server.hpp"
 
 /* ******************************************** *
 *                CPP CANONICAL                  *
@@ -184,12 +185,12 @@ std::string					User::getChanels( void ) {
 	return st;
 }
 
-int							User::getConnectTime( void ) {
+std::string					User::getConnectTime( void ) {
 
-	return difftime(time(NULL), this->_connectTime);
+	return convert_time(int(difftime(time(NULL), this->_connectTime)), "Client here from ");
 }
 
-std::time_t					User::getLastPong( void ) {
+int					User::getLastPong( void ) {
 
-	return this->_lastPong;
+	return int(difftime(time(NULL), this->_connectTime));
 }

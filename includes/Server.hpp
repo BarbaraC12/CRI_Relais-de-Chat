@@ -119,4 +119,6 @@ class Server
 		std::string	get_run_time(void);
 };
 
+std::string	convert_time( int, std::string );
+
 #endif

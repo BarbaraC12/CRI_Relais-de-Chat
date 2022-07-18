@@ -69,14 +69,12 @@ class User {
 		std::string					getServname( void );
 		std::string					getRealname( void );
 		std::string					getChanels( void );
-		int							getConnectTime( void );
-		std::time_t					getLastPong( void );
+		std::string					getConnectTime( void );
+		int							getLastPong( void ); // return last pong in second
 
 		void  set_user_params(std::string, std::string, std::string, std::string);
 
 		User &operator=(User const &rhs);
 };
-
-
 
 #endif

@@ -22,7 +22,7 @@
 #endif
 #define BUFFER_SIZE_IRC	512
 #define SSTR( x ) static_cast< std::ostringstream & >( \
-        ( std::ostringstream() << std::dec << x ) ).str()
+		( std::ostringstream() << std::dec << x ) ).str()
 
 Server::Server(uint16_t &port, std::string const &passwd)
 	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(),
@@ -506,35 +506,57 @@ std::string	Server::get_local_time(void)
 	return (time_string.substr(1, time_string.length() - 2));
 }
 
-std::string	Server::get_run_time(void)
-{
+std::string		convert_time( int seconds, std::string params) {
+
+	int			rest;
+	std::string	result;
+
+	rest = seconds % (3600 * 24);
+	result += params;
+	result += SSTR(int(seconds / (3600 * 24))) + " days ";
+	seconds = rest;
+	rest = seconds % 3600;
+	if (int(seconds / 3600) < 10)
+		result += "0";
+	result += SSTR(int(seconds / 3600)) + ":";
+	seconds = rest;
+	rest = seconds % 60;
+	if (int(seconds / 60) < 10)
+		result += "0";
+	result += SSTR(int(seconds / 60)) + ":";
+	if (rest < 10)
+		result += "0";
+	result += SSTR(rest);
+	return result;
+}
+
 std::string    Server::get_run_time(void)
 {
-    time_t        now;
-    std::string    result;
-    int    seconds;
-    int    rest;
+	// time_t        now;
+	std::string    result;
+	int    			seconds;
+	// int    rest;
 
-    time(&now);
-    seconds = int(difftime(now, this->_start_time));
-    rest = seconds % (3600 * 24);
-    result += "Server Up ";
-    result += SSTR(int(seconds / (3600 * 24))) + " days ";
-    seconds = rest;
-    rest = seconds % 3600;
-    if (int(seconds / 3600) < 10)
-        result += "0";
-    result += SSTR(int(seconds / 3600)) + ":";
-    seconds = rest;
-    rest = seconds % 60;
-    if (int(seconds / 60) < 10)
-        result += "0";
-    result += SSTR(int(seconds / 60)) + ":";
-    if (rest < 10)
-        result += "0";
-    result += SSTR(rest);
-    return result;
-}
+	// time(&now);
+	// seconds = int(difftime(now, this->_start_time));
+	seconds = int(difftime(time(NULL), this->_start_time));
+	// rest = seconds % (3600 * 24);
+	// result += "Server Up ";
+	// result += SSTR(int(seconds / (3600 * 24))) + " days ";
+	// seconds = rest;
+	// rest = seconds % 3600;
+	// if (int(seconds / 3600) < 10)
+	//     result += "0";
+	// result += SSTR(int(seconds / 3600)) + ":";
+	// seconds = rest;
+	// rest = seconds % 60;
+	// if (int(seconds / 60) < 10)
+	//     result += "0";
+	// result += SSTR(int(seconds / 60)) + ":";
+	// if (rest < 10)
+	//     result += "0";
+	// result += SSTR(rest);
+	return convert_time(seconds, "Server Up ");
 }
 
 /* ########### Server & Queries Commands ########### */
