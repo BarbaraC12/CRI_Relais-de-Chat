@@ -1,17 +1,19 @@
 # include "Channel.hpp"
 
-Channel::Channel(std::string const &name, std::string const &key): _name(name),
-	_key(key)
+Channel::Channel(std::string const &name, std::string const &key): _name(name), 
+	_key(key), _users()
 {
 
 }
 
-Channel::Channel(Channel const &src)
+Channel::Channel(Channel const &src): _name(name), 
+	_key(key), _users()
 {
 	*this = src;
 }
 
-Channel::~Channel(void)
+Channel::~Channel(void): _name(name), 
+	_key(key), _users()
 {
 
 }
