@@ -506,8 +506,8 @@ std::string	Server::get_local_time(void)
 	return (time_string.substr(1, time_string.length() - 2));
 }
 
-std::string		convert_time( int seconds, std::string params) {
-
+std::string		convert_time( int seconds, std::string params)
+{
 	int			rest;
 	std::string	result;
 
