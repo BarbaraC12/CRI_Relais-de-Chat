@@ -93,10 +93,11 @@ int			BotBase::parse_buffer(std::string & buffer) {
 			}
 			to_find = sub.find(" ");
 			sub = sub.substr(0, to_find);
-			std::cout << "SUB: " << sub << std::endl;
+			//std::cout << "SUB: " << sub << std::endl;
 		}
 	}
 	while (to_find != std::string::npos);
+	std::cout << "Buffer at the end: " << buffer << std::endl;
 	return 0;
 }
 
@@ -118,7 +119,7 @@ int			BotBase::recv() {
 	memset(buf, 0, 4096);
 	//bytes = ::recv(this->_sock_fd, buf, 4096, 0);
 	do {
-		sleep(2);
+		sleep(1);
 		// std::cout << "> ";
 		// getline(std::cin, input);
 		// input += "\r\n";
@@ -142,8 +143,9 @@ int			BotBase::recv() {
 			buf[bytes] = '\0';
 			buffer.append(buf);
 			std::cout << "recv()::bytes: " << bytes << std::endl;
-			std::cout << "[SERVER]:\n" << std::string(buf, static_cast<std::string::size_type>(bytes)) << "\r\n";
+			//std::cout << "[SERVER]:\n" << std::string(buf, static_cast<std::string::size_type>(bytes)) << "\r\n";
 		} while (::strlen(buf) == 4096);
+		std::cout << "buffer raw:\n" << buffer << std::endl;
 		this->parse_buffer(buffer);
 	} while (1);
 	std::cout << YELL + "Connection Closed!" + NOR << std::endl;

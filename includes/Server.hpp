@@ -3,6 +3,7 @@
 
 #include "User.hpp"
 #include "Param.hpp"
+#include "Channel.hpp"
 #include <stdint.h>
 #include <poll.h>
 #include <string>
@@ -27,17 +28,18 @@ class Server
 	private:
 		typedef std::vector<pollfd>::size_type	fd_index_t;
 		
-		std::vector<pollfd> 		_fds;
-		std::vector<std::string> 	_fds_buffer;
-		fd_index_t					_ndfs;
+		std::vector<pollfd> 			_fds;
+		std::vector<std::string> 		_fds_buffer;
+		fd_index_t						_ndfs;
 		std::map<std::string, int (Server::* const)(std::string const &, int)>	_map_funct;
-		std::map<int, User>			_map_users;
-		std::string					_name;
-		std::string					_passwd;
-		int							_listen_sd; // sd for Socket Descriptor
-		uint16_t					_port;
-		uint16_t					_padded; // for flag -Wpadded
-		time_t						_start_time;
+		std::map<int, User>				_map_users;
+		std::map<std::string, Channel>	_map_channels;
+		std::string						_name;
+		std::string						_passwd;
+		int								_listen_sd; // sd for Socket Descriptor
+		uint16_t						_port;
+		uint16_t						_padded; // for flag -Wpadded
+		time_t							_start_time;
 		//std::string					_version;
 		//std::string					_debuglevel;
 
