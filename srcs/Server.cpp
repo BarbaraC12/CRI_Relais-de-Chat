@@ -25,7 +25,7 @@
         ( std::ostringstream() << std::dec << x ) ).str()
 
 Server::Server(uint16_t &port, std::string const &passwd)
-	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(),
+	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(), _map_channels(),
 	_name("irc.anclarma.42.fr"), _passwd(passwd), _listen_sd(-1), _port(port),
 	_padded(), _start_time()
 {
@@ -35,7 +35,7 @@ Server::Server(uint16_t &port, std::string const &passwd)
 }
 
 Server::Server(void)
-	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(),
+	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(), _map_channels(),
 	_name("irc.anclarma.42.fr"), _passwd(), _listen_sd(-1), _port(), _padded(),
 	_start_time()
 {
@@ -45,7 +45,7 @@ Server::Server(void)
 }
 
 Server::Server(Server const &src)
-	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(),
+	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(), _map_channels(),
 	_name("irc.anclarma.42.fr"), _passwd(), _listen_sd(-1), _port(), _padded(),
 	_start_time()
 {
