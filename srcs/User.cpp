@@ -1,22 +1,26 @@
 #include "../includes/User.hpp"
 
+/* ******************************************** *
+*                CPP CANONICAL                  *
+* ********************************************* */
+
 User::User( int fd )
 	:_sd(fd), _nickName(""), _userName(""), _hostName(""), _servName(""),
-	_realName(""), _userMode(), _chan(), _status(NOPASS), _connectTime(0), nickname("")
+	_realName(""), _userMode(), _chan(), _status(NOPASS), _connectTime(0), lastPong(0), nickname("")
 {
 	std::cout << "New user create" << std::endl;
 }
 
 User::User(void)
 	:_sd(0),_nickName(""), _userName(""), _hostName(""), _servName(""),
-	_realName(""), _userMode(), _chan(), _status(NOPASS), _connectTime(0), nickname("")
+	_realName(""), _userMode(), _chan(), _status(NOPASS), _connectTime(0), lastPong(0), nickname("")
 {
 	return;
 }
 
 User::User(User const &src)
 	:_sd(src._sd), _nickName(), _userName(), _hostName(), _servName(),
-	_realName(), _userMode(), _chan(), _status(NOPASS), _connectTime(0), nickname()
+	_realName(), _userMode(), _chan(), _status(NOPASS), _connectTime(0), lastPong(0), nickname()
 {
 	*this = src;
 	return;
@@ -34,6 +38,10 @@ User &User::operator=(User const &rhs) {
 	return (*this);
 }
 
+/* ******************************************** *
+*                    SETTERS                    *
+* ********************************************* */
+
 void 		User::setSd(int fd) {
 	this->_sd = fd;
 }
@@ -42,8 +50,8 @@ void		User::setStatus( e_user_status stat ) {
 	this->_status = stat;	
 }
 
-void		User::setNickname( std::string nickN) {
-	this->_nickName = nickN;	
+void		User::addNickname( std::string nickN) {
+	this->_nickName.push_back(nickN);	
 }
 
 void		User::setUsername( std::string userN ) {
@@ -66,14 +74,18 @@ void		User::setUsermode( e_user_mode userM, bool status ) {
 	this->_userMode[userM] = status;
 }
 
-void	setConnectTime( std::time_t );
-// void	setLastPong( std::time_t );
+void		User::setConnectTime( std::time_t );
 
+void		User::setLastPong( std::time_t );
 
 void		User::addChanel( std::string ) {
 }
 
-int				User::getSd( void ) {
+/* ******************************************** *
+*                    GETTERS                    *
+* ********************************************* */
+
+int			User::getSd( void ) {
 	return this->_sd;
 }
 
@@ -82,6 +94,10 @@ e_user_status	User::getStatus( void ) {
 }
 
 std::string		User::getNickname( void ) {
+	return this->_nickName.back();
+}
+
+std::vector<std::string>	getNickname_history( void ) {
 	return this->_nickName;
 }
 
@@ -112,8 +128,8 @@ std::string		User::getChanels( void ) {
 }
 
 std::time_t		getConnectTime( void );
-// std::time_t		getLastPong( void );
 
+std::time_t		getLastPong( void );
 
 void  User::set_user_params(std::string uname, std::string host, std::string server, std::string realname) {
 

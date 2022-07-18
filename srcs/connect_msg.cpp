@@ -55,7 +55,7 @@ int	Server::nick_msg(std::string const &params, int fd) {
 			if (it->second.getStatus() < DESACTIVE && it->second.getNickname() == params && it->second.getSd() != fd)
 				reply = gen_bnf_msg(ERR_NICKCOLLISION, p);
 		}
-		this->_map_users[fd].setNickname(params);
+		this->_map_users[fd].addNickname(params);
 		if (this->_map_users[fd].getStatus() == PASSWORD)
 			this->_map_users[fd].setStatus(NICKNAME);
 		std::cout << "NICK ok" << std::endl;
