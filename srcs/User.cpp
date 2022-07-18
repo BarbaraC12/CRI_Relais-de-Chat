@@ -5,22 +5,22 @@
 * ********************************************* */
 
 User::User( int fd )
-	:_sd(fd), _nickName(""), _userName(""), _hostName(""), _servName(""),
-	_realName(""), _userMode(), _chan(), _status(NOPASS), _connectTime(0), lastPong(0), nickname("")
+	:_sd(fd), _nickName(), _userName(""), _hostName(""), _servName(""),
+	_realName(""), _userMode(), _chan(), _status(NOPASS), _connectTime(0), _lastPong(0), nickname("")
 {
 	std::cout << "New user create" << std::endl;
 }
 
 User::User(void)
-	:_sd(0),_nickName(""), _userName(""), _hostName(""), _servName(""),
-	_realName(""), _userMode(), _chan(), _status(NOPASS), _connectTime(0), lastPong(0), nickname("")
+	:_sd(0),_nickName(), _userName(""), _hostName(""), _servName(""),
+	_realName(""), _userMode(), _chan(), _status(NOPASS), _connectTime(0), _lastPong(0), nickname("")
 {
 	return;
 }
 
 User::User(User const &src)
 	:_sd(src._sd), _nickName(), _userName(), _hostName(), _servName(),
-	_realName(), _userMode(), _chan(), _status(NOPASS), _connectTime(0), lastPong(0), nickname()
+	_realName(), _userMode(), _chan(), _status(NOPASS), _connectTime(0), _lastPong(0), nickname()
 {
 	*this = src;
 	return;
@@ -74,9 +74,13 @@ void		User::setUsermode( e_user_mode userM, bool status ) {
 	this->_userMode[userM] = status;
 }
 
-void		User::setConnectTime( std::time_t );
+void		User::setConnectTime( std::time_t ) {
+	this->_connectTime = time(NULL);
+}
 
-void		User::setLastPong( std::time_t );
+void		User::setLastPong( std::time_t ) {
+	this->_lastPong = time(NULL);
+}
 
 void		User::addChanel( std::string ) {
 }
@@ -97,7 +101,7 @@ std::string		User::getNickname( void ) {
 	return this->_nickName.back();
 }
 
-std::vector<std::string>	getNickname_history( void ) {
+std::vector<std::string>	User::getNickname_history( void ) {
 	return this->_nickName;
 }
 

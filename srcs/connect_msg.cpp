@@ -5,6 +5,7 @@
 #include <sstream>
 #include <utility>
 #include <algorithm>
+#include <vector>
 
 static bool valid_nick(std::string const &str) {
  (void)str;

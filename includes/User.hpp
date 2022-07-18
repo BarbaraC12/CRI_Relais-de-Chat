@@ -4,6 +4,7 @@
 # include <string>
 # include <ctime>
 # include <iostream>
+# include <vector>
 
 enum e_user_status
 {
