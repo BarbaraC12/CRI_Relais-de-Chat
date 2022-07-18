@@ -5,23 +5,31 @@
 * ********************************************* */
 
 User::User( int fd )
-	:_sd(fd), _nickName(), _userName(""), _hostName(""), _servName(""),
-	_realName(""), _userMode(), _chan(), _status(NOPASS), _connectTime(0), _lastPong(0), nickname("")
-{
+	:_sd(fd), _nickName(), _userName(""), _hostName(""),
+	_servName(""), _realName(""), _userMode(), _chan(),
+	_status(NOPASS), _connectTime(0), _lastPong(0), nickname("") {
+
 	std::cout << "New user create" << std::endl;
+	initConnectTime();
+	initLastPong();
+	return;
 }
 
 User::User(void)
 	:_sd(0),_nickName(), _userName(""), _hostName(""), _servName(""),
-	_realName(""), _userMode(), _chan(), _status(NOPASS), _connectTime(0), _lastPong(0), nickname("")
-{
+	_realName(""), _userMode(), _chan(), _status(NOPASS), _connectTime(0),
+	_lastPong(0), nickname("") {
+
+	initConnectTime();
+	initLastPong();
 	return;
 }
 
 User::User(User const &src)
-	:_sd(src._sd), _nickName(), _userName(), _hostName(), _servName(),
-	_realName(), _userMode(), _chan(), _status(NOPASS), _connectTime(0), _lastPong(0), nickname()
-{
+	:_sd(src._sd), _nickName(), _userName(), _hostName(),
+	_servName(), _realName(), _userMode(), _chan(),
+	_status(NOPASS), _connectTime(0), _lastPong(0), nickname() {
+
 	*this = src;
 	return;
 }
@@ -34,6 +42,15 @@ User &User::operator=(User const &rhs) {
 	if (this != &rhs)
 	{
 		this->nickname = rhs.nickname;
+		this->_sd = rhs._sd;
+		this->_nickName = rhs._nickName;
+		this->_userName = rhs._userName;
+		this->_hostName = rhs._hostName;
+		this->_servName = rhs._servName;
+		this->_realName = rhs._realName;
+		this->_status = rhs._status;
+		this->_connectTime = rhs._connectTime;
+		this->_lastPong = rhs._lastPong;
 }
 	return (*this);
 }
@@ -77,26 +94,6 @@ void	User::setRealname( std::string realN ) {
 	this->_realName = realN;
 }
 
-void	User::setUsermode(
-	e_user_mode userM, bool status ) {
-
-	this->_userMode[userM] = status;
-}
-
-void	User::setConnectTime( std::time_t ) {
-
-	this->_connectTime = time(NULL);
-}
-
-void	User::setLastPong( std::time_t ) {
-
-	this->_lastPong = time(NULL);
-}
-
-void	User::addChanel( std::string ) {
-
-}
-
 void	User::set_user_params(
 	std::string uname, std::string host,
 	std::string server, std::string realname ) {
@@ -106,6 +103,26 @@ void	User::set_user_params(
 	this->_servName = server;
 	this->_realName = realname;
 	this->_status = REGISTER;
+}
+
+void	User::setUsermode(
+	e_user_mode userM, bool status ) {
+
+	this->_userMode[userM] = status;
+}
+
+void	User::initConnectTime( void ) {
+
+	time(&_connectTime);
+}
+
+void	User::initLastPong( void ) {
+
+	time(&_lastPong);
+}
+
+void	User::addChanel( std::string ) {
+
 }
 
 /* ******************************************** *
@@ -124,7 +141,10 @@ e_user_status				User::getStatus( void ) {
 
 std::string					User::getNickname( void ) {
 
-	return this->_nickName.back();
+	if (this->_nickName.size() > 0)
+		return this->_nickName.back();
+	else
+		return "";
 }
 
 std::vector<std::string>	User::getNickname_history( void ) {
@@ -164,9 +184,9 @@ std::string					User::getChanels( void ) {
 	return st;
 }
 
-std::time_t					User::getConnectTime( void ) {
+double					User::getConnectTime( void ) {
 
-	return this->_connectTime;
+	return difftime(time(NULL), this->_connectTime);
 }
 
 std::time_t					User::getLastPong( void ) {

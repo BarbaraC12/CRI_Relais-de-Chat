@@ -21,6 +21,8 @@
 # define SOCK_NONBLOCK O_NONBLOCK
 #endif
 #define BUFFER_SIZE_IRC	512
+#define SSTR( x ) static_cast< std::ostringstream & >( \
+        ( std::ostringstream() << std::dec << x ) ).str()
 
 Server::Server(uint16_t &port, std::string const &passwd)
 	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(),
@@ -506,38 +508,33 @@ std::string	Server::get_local_time(void)
 
 std::string	Server::get_run_time(void)
 {
-	time_t		now;
-	std::string	result;
-	std::stringstream	days;
-	std::stringstream	hours;
-	std::stringstream	min;
-	std::stringstream	sec;
-	int	seconds;
-	int	rest;
+std::string    Server::get_run_time(void)
+{
+    time_t        now;
+    std::string    result;
+    int    seconds;
+    int    rest;
 
-	time(&now);
-	seconds = int(difftime(now, this->_start_time));
-	rest = seconds % (3600 * 24);
-	result += "Server Up ";
-	days << int(seconds / (3600 * 24));
-	result += days.str() + " days ";
-	seconds = rest;
-	rest = seconds % 3600;
-	if (int(seconds / 3600) < 10)
-		result += "0";
-	hours << int(seconds / 3600);
-	result += hours.str() + ":";
-	seconds = rest;
-	rest = seconds % 60;
-	if (int(seconds / 60) < 10)
-		result += "0";
-	min << int(seconds / 60);
-	result += min.str() + ":";
-	if (rest < 10)
-		result += "0";
-	sec << rest;
-	result += sec.str();
-	return result;
+    time(&now);
+    seconds = int(difftime(now, this->_start_time));
+    rest = seconds % (3600 * 24);
+    result += "Server Up ";
+    result += SSTR(int(seconds / (3600 * 24))) + " days ";
+    seconds = rest;
+    rest = seconds % 3600;
+    if (int(seconds / 3600) < 10)
+        result += "0";
+    result += SSTR(int(seconds / 3600)) + ":";
+    seconds = rest;
+    rest = seconds % 60;
+    if (int(seconds / 60) < 10)
+        result += "0";
+    result += SSTR(int(seconds / 60)) + ":";
+    if (rest < 10)
+        result += "0";
+    result += SSTR(rest);
+    return result;
+}
 }
 
 /* ########### Server & Queries Commands ########### */

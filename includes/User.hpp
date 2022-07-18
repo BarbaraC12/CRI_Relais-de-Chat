@@ -29,7 +29,7 @@ class User {
 
 	private:
 		int	_sd;
-		std::vector<std::string>		_nickName;
+		std::vector<std::string>	_nickName;
 		std::string		_userName;
 		std::string 	_hostName;
 		std::string 	_servName;
@@ -53,11 +53,11 @@ class User {
 		void	addNickname( std::string );
 		void	setUsername( std::string );
 		void	setHostname( std::string );
-		void	addChanel( std::string );
 		void	setServname( std::string );
 		void	setRealname( std::string );
-		void	setConnectTime( std::time_t );
-		void	setLastPong( std::time_t );
+		void	initConnectTime( void );
+		void	initLastPong( void );
+		void	addChanel( std::string );
 		
 		int							getSd( void );
 		bool						getUsermode( void );
