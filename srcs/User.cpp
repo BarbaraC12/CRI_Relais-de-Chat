@@ -184,7 +184,7 @@ std::string					User::getChanels( void ) {
 	return st;
 }
 
-double					User::getConnectTime( void ) {
+int							User::getConnectTime( void ) {
 
 	return difftime(time(NULL), this->_connectTime);
 }

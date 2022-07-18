@@ -69,7 +69,7 @@ class User {
 		std::string					getServname( void );
 		std::string					getRealname( void );
 		std::string					getChanels( void );
-		std::time_t					getConnectTime( void );
+		int							getConnectTime( void );
 		std::time_t					getLastPong( void );
 
 		void  set_user_params(std::string, std::string, std::string, std::string);
