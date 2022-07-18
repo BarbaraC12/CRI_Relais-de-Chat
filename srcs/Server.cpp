@@ -487,6 +487,7 @@ int	Server::cap_msg(std::string const &params, int fd)
 // JEAN-PHILIPPE
 int	Server::send_msg(int fd, std::string const &reply)
 {
+	std::clog << this->logtime() << "sending: " << reply << std::endl;
 	if (send(fd, reply.data(), reply.length(), 0) < 0)
 	{
 		std::clog << this->logtime() << "send() failed" << std::endl;
