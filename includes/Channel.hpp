@@ -11,6 +11,7 @@ class Channel
 	private:
 		std::string			_name;
 		std::string			_key;
+		std::string			_topic;
 		std::vector<User>	_users;
 
 	public:
@@ -19,8 +20,12 @@ class Channel
 		~Channel(void);
 		Channel	&operator=(Channel const &rhs);
 
-		std::string		get_name(void) const;
-		std::string		get_key(void) const;
+		std::string			get_name(void) const;
+		std::string			get_key(void) const;
+		std::string			get_topic(void) const;
+		std::vector<User>	get_users(void) const;
+
+		void				set_topic(std::string const &topic);
 };
 
 #endif

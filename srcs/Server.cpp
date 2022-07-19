@@ -991,10 +991,48 @@ int	Server::mode_msg(std::string const &params, int fd)
 	(void)fd;
 	return (0);
 }
+
+//Command: TOPIC
+//Parameters: <channel> [<topic>]
+//   ERR_NEEDMOREPARAMS
+//   ERR_NOTONCHANNEL
+//   RPL_NOTOPIC
+//   RPL_TOPIC
+//   ERR_CHANOPRIVSNEEDED
 int	Server::topic_msg(std::string const &params, int fd)
 {
-	(void)params;
 	(void)fd;
+	std::vector<std::string>	p;
+	std::string					reply;
+	std::string					channel;
+	std::string					topic;
+	size_t						to_find;
+
+	if (params.empty())
+	{
+		reply = gen_bnf_msg(ERR_NEEDMOREPARAMS, p);
+		if (this->send_msg(fd, reply) < 0)
+			return (-1);
+	}
+	else
+	{
+		to_find = params.find(" ");
+		if (to_find != std::string::npos)
+		{
+			channel = params.substr(0, to_find);
+			//params.erase(0, to_find + 1);
+		}
+		else
+		{
+			channel = params;
+			topic = this->_map_channels[channel].get_topic();
+		}
+		to_find = params.find(" ");
+		if (to_find != std::string::npos && this->_map_users[fd].getUsermode() > 0)
+		{
+
+		}
+	}
 	return (0);
 }
 int	Server::names_msg(std::string const &params, int fd)
