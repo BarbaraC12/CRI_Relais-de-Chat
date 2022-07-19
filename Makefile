@@ -25,7 +25,8 @@ C_FILES		= main.cpp	\
 			  User.cpp	\
 			  connect_msg.cpp \
 			  bnf.cpp	\
-			  Param.cpp
+			  Param.cpp \
+			  Channel.cpp
 SRCS		= $(patsubst %, $(C_DIR)/%, $(C_FILES))
 
 # ################################## #
