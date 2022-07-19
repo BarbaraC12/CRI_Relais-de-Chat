@@ -84,17 +84,16 @@ int	Server::whois_msg(std::string const& params, int fd)
 
 int	Server::whowas_msg(std::string const& params, int fd)
 {
-	(void)params;
 	(void)fd;
+	std::string reply;
+	std::vector<std::string>	p;
 	std::string	nickname = "";
 	std::string	count = "";
 	std::string	server = "";
 	// NO WILDCARD ALLOWED IN PARAMETERS HERE
 
-	if (nickname == "")
-	{
-		// send 431 ERR_NONICKNAMEGIVEN ":No nickname given"
-	}
+	if (params.empty())
+		reply = gen_bnf_msg(ERR_NEEDMOREPARAMS, p);
 	else
 	{
 		if (nickname != "target")

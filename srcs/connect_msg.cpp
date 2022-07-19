@@ -33,12 +33,7 @@ int	Server::pass_msg(std::string const &params, int fd)
 			return (0);
 		}
 	}
-	if (send(fd, reply.data(), reply.length(), 0) < 0)
-	{
-		std::clog << this->logtime() << "send failed" << std::endl;
-		return (-1);
-	}
-	return (0);
+	return (this->send_msg(fd, reply));
 }
 
 int	Server::nick_msg(std::string const &params, int fd)
