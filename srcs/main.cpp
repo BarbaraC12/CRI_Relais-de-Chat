@@ -6,6 +6,7 @@
 #include <csignal>
 #include <cctype>
 #include <iostream>
+#include <fstream>
 
 static sig_atomic_t	end_irc = 0;
 
@@ -43,6 +44,7 @@ int main(int argc, char **argv)
 {
 	uint16_t	port = 0;
 	std::string	pwd;
+	const char *banW("banWords.txt");
 
 	signal(SIGINT, sigint_handler);
 	if (arg_error(argc, argv[1]))
@@ -52,6 +54,8 @@ int main(int argc, char **argv)
 	{
 		Server s(port, pwd);
 
+		if (s.get_ban_list(banW))
+			return (1);
 		s.start();
 		while (end_irc == 0)
 			end_irc = s.poll_loop();

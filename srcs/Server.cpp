@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <iostream>
+#include <fstream>
 #include <netinet/in.h>
 #include <sys/ioctl.h>
 #include <sys/poll.h>
@@ -27,7 +28,7 @@
 Server::Server(uint16_t &port, std::string const &passwd)
 	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(), _map_channels(),
 	_name("irc.anclarma.42.fr"), _passwd(passwd), _listen_sd(-1), _port(port),
-	_padded(), _start_time()
+	_padded(), _start_time(), _ban_words()
 {
 	time(&this->_start_time);
 	this->init_map_funct();
@@ -37,7 +38,7 @@ Server::Server(uint16_t &port, std::string const &passwd)
 Server::Server(void)
 	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(), _map_channels(),
 	_name("irc.anclarma.42.fr"), _passwd(), _listen_sd(-1), _port(), _padded(),
-	_start_time()
+	_start_time(), _ban_words()
 {
 	time(&this->_start_time);
 	this->init_map_funct();
@@ -47,7 +48,7 @@ Server::Server(void)
 Server::Server(Server const &src)
 	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(), _map_channels(),
 	_name("irc.anclarma.42.fr"), _passwd(), _listen_sd(-1), _port(), _padded(),
-	_start_time()
+	_start_time(), _ban_words()
 {
 	*this = src;
 	return;
@@ -453,3 +454,28 @@ std::string    Server::get_run_time(void)
 	return convert_time(seconds, "Server Up ");
 }
 
+int Server::get_ban_list(const char *ban_file)
+{
+	std::ifstream ban(ban_file);
+	std::string	line;
+	if (ban.is_open()) {
+		while (getline(ban, line)) {
+			this->_ban_words.push_back(line);
+		}
+		ban.close();
+		return (0);
+	}
+	std::cout << "./ircserv: can't open " << ban_file << ": invalid file descriptor" << std::endl;
+	return (1);
+}
+
+bool	Server::is_ban_word(std::string msg)
+{
+	std::transform(msg.begin(), msg.end(),msg.begin(), ::toupper);
+	std::cout << "msg: " << msg << std::endl;
+	for (std::size_t i(0); i < this->_ban_words.size(); i++) {
+		if (msg.find(this->_ban_words[i]) != std::string::npos)
+			return (true);
+	}
+	return (false);
+}

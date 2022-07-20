@@ -7,12 +7,6 @@
 #include <algorithm>
 #include <vector>
 
-static bool valid_nick(std::string const &str)
-{
-	(void)str;
-	return true;
-}
-
 int	Server::pass_msg(std::string const &params, int fd)
 {
 	std::string reply;
@@ -47,7 +41,7 @@ int	Server::nick_msg(std::string const &params, int fd)
 		reply = gen_bnf_msg(ERR_NONICKNAMEGIVEN, p);
 	else if (this->_map_users[fd].getNickname() == params)
 		reply = gen_bnf_msg(ERR_NICKNAMEINUSE, p);
-	else if (!valid_nick(params))
+	else if (is_ban_word(params) == true)
 		reply = gen_bnf_msg(ERR_ERRONEUSNICKNAME, p);
 	else
 	{
