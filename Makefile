@@ -22,13 +22,13 @@ NAME2		= bot
 C_DIR		= srcs
 C_FILES		= main.cpp	\
 			  bnf.cpp	\
+			  channel_oper.cpp \
 			  Channel.cpp \
 			  connect_msg.cpp \
 			  miscellaneous_msg.cpp \
 			  Param.cpp \
 			  server_queries_cmd.cpp \
 			  Server.cpp	\
-			  service_query_cmd.cpp \
 			  user_queries.cpp \
 			  User.cpp
 SRCS		= $(patsubst %, $(C_DIR)/%, $(C_FILES))

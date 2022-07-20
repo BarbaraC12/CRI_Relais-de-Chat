@@ -23,6 +23,7 @@
 #define BUFFER_SIZE_IRC	512
 #define SSTR( x ) static_cast< std::ostringstream & >( \
 		( std::ostringstream() << std::dec << x ) ).str()
+
 /* ########### Server & Queries Commands ########### */
 //Command: MOTD
 //Parameters: [ <target> ]

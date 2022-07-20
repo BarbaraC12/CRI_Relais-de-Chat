@@ -52,3 +52,16 @@ void				Channel::set_topic(std::string const &topic)
 {
 	this->_topic = topic;
 }
+
+void				Channel::add_user(User const &user)
+{
+	this->_users.push_back(user);
+}
+
+void				Channel::remove_user(User const &user)
+{
+	std::vector<User>::iterator it = this->_users.begin();
+	while (!((*it) == user))
+		it++;
+	this->_users.erase(it);
+}

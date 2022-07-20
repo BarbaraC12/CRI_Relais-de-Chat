@@ -61,12 +61,16 @@ int	Server::join_msg(std::string const &params, int fd)
 		//checking if chan exist or not
 		if (this->_map_channels.find(chan) != this->_map_channels.end())
 		{
+
 			if (this->_map_channels[chan].get_key() == k)
 				std::cout << "OK" << std::endl;
 		}
 		else
 		{
-			//create a new chan
+			Channel new_chan;
+			new_chan.add_user(this->_map_users[fd]);
+			//change mode for this user
+			this->_map_channels[chan] = new_chan;
 		}
 	} while (to_find != std::string::npos);
 	return (0);
@@ -93,42 +97,117 @@ int	Server::mode_msg(std::string const &params, int fd)
 //   ERR_CHANOPRIVSNEEDED
 int	Server::topic_msg(std::string const &params, int fd)
 {
-	(void)fd;
 	std::vector<std::string>	p;
 	std::string					reply;
 	std::string					channel;
 	std::string					topic;
 	size_t						to_find;
+	std::string					tmp;
 
-	if (params.empty())
+	tmp = params.substr(0);
+	if (tmp.empty())
 	{
+		p.push_back("TOPIC");
 		reply = gen_bnf_msg(ERR_NEEDMOREPARAMS, p);
-		if (this->send_msg(fd, reply) < 0)
-			return (-1);
 	}
 	else
 	{
-		to_find = params.find(" ");
+		to_find = tmp.find(" ");
 		if (to_find != std::string::npos)
+			channel = tmp.substr(0, to_find);
+		else
+			channel = tmp;
+		p.push_back(channel);
+		if (!this->_map_users[fd].isChanMember(channel))
 		{
-			channel = params.substr(0, to_find);
-			//params.erase(0, to_find + 1);
+			reply = gen_bnf_msg(ERR_NOTONCHANNEL, p);
 		}
 		else
 		{
-			channel = params;
-			topic = this->_map_channels[channel].get_topic();
+			if (to_find != std::string::npos)
+			{
+				if (this->_map_users[fd].getUsermode() > 0)
+				{
+					reply = gen_bnf_msg(ERR_CHANOPRIVSNEEDED, p);
+				}
+				else
+				{
+					tmp.erase(0, to_find + 1);
+					topic = tmp;
+					this->_map_channels[channel].set_topic(topic);
+				}
+			}
+			else
+			{
+				topic = this->_map_channels[channel].get_topic();
+				if (topic.empty())
+					reply = gen_bnf_msg(RPL_NOTOPIC, p);
+				else
+				{
+					p.push_back(topic);
+					reply = gen_bnf_msg(RPL_TOPIC, p);
+				}
+			}
 		}
-		to_find = params.find(" ");
-		if (to_find != std::string::npos && this->_map_users[fd].getUsermode() > 0) {}
 	}
-	return (0);
+	return (this->send_msg(fd, reply));
 }
+
+//Command: NAMES
+//Parameters: [<channel>{,<channel>}]
+//   RPL_NAMREPLY
+//   RPL_ENDOFNAMES
 int	Server::names_msg(std::string const &params, int fd)
 {
-	(void)params;
-	(void)fd;
-	return (0);
+	std::map<std::string, Channel>::iterator	it;
+	std::vector<std::string>					p;
+	std::string									reply;
+	size_t										to_find;
+	std::string									tmp;
+
+	tmp = params.substr(0);
+	if (tmp.empty())
+	{
+		for(it = this->_map_channels.begin(); it != this->_map_channels.end(); it++)
+		{
+			p.clear();
+			p.push_back((*it).second.get_name());
+			std::vector<User> users = (*it).second.get_users();
+			for(std::vector<User>::iterator it2 = users.begin(); it2 != users.end(); it2++)
+				p.push_back((*it2).getNickname());
+			reply = gen_bnf_msg(RPL_NAMREPLY, p);
+			if (this->send_msg(fd, reply) < 0)
+				return (-1);
+		}
+	}
+	else
+	{
+		std::string	chan;
+		do {
+			to_find = tmp.find(" ");
+			std::string chan_name;
+			if (to_find != std::string::npos)
+			{
+				chan_name = tmp.substr(0, to_find);
+				tmp.erase(0, to_find + 1);
+			}
+			else
+				chan_name = tmp;
+			p.clear();
+			Channel chan = this->_map_channels[chan_name];
+			p.push_back(chan.get_name());
+			std::vector<User> users = chan.get_users();
+			for(std::vector<User>::iterator it = users.begin(); it != users.end(); it++)
+				p.push_back((*it).getNickname());
+			reply = gen_bnf_msg(RPL_NAMREPLY, p);
+			if (this->send_msg(fd, reply) < 0)
+				return (-1);		
+		}
+		while (to_find != std::string::npos);
+	}
+	p.clear();
+	reply = gen_bnf_msg(RPL_ENDOFNAMES, p);
+	return (this->send_msg(fd, reply));
 }
 int	Server::list_msg(std::string const &params, int fd)
 {
