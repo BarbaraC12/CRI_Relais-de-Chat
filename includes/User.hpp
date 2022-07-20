@@ -29,16 +29,17 @@ class User {
 
 	private:
 		int	_sd;
+		int	_totalChanJoined;
 		std::vector<std::string>	_nickName;
-		std::string		_userName;
-		std::string 	_hostName;
-		std::string 	_servName;
-		std::string 	_realName;
-		bool			_userMode[5];
-		std::string 	_chan[10];
-		e_user_status	_status;
-		std::time_t		_connectTime;
-		std::time_t		_lastPong;
+		std::string					_userName;
+		std::string 				_hostName;
+		std::string 				_servName;
+		std::string 				_realName;
+		bool						_userMode[5];
+		std::vector<std::string> 	_chan;
+		e_user_status				_status;
+		std::time_t					_connectTime;
+		std::time_t					_lastPong;
 		
 	public:
 		User( void );
@@ -58,23 +59,26 @@ class User {
 		void	initConnectTime( void );
 		void	initLastPong( void );
 		void	addChanel( std::string );
+		bool	isChanMember(std::string const &channel);
 		
-		int							getSd( void );
-		bool						getUsermode( void );
-		e_user_status				getStatus( void );
-		std::string					getNickname( void );
-		std::vector<std::string>	getNickname_history( void );
-		std::string					getUsername( void );
-		std::string					getHostname( void );
-		std::string					getServname( void );
-		std::string					getRealname( void );
-		std::string					getChanels( void );
-		std::string					getConnectTime( void );
-		int							getLastPong( void ); // return last pong in second
+		int							getSd( void ) const;
+		bool						getUsermode( void ) const;
+		e_user_status				getStatus( void ) const;
+		std::string					getNickname( void ) const;
+		std::vector<std::string>	getNickname_history( void ) const;
+		std::string					getUsername( void ) const;
+		std::string					getHostname( void ) const;
+		std::string					getServname( void ) const;
+		std::string					getRealname( void ) const;
+		std::vector<std::string>	getChanels( void ) const;
+		std::string					getConnectTime( void ) const;
+		int							getLastPong( void ) const; // return last pong in second
 
 		void  set_user_params(std::string, std::string, std::string, std::string);
 
 		User &operator=(User const &rhs);
 };
+
+bool	operator==(User const &u1, User const &u2);
 
 #endif

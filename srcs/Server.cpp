@@ -995,12 +995,16 @@ int	Server::join_msg(std::string const &params, int fd)
 		//checking if chan exist or not
 		if (this->_map_channels.find(chan) != this->_map_channels.end())
 		{
+
 			if (this->_map_channels[chan].get_key() == k)
 				std::cout << "OK" << std::endl;
 		}
 		else
 		{
-			//create a new chan
+			Channel new_chan;
+			new_chan.add_user(this->_map_users[fd]);
+			//change mode for this user
+			this->_map_channels[chan] = new_chan;
 		}
 	} while (to_find != std::string::npos);
 	return (0);
@@ -1027,45 +1031,117 @@ int	Server::mode_msg(std::string const &params, int fd)
 //   ERR_CHANOPRIVSNEEDED
 int	Server::topic_msg(std::string const &params, int fd)
 {
-	(void)fd;
 	std::vector<std::string>	p;
 	std::string					reply;
 	std::string					channel;
 	std::string					topic;
 	size_t						to_find;
+	std::string					tmp;
 
-	if (params.empty())
+	tmp = params.substr(0);
+	if (tmp.empty())
 	{
+		p.push_back("TOPIC");
 		reply = gen_bnf_msg(ERR_NEEDMOREPARAMS, p);
-		if (this->send_msg(fd, reply) < 0)
-			return (-1);
 	}
 	else
 	{
-		to_find = params.find(" ");
+		to_find = tmp.find(" ");
 		if (to_find != std::string::npos)
+			channel = tmp.substr(0, to_find);
+		else
+			channel = tmp;
+		p.push_back(channel);
+		if (!this->_map_users[fd].isChanMember(channel))
 		{
-			channel = params.substr(0, to_find);
-			//params.erase(0, to_find + 1);
+			reply = gen_bnf_msg(ERR_NOTONCHANNEL, p);
 		}
 		else
 		{
-			channel = params;
-			topic = this->_map_channels[channel].get_topic();
-		}
-		to_find = params.find(" ");
-		if (to_find != std::string::npos && this->_map_users[fd].getUsermode() > 0)
-		{
-
+			if (to_find != std::string::npos)
+			{
+				if (this->_map_users[fd].getUsermode() > 0)
+				{
+					reply = gen_bnf_msg(ERR_CHANOPRIVSNEEDED, p);
+				}
+				else
+				{
+					tmp.erase(0, to_find + 1);
+					topic = tmp;
+					this->_map_channels[channel].set_topic(topic);
+				}
+			}
+			else
+			{
+				topic = this->_map_channels[channel].get_topic();
+				if (topic.empty())
+					reply = gen_bnf_msg(RPL_NOTOPIC, p);
+				else
+				{
+					p.push_back(topic);
+					reply = gen_bnf_msg(RPL_TOPIC, p);
+				}
+			}
 		}
 	}
-	return (0);
+	return (this->send_msg(fd, reply));
 }
+
+//Command: NAMES
+//Parameters: [<channel>{,<channel>}]
+//   RPL_NAMREPLY
+//   RPL_ENDOFNAMES
 int	Server::names_msg(std::string const &params, int fd)
 {
-	(void)params;
-	(void)fd;
-	return (0);
+	std::map<std::string, Channel>::iterator	it;
+	std::vector<std::string>					p;
+	std::string									reply;
+	size_t										to_find;
+	std::string									tmp;
+
+	tmp = params.substr(0);
+	if (tmp.empty())
+	{
+		for(it = this->_map_channels.begin(); it != this->_map_channels.end(); it++)
+		{
+			p.clear();
+			p.push_back((*it).second.get_name());
+			std::vector<User> users = (*it).second.get_users();
+			for(std::vector<User>::iterator it2 = users.begin(); it2 != users.end(); it2++)
+				p.push_back((*it2).getNickname());
+			reply = gen_bnf_msg(RPL_NAMREPLY, p);
+			if (this->send_msg(fd, reply) < 0)
+				return (-1);
+		}
+	}
+	else
+	{
+		std::string	chan;
+		do {
+			to_find = tmp.find(" ");
+			std::string chan_name;
+			if (to_find != std::string::npos)
+			{
+				chan_name = tmp.substr(0, to_find);
+				tmp.erase(0, to_find + 1);
+			}
+			else
+				chan_name = tmp;
+			p.clear();
+			Channel chan = this->_map_channels[chan_name];
+			p.push_back(chan.get_name());
+			std::vector<User> users = chan.get_users();
+			for(std::vector<User>::iterator it = users.begin(); it != users.end(); it++)
+				p.push_back((*it).getNickname());
+			reply = gen_bnf_msg(RPL_NAMREPLY, p);
+			if (this->send_msg(fd, reply) < 0)
+				return (-1);		
+		}
+		while (to_find != std::string::npos);
+	}
+	p.clear();
+	reply = gen_bnf_msg(RPL_ENDOFNAMES, p);
+	return (this->send_msg(fd, reply));
 }
 int	Server::list_msg(std::string const &params, int fd)
 {
@@ -1083,95 +1159,5 @@ int	Server::kick_msg(std::string const &params, int fd)
 {
 	(void)params;
 	(void)fd;
-	return (0);
-}
-
-/* ########### User based Queries ########### */
-
-int	Server::who_msg(std::string const& params, int fd)
-{
-	(void)params;
-	(void)fd;
-	std::string		name = "0";
-	std::string		ope = "o";
-	if (name == "" || name == "0" || name == "*")
-	{
-		if (ope == "o")
-		{
-			//add filter operator to get users list
-		}
-		// if wildcard : find user corresponding to wildcard 
-		// get list of users except users with mode +i (invisible) + not a common channel with requestin client
-		// For each user :
-		// send 352 RPL_WHOREPLY "<channel> <user> <host> <server> <nick> <H|G>[*][@|+] :<hopcount> <real name>"
-
-		// send 315 RPL_ENDOFWHO "<name> :End of /WHO list"
-	}
-	return (0);
-}
-
-int	Server::whois_msg(std::string const& params, int fd)
-{
-	(void)params;
-	(void)fd;
-	std::string		server = "";
-	std::string		nickname = "jipay";
-	if (server != "")
-	{
-		// send 402 ERR_NOSUCHSERVER "<server name>:No such server"
-	}
-	else if (nickname == "")
-	{
-		// send 431 ERR_NONICKNAMEGIVEN ":No nickname given"
-	}
-	// add an other condition in which get_user didn't find any user with this nick
-	// send 401 ERR_NOSUCHNICK "<nickname> :No such nick/channel"
-	else //everything is OK! to send information about user
-	{
-		// send 311 RPL_WHOISUSER "<nick> <user> <host> * :<real name>"
-		// send 312 RPL_WHOISSERVER "<nick> <server> :<server info>"
-		// IF USER IS AN OPERATOR
-			// send 313 RPL_WHOISOPERATOR "<nick> :is an IRC operator"
-		// IF USER IS AWAY
-			// send 317 RPL_WHOISIDLE "<nick> <integer> :seconds idle"
-		// IF USER JOIN CHANNEL AND FOR EACH CHANNEL 
-			// 319 RPL_WHOISCHANNELS "<nick> :{[@|+]<channel><space>}"
-	}
-			// 319 RPL_WHOISCHANNELS "<nick> :{[@|+]<channel><space>}"
-
-	// send 318 RPL_ENDOFWHOIS "<nick> :End of /WHOIS list"
-
-	return (0);
-}
-
-int	Server::whowas_msg(std::string const& params, int fd)
-{
-	(void)params;
-	(void)fd;
-	std::string	nickname = "";
-	std::string	count = "";
-	std::string	server = "";
-	// NO WILDCARD ALLOWED IN PARAMETERS HERE
-
-	if (nickname == "")
-	{
-		// send 431 ERR_NONICKNAMEGIVEN ":No nickname given"
-	}
-	else
-	{
-		if (nickname != "target")
-		{
-			// the function get_nickname_history return wrong nickname
-			// send 406 ERR_WASNOSUCHNICK "<nickname> :There was no such nickname"
-		}
-		else
-		{
-			// according to count value get the history list
-			// for each entry :
-			// send 314 RPL_WHOWASUSER "<nick> <user> <host> * :<real name>"
-			// send 312 RPL_WHOISSERVER "<nick> <server> :<server info>"
-		}
-	}
-	// send 369 RPL_ENDOFWHOWAS "<nick> :End of WHOWAS"
 	return (0);
 }
