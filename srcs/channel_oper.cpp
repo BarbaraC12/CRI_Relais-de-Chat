@@ -45,40 +45,90 @@ int	Server::join_msg(std::string const &params, int fd)
 	size_t		to_find;
 	std::string	channels;
 	std::string	chan;
-	std::string	keys;
-	std::string	k;
 	//parsing params
 	to_find = params.find(" ");
-	channels = params.substr(0, to_find);
-	keys = params.substr(to_find + 1, params.length());
+	if (to_find != std::string::npos)
+		channels = params.substr(0, to_find);
+	else
+		channels = params;
 	do {
 		to_find = channels.find(",");
-		chan = channels.substr(0, to_find);
-		channels.erase(0, to_find + 1);
-		to_find = keys.find(",");
-		k = keys.substr(0, to_find);
-		keys.erase(0, to_find + 1);
+		if (to_find != std::string::npos)
+		{
+			chan = channels.substr(0, to_find);
+			channels.erase(0, to_find + 1);
+		}
+		else
+			chan = channels;
 		//checking if chan exist or not
 		if (this->_map_channels.find(chan) != this->_map_channels.end())
-		{
-
-			if (this->_map_channels[chan].get_key() == k)
-				std::cout << "OK" << std::endl;
-		}
+			this->_map_channels[chan].add_user(this->_map_users[fd]);
 		else
 		{
 			Channel new_chan;
 			new_chan.add_user(this->_map_users[fd]);
-			//change mode for this user
 			this->_map_channels[chan] = new_chan;
 		}
 	} while (to_find != std::string::npos);
 	return (0);
 }
+
+//Command: PART
+//Parameters: <channel>{,<channel>}
+//   ERR_NEEDMOREPARAMS
+//   ERR_NOSUCHCHANNEL
+//   ERR_NOTONCHANNEL
 int	Server::part_msg(std::string const &params, int fd)
 {
-	(void)params;
-	(void)fd;
+	std::vector<std::string>	p;
+	std::string					reply;
+	size_t						to_find;
+
+	if (params.empty())
+	{
+		p.push_back("PART");
+		reply = gen_bnf_msg(ERR_NEEDMOREPARAMS, p);
+		if (this->send_msg(fd, reply) < 0)
+			return (-1);
+	}
+	else
+	{
+		std::string tmp = params.substr(0);
+		std::string	chan_name;
+		do {
+			to_find = tmp.find(",");
+			if (to_find != std::string::npos)
+			{
+				chan_name = tmp.substr(0, to_find);
+				tmp.erase(0, to_find + 1);
+			}
+			else
+				chan_name = tmp;
+			std::map<std::string, Channel>::iterator it;
+			if ((it = this->_map_channels.find(chan_name)) != this->_map_channels.end())
+			{
+				if (this->_map_users[fd].isChanMember(chan_name))
+				{
+					this->_map_channels[chan_name].remove_user(this->_map_users[fd]);
+				}
+				else
+				{
+					p.push_back(chan_name);
+					reply = gen_bnf_msg(ERR_NOTONCHANNEL, p);
+					if (this->send_msg(fd, reply) < 0)
+						return (-1);	
+				}
+			}
+			else
+			{
+				p.push_back(chan_name);
+				reply = gen_bnf_msg(ERR_NOSUCHCHANNEL, p);
+				if (this->send_msg(fd, reply) < 0)
+					return (-1);
+			}
+		}
+		while(to_find != std::string::npos);
+	}
 	return (0);
 }
 int	Server::mode_msg(std::string const &params, int fd)
