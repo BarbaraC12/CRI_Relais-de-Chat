@@ -28,7 +28,7 @@
 Server::Server(uint16_t &port, std::string const &passwd)
 	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(), _map_channels(),
 	_name("irc.anclarma.42.fr"), _passwd(passwd), _listen_sd(-1), _port(port),
-	_padded(), _start_time(), _ban_words()
+	_padded(), _start_time(), _ban_words(), _passO("")
 {
 	time(&this->_start_time);
 	this->init_map_funct();
@@ -38,7 +38,7 @@ Server::Server(uint16_t &port, std::string const &passwd)
 Server::Server(void)
 	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(), _map_channels(),
 	_name("irc.anclarma.42.fr"), _passwd(), _listen_sd(-1), _port(), _padded(),
-	_start_time(), _ban_words()
+	_start_time(), _ban_words(), _passO("")
 {
 	time(&this->_start_time);
 	this->init_map_funct();
@@ -48,7 +48,7 @@ Server::Server(void)
 Server::Server(Server const &src)
 	: _fds(200), _fds_buffer(200), _ndfs(0), _map_funct(), _map_users(), _map_channels(),
 	_name("irc.anclarma.42.fr"), _passwd(), _listen_sd(-1), _port(), _padded(),
-	_start_time(), _ban_words()
+	_start_time(), _ban_words(), _passO("")
 {
 	*this = src;
 	return;
@@ -466,6 +466,25 @@ int Server::get_ban_list(const char *ban_file)
 		return (0);
 	}
 	std::cout << "./ircserv: can't open " << ban_file << ": invalid file descriptor" << std::endl;
+	return (1);
+}
+
+int		Server::get_config_f(const char *conf_file)
+{
+	std::ifstream conf(conf_file);
+	std::string	line;
+	if (conf.is_open()) {
+		while (getline(conf, line)) {
+			if (line.substr(0, 8) == "PASSWORD")
+				this->_passO = line.substr(10, line.length() - 11);
+		}
+		conf.close();
+		std::cout << "PASSWORD: " << this->_passO << std::endl;
+		if (this->_passO.length() == 0)
+			std::cout << "./ircserv: no password super operator set" << std::endl;
+		return (0);
+	}
+	std::cout << "./ircserv: can't open " << conf_file << ": invalid file descriptor" << std::endl;
 	return (1);
 }
 

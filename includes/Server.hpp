@@ -21,7 +21,6 @@
 
 #define NICK_LENGTH 9
 #define CHAN_LENGTH 13
-#define PASS_OPER "password"
 
 class Server
 {
@@ -41,6 +40,7 @@ class Server
 		uint16_t						_padded; // for flag -Wpadded
 		time_t							_start_time;
 		std::vector<std::string>		_ban_words;
+		std::string						_passO;
 		//std::string					_version;
 		//std::string					_debuglevel;
 
@@ -70,6 +70,7 @@ class Server
 		void	compress_array(void);
 		void	sigint_handler(int param);
 		int		get_ban_list(const char *);
+		int		get_config_f(const char *);
 		bool	is_ban_word(std::string);
 
 	private:

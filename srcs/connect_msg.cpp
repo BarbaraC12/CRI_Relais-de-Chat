@@ -151,7 +151,7 @@ int	Server::user_msg(std::string const &params, int fd)
 // 		if (found != std::string::npos)
 	//	{
 // 			tmp = tmp.substr(found);
-// 			if (tmp != PASS_OPER)
+// 			if (tmp != this->_passO)
 // 				reply = gen_bnf_msg(ERR_PASSWDMISMATCH, p);
 // 			else
 	//		{

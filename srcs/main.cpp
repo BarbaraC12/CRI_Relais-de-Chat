@@ -44,7 +44,6 @@ int main(int argc, char **argv)
 {
 	uint16_t	port = 0;
 	std::string	pwd;
-	const char *banW("banWords.txt");
 
 	signal(SIGINT, sigint_handler);
 	if (arg_error(argc, argv[1]))
@@ -54,7 +53,8 @@ int main(int argc, char **argv)
 	{
 		Server s(port, pwd);
 
-		if (s.get_ban_list(banW))
+		if (s.get_ban_list("banWords.txt")
+			|| s.get_config_f("config.txt"))
 			return (1);
 		s.start();
 		while (end_irc == 0)
